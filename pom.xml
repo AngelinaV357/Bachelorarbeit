@@ -10,7 +10,7 @@
     <dependencies>
         <!-- Camunda BPMN Model API -->
         <dependency>
-            <groupId>org.camunda.bpm.model</groupId>
+            <groupId>org.camunda.bpm.model</groupId> 
             <artifactId>camunda-bpmn-model</artifactId>
             <version>7.22.0</version>
         </dependency>
