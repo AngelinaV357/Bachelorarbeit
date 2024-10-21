@@ -3,39 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <!-- Grundlegende Projektinformationen -->
     <groupId>com.example</groupId>
     <artifactId>bpmn-project</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging> <!-- 'jar' ist hier sinnvoll, wenn du ein ausführbares JAR erzeugen möchtest -->
+    <packaging>jar</packaging>
 
-    <!-- Eigenschaften -->
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
-    <!-- Abhängigkeiten (Dependencies) -->
     <dependencies>
-        <!-- Camunda BPMN Model API Dependency -->
         <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-bpmn-model</artifactId>
             <version>7.22.0</version>
         </dependency>
     </dependencies>
-
-    <!-- Profile (optional) -->
-    <profiles>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <!-- Hier kannst du spezifische Module hinzufügen, falls vorhanden -->
-            </modules>
-        </profile>
-    </profiles>
 </project>
