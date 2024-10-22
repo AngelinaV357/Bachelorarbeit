@@ -18,19 +18,16 @@ public class XMLReader {
     public static void main(String[] args) {
         File file = new File("C:\\Users\\pinki\\OneDrive\\Desktop\\Bachelor\\XML Dateien\\May_combine_ingredients.bpmn");
 
-        // Einlesen der Datei mit Ausnahme, wenn es nicht korrekt eingelesen werden konnte
         try {
-            // Datei für das BPMN-Modell festlegen
             BpmnModelInstance modelInstance = Bpmn.readModelFromFile(file);
             System.out.println("BPMN-Datei erfolgreich eingelesen!");
 
-            // Alle Sequenzflüsse finden
             Collection<SequenceFlow> sequenceFlows = modelInstance.getModelElementsByType(SequenceFlow.class);
-            
-            // Zuerst die Verbindungen vom Start-Event ausgeben
+
+            // Verbindungen vom Start-Event ausgeben
             List<SequenceFlow> startFlows = sequenceFlows.stream()
-                .filter(flow -> flow.getSource() instanceof StartEvent)
-                .collect(Collectors.toList());
+                    .filter(flow -> flow.getSource() instanceof StartEvent)
+                    .collect(Collectors.toList());
 
             for (SequenceFlow flow : startFlows) {
                 FlowNode target = flow.getTarget();
@@ -38,23 +35,31 @@ public class XMLReader {
                 System.out.println("Start ist mit \"" + targetName + "\" verbunden.");
             }
 
-            // Dann alle anderen Sequenzflüsse ausgeben
+            // Andere Sequenzflüsse ausgeben
             for (SequenceFlow flow : sequenceFlows) {
                 FlowNode source = flow.getSource();
                 FlowNode target = flow.getTarget();
-                
-                // Überspringe Verbindungen vom Start-Event, die bereits ausgegeben wurden
+
                 if (source instanceof StartEvent) {
                     continue;
                 }
-                
+
                 String sourceName = getName(source);
                 String targetName = getName(target);
-                
-                // Ausgabe der Verbindungen
-                if (source instanceof ExclusiveGateway) {
+
+                if (source instanceof ExclusiveGateway exclusiveGateway) {
+                    // Bestimme die tatsächliche Bedingung aus der XML-Datei
                     String condition = getCondition(flow);
-                    System.out.println("XOR: \"" + sourceName + "\" (" + condition + ") ist mit \"" + targetName + "\" verbunden.");
+
+                    // Wenn die Bedingung spezifisch "JA" oder "NEIN" ist, dann gib dies aus
+                    if (condition.toLowerCase().contains("yes") || condition.toLowerCase().contains("ja")) {
+                        System.out.println("Exklusives Gateway \"" + sourceName + "\" (JA) ist mit \"" + targetName + "\" verbunden.");
+                    } else if (condition.toLowerCase().contains("no") || condition.toLowerCase().contains("nein")) {
+                        System.out.println("Exklusives Gateway \"" + sourceName + "\" (NEIN) ist mit \"" + targetName + "\" verbunden.");
+                    } else {
+                        // Wenn keine klare "JA" oder "NEIN" Bedingung vorliegt, gib die Bedingung direkt aus
+                        System.out.println("Exklusives Gateway \"" + sourceName + "\" (" + condition + ") ist mit \"" + targetName + "\" verbunden.");
+                    }
                 } else {
                     System.out.println("\"" + sourceName + "\" ist mit \"" + targetName + "\" verbunden.");
                 }
@@ -69,11 +74,11 @@ public class XMLReader {
         if (node instanceof Activity activity) {
             return activity.getName();
         } else if (node instanceof StartEvent) {
-            return "Start"; 
+            return "Start";
         } else if (node instanceof EndEvent) {
-            return "Ende"; 
+            return "Ende";
         } else if (node instanceof ExclusiveGateway) {
-            return "XOR-Gateway"; 
+            return node.getName() != null && !node.getName().isEmpty() ? node.getName() : "Unbekanntes XOR-Gateway";
         }
         return "Unbekannt"; // Für andere Knoten, die keine Aktivität, Start- oder End-Ereignisse sind
     }
