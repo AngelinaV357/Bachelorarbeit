@@ -1,0 +1,9 @@
+Der Prozess startet.
+Es ist notwendig, dass Rolle Prepare sale slip ausführt, wenn Rolle Determine customer preferences  ausführt.
+Es ist notwendig, dass Rolle Collect payment ausführt, wenn Rolle Prepare sale slip ausführt.
+Es ist notwendig, dass Rolle XOR-Gateway ausführt, wenn Rolle Collect payment ausführt.
+Es ist notwendig, dass Rolle Dry Car ausführt, wenn Rolle Clean Car ausführt.
+Es ist notwendig, dass Rolle Ende ausführt, wenn Rolle Dry Car ausführt.
+Es ist obligatorisch, dass Demand other form of payment oder Demand other form of payment, aber nicht beides, wenn Rolle XOR-Gateway ausführt. 
+Es ist obligatorisch, dass Clean Car oder Clean Car, aber nicht beides, wenn Rolle XOR-Gateway ausführt. 
+Es ist notwendig, dass Rolle Collect payment ausführt, wenn Rolle Demand other form of payment ausführt.

@@ -68,7 +68,7 @@ public class TreeXMLReader {
     }
 
     // Hilfsmethode zum Abrufen des Namens von Prozessknoten
-    private static String getName(FlowNode node) {
+    public static String getName(FlowNode node) {
         if (node instanceof org.camunda.bpm.model.bpmn.instance.Activity activity) {
             return activity.getName();
         } else if (node instanceof org.camunda.bpm.model.bpmn.instance.StartEvent) {

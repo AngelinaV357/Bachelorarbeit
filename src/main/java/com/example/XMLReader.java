@@ -9,52 +9,79 @@ import java.util.stream.Collectors;
 
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.Activity;
-import org.camunda.bpm.model.bpmn.instance.EndEvent;
-import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
-import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.*;
 
 public class XMLReader {
     public static void main(String[] args) {
         File file = new File("src/main/resources/Car Wash Process.bpmn");
         File outputFile = new File("src/main/resources/output.txt");
+        File sbvr_output = new File("src/main/resources/sbvr_output.txt");
 
         try {
             BpmnModelInstance modelInstance = Bpmn.readModelFromFile(file);
             System.out.println("BPMN-Datei erfolgreich eingelesen!");
 
-            // Alle Knoten und Sequenzflüsse finden
             Collection<FlowNode> nodes = modelInstance.getModelElementsByType(FlowNode.class);
             Collection<SequenceFlow> sequenceFlows = modelInstance.getModelElementsByType(SequenceFlow.class);
 
-            // Adjazenzmatrix erzeugen
-            Map<String, Integer> nodeIndexMap = new HashMap<>(); // Mapping von Node-ID zu Index
-            int index = 0;
-            for (FlowNode node : nodes) {
-                nodeIndexMap.put(node.getId(), index++);
-            }
+            // Output-Builder für Standard- und SBVR-Ausgaben
+            StringBuilder output = new StringBuilder();
+            StringBuilder sbvrOutput = new StringBuilder();
 
-            int[][] adjacencyMatrix = new int[nodes.size()][nodes.size()]; // Adjazenzmatrix initialisieren
-
-            // Matrix mit Sequenzflüssen füllen
+            // Verarbeitung der Sequenzflüsse
             for (SequenceFlow flow : sequenceFlows) {
                 FlowNode source = flow.getSource();
                 FlowNode target = flow.getTarget();
-                Integer sourceIndex = nodeIndexMap.get(source.getId());
-                Integer targetIndex = nodeIndexMap.get(target.getId());
 
-                if (sourceIndex != null && targetIndex != null) {
-                    adjacencyMatrix[sourceIndex][targetIndex] = 1;
+                if (source instanceof StartEvent) {
+                    String message = "\"Start\" ist mit \"" + getName(target) + "\" verbunden.\n";
+                    output.append(message);
+                    sbvrOutput.append(SBVRTransformer.transformStartEventToSBVR((StartEvent) source)).append("\n");
+                    System.out.println(message);
+                } else if (source instanceof EndEvent) {
+                    String message = "\"" + getName(source) + "\" ist mit \"Ende\" verbunden.\n";
+                    output.append(message);
+                    sbvrOutput.append(SBVRTransformer.transformEndEventToSBVR((EndEvent) source)).append("\n");
+                    System.out.println(message);
+                } else if (source instanceof ExclusiveGateway) {
+                    String message = "XOR-Gateway: \"" + getName(source) + "\" ist mit \"" + getName(target)
+                            + "\" verbunden. Bedingung: " + (flow.getName() != null ? flow.getName() : "unbekannt") + "\n";
+                    output.append(message);
+                    sbvrOutput.append(SBVRTransformer.transformXORGatewayToSBVR((ExclusiveGateway) source,
+                                    Collections.singletonList(flow)))
+                            .append("\n");
+                    System.out.println(message);
+                } else if (target instanceof ExclusiveGateway) {
+                    String message = "\"" + getName(source) + "\" ist mit XOR-Gateway: \"" + getName(target) + "\" verbunden.\n";
+                    output.append(message);
+                    sbvrOutput.append(SBVRTransformer.transformSequenceFlowToSBVR(source, target)).append("\n");
+                    System.out.println(message);
+//                } else if (source instanceof Activity) {
+//                    String message = "\"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
+//                    output.append(message);
+//                    sbvrOutput.append(SBVRTransformer.transformActivityToSBVR((Activity) source)).append("\n");
+//                    System.out.println(message);
+                } else if (source instanceof ParallelGateway) {
+                    String message = "UND-Gateway: \"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
+                    output.append(message);
+                    sbvrOutput.append(SBVRTransformer.transformANDGatewayToSBVR((ParallelGateway) source,
+                                    Collections.singletonList(flow)))
+                            .append("\n");
+                    System.out.println(message);
+                } else {
+                    String message = "\"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
+                    output.append(message);
+                    sbvrOutput.append(SBVRTransformer.transformSequenceFlowToSBVR(source, target)).append("\n");
+                    System.out.println(message);
                 }
             }
 
-            // Ausgabe der Adjazenzmatrix
-            writeAdjacencyMatrixToFile(adjacencyMatrix, nodes, nodeIndexMap, "src/main/resources/adjacency_matrix.txt");
+            // Ergebnisse in Dateien schreiben
+            writeToFile(output.toString(), outputFile, "Standard-Ausgaben");
+            writeToFile(sbvrOutput.toString(), sbvr_output, "SBVR-Ausgaben");
 
-            // Sequenzfluss-Informationen wie bisher ausgeben
-            StringBuilder output = new StringBuilder();
+            // Sequenzfluss-Informationen wie in der ersten Datei ausgeben
+            StringBuilder additionalOutput = new StringBuilder();
             List<SequenceFlow> startFlows = sequenceFlows.stream()
                     .filter(flow -> flow.getSource() instanceof StartEvent)
                     .collect(Collectors.toList());
@@ -63,7 +90,7 @@ public class XMLReader {
                 FlowNode target = flow.getTarget();
                 String targetName = getName(target);
                 String message = "\"Start\" ist mit \"" + targetName + "\" verbunden.\n";
-                output.append(message);
+                additionalOutput.append(message);
                 System.out.println(message);
                 classifyFlow("Start", targetName, "unknown");
             }
@@ -82,28 +109,24 @@ public class XMLReader {
 
                 if (source instanceof ExclusiveGateway) {
                     String message = "XOR-Gateway: \"" + sourceName + "\" ist mit \"" + targetName + "\" verbunden. Bedingung: " + object + "\n";
-                    output.append(message);
+                    additionalOutput.append(message);
                     System.out.println(message);
                     classifyFlow(sourceName, targetName, object);
                 } else if (target instanceof ExclusiveGateway) {
                     String message = "\"" + sourceName + "\" ist mit XOR-Gateway: \"" + targetName + "\" verbunden.\n";
-                    output.append(message);
+                    additionalOutput.append(message);
                     System.out.println(message);
                     classifyFlow(sourceName, targetName, "unknown");
                 } else {
                     String message = "\"" + sourceName + "\" ist mit \"" + targetName + "\" verbunden.\n";
-                    output.append(message);
+                    additionalOutput.append(message);
                     System.out.println(message);
                     classifyFlow(sourceName, targetName, "unknown");
                 }
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-                writer.write(output.toString());
-                System.out.println("Die Ausgaben wurden erfolgreich in die Datei geschrieben: " + outputFile.getAbsolutePath());
-            } catch (IOException e) {
-                System.out.println("Fehler beim Schreiben in die Datei: " + e.getMessage());
-            }
+            // Zusätzliches Ergebnis in die Datei schreiben
+            writeToFile(additionalOutput.toString(), outputFile, "Zusätzliche Standard-Ausgaben");
 
         } catch (Exception e) {
             System.out.println("Ein unerwarteter Fehler ist aufgetreten: " + e.getMessage());
@@ -123,21 +146,12 @@ public class XMLReader {
         return "Unbekannt";
     }
 
-    // Hilfsmethode zum Schreiben der Adjazenzmatrix in eine Datei
-    private static void writeAdjacencyMatrixToFile(int[][] matrix, Collection<FlowNode> nodes, Map<String, Integer> nodeIndexMap, String filePath) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            writer.write("Adjacency Matrix:\n");
-            List<String> nodeNames = nodes.stream().map(XMLReader::getName).collect(Collectors.toList());
-
-            for (int i = 0; i < matrix.length; i++) {
-                for (int j = 0; j < matrix[i].length; j++) {
-                    writer.write(matrix[i][j] + " ");
-                }
-                writer.newLine();
-            }
-            System.out.println("Die Adjazenzmatrix wurde erfolgreich in die Datei geschrieben: " + filePath);
+    private static void writeToFile(String content, File file, String type) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(content);
+            System.out.println(type + " wurden erfolgreich in die Datei geschrieben: " + file.getAbsolutePath());
         } catch (IOException e) {
-            System.out.println("Fehler beim Schreiben der Adjazenzmatrix in die Datei: " + e.getMessage());
+            System.out.println("Fehler beim Schreiben in die Datei: " + e.getMessage());
         }
     }
 
