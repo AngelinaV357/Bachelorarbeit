@@ -136,7 +136,7 @@
         </ns3:BPMNLabel>
       </ns3:BPMNShape>
       <ns3:BPMNShape bpmnElement="sid-4CFBD29A-FE81-448D-9647-C1EE7AC7C7E0" id="sid-4CFBD29A-FE81-448D-9647-C1EE7AC7C7E0_gui">
-        <ns4:Bounds height="110.0" width="110.0" x="545.0" y="120.0"/>
+        <ns4:Bounds height="130.0" width="190.0" x="545.0" y="120.0"/>
         <ns3:BPMNLabel labelStyle="sid-4c615f8f-7e6e-4824-a7db-a880a8ce4fd4">
           <ns4:Bounds height="48.0" width="80.22857666015625" x="554.8857116699219" y="134.0"/>
         </ns3:BPMNLabel>
@@ -170,7 +170,7 @@
       <ns3:BPMNEdge bpmnElement="sid-17EA1118-2A92-427F-B0F2-B9A2464C293B" id="sid-17EA1118-2A92-427F-B0F2-B9A2464C293B_gui">
         <ns5:waypoint x="480.12578616352204" y="220.0"/>
         <ns5:waypoint x="480.5" y="160.5"/>
-        <ns5:waypoint x="545.0" y="175.6875"/>
+        <ns5:waypoint x="545.0" y="185.8125"/>
         <ns3:BPMNLabel labelStyle="sid-117b417a-abe2-491e-81af-d90f0336a824">
           <ns4:Bounds height="12.0" width="14.657135009765625" x="457.3428649902344" y="181.1179962158203"/>
         </ns3:BPMNLabel>
@@ -184,7 +184,7 @@
         </ns3:BPMNLabel>
       </ns3:BPMNEdge>
       <ns3:BPMNEdge bpmnElement="sid-BE036732-3DF6-4AD8-9965-4EDC908DEA03" id="sid-BE036732-3DF6-4AD8-9965-4EDC908DEA03_gui">
-        <ns5:waypoint x="655.0" y="175.0"/>
+        <ns5:waypoint x="735.0" y="185.0"/>
         <ns5:waypoint x="710.5" y="160.0"/>
         <ns5:waypoint x="710.125" y="220.0"/>
       </ns3:BPMNEdge>
