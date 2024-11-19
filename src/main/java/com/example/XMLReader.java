@@ -23,10 +23,28 @@ public class XMLReader {
 
             Collection<FlowNode> nodes = modelInstance.getModelElementsByType(FlowNode.class);
             Collection<SequenceFlow> sequenceFlows = modelInstance.getModelElementsByType(SequenceFlow.class);
+            Collection<Lane> lanes = modelInstance.getModelElementsByType(Lane.class);  // Lanes hinzufügen
 
             // Output-Builder für Standard- und SBVR-Ausgaben
             StringBuilder output = new StringBuilder();
             StringBuilder sbvrOutput = new StringBuilder();
+
+            /// Verarbeitung der Lanes und Extraktion der Rollen
+            Set<String> uniqueRoles = new HashSet<>();  // Set für einzigartige Rollen
+
+            for (Lane lane : lanes) {
+                String roleName = lane.getName();  // Name der Lane (z. B. "Cashier")
+                if (roleName != null && !roleName.trim().isEmpty()) {
+                    uniqueRoles.add(roleName);  // Rolle zum Set hinzufügen
+                }
+            }
+
+            // Ausgabe der einzigartigen Rollen
+            for (String role : uniqueRoles) {
+                output.append("Rolle: \"").append(role).append("\"\n");
+                sbvrOutput.append(SBVRTransformer.transformRoleToSBVR(role)).append("\n");  // Für die SBVR-Transformation
+                System.out.println("Rolle: " + role);
+            }
 
             // Verarbeitung der Sequenzflüsse
             for (SequenceFlow flow : sequenceFlows) {
@@ -56,11 +74,6 @@ public class XMLReader {
                     output.append(message);
                     sbvrOutput.append(SBVRTransformer.transformSequenceFlowToSBVR(source, target)).append("\n");
                     System.out.println(message);
-//                } else if (source instanceof Activity) {
-//                    String message = "\"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
-//                    output.append(message);
-//                    sbvrOutput.append(SBVRTransformer.transformActivityToSBVR((Activity) source)).append("\n");
-//                    System.out.println(message);
                 } else if (source instanceof ParallelGateway) {
                     String message = "UND-Gateway: \"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
                     output.append(message);

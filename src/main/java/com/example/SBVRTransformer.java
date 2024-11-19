@@ -5,20 +5,23 @@ import java.util.List;
 
 public class SBVRTransformer {
 
-
-
+    public static String transformRoleToSBVR(String roleName) {
+        // SBVR-Ausdruck für eine Rolle im Format "Role X is a role"
+        String sbvrRole = roleName + " is a role.";
+        return sbvrRole;
+    }
     /**
      * Transforms an Activity node into an SBVR-compliant statement.
      * @param activity The BPMN activity node.
      * @return SBVR-compliant statement describing the activity.
      */
-//    public static String transformActivityToSBVR(Activity activity) {
-//        String action = activity.getName() != null ? activity.getName() : "führt eine Aktivität aus";
-//        String role = "Rolle"; // You can extract the role if needed from the activity or context.
-//
-//        // Example SBVR-compliant sentence for activities
-//        return "Es ist notwendig, dass " + role + " " + action + " ausführt.";
-//    }
+    public static String transformActivityToSBVR(Activity activity) {
+        String action = activity.getName() != null ? activity.getName() : "führt eine Aktivität aus";
+        String role = "Rolle"; // You can extract the role if needed from the activity or context.
+
+        // Example SBVR-compliant sentence for activities
+        return "Es ist notwendig, dass " + role + " " + action + " ausführt.";
+    }
 
     /**
      * Transforms a Start Event into an SBVR-compliant statement.
@@ -122,4 +125,5 @@ public class SBVRTransformer {
         }
         return "Unbekannter Knoten";
     }
+
 }

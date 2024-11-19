@@ -1,3 +1,10 @@
+Sales Person is a role.
+Car Wash Owner is a role.
+Cashier is a role.
+Automated Car Wash Lane
+ is a role.
+Detailing Crew
+ is a role.
 Der Prozess startet.
 Es ist notwendig, dass Rolle Prepare sale slip ausführt, wenn Rolle Determine customer preferences  ausführt.
 Es ist notwendig, dass Rolle Collect payment ausführt, wenn Rolle Prepare sale slip ausführt.
