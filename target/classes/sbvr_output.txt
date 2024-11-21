@@ -6,11 +6,21 @@ Automated Car Wash Lane
 Detailing Crew
  is a role.
 Der Prozess startet.
-Es ist notwendig, dass Rolle Prepare sale slip ausführt, wenn Rolle Determine customer preferences  ausführt.
-Es ist notwendig, dass Rolle Collect payment ausführt, wenn Rolle Prepare sale slip ausführt.
-Es ist notwendig, dass Rolle XOR-Gateway ausführt, wenn Rolle Collect payment ausführt.
-Es ist notwendig, dass Rolle Dry Car ausführt, wenn Rolle Clean Car ausführt.
-Es ist notwendig, dass Rolle Ende ausführt, wenn Rolle Dry Car ausführt.
-Es ist obligatorisch, dass Demand other form of payment oder Demand other form of payment, aber nicht beides, wenn Rolle XOR-Gateway ausführt. 
-Es ist obligatorisch, dass Clean Car oder Clean Car, aber nicht beides, wenn Rolle XOR-Gateway ausführt. 
-Es ist notwendig, dass Rolle Collect payment ausführt, wenn Rolle Demand other form of payment ausführt.
+Es ist notwendig, dass Sales Person Prepare sale slip ausführt, wenn Sales Person Determine customer preferences  ausführt.
+Es ist notwendig, dass Cashier Collect payment ausführt, wenn Sales Person Prepare sale slip ausführt.
+Es ist notwendig, dass Cashier XOR-Gateway ausführt, wenn Cashier Collect payment ausführt.
+Es ist notwendig, dass Detailing Crew
+ Dry Car ausführt, wenn Automated Car Wash Lane
+ Clean Car ausführt.
+Es ist notwendig, dass Detailing Crew
+ Ende ausführt, wenn Detailing Crew
+ Dry Car ausführt.
+Es ist obligatorisch, dass Cashier Demand other form of payment oderDemand other form of payment ausführt, aber nicht beides, wenn Cashier Collect payment ausführt und Bedingung: no.
+Es ist obligatorisch, dass Automated Car Wash Lane
+ Clean Car oderClean Car ausführt, aber nicht beides, wenn Cashier Collect payment ausführt und Bedingung: yes.
+
+Es ist obligatorisch, dass Cashier Demand other form of payment oderDemand other form of payment ausführt, aber nicht beides, wenn Cashier Collect payment ausführt und Bedingung: no.
+Es ist obligatorisch, dass Automated Car Wash Lane
+ Clean Car oderClean Car ausführt, aber nicht beides, wenn Cashier Collect payment ausführt und Bedingung: yes.
+
+Es ist notwendig, dass Cashier Collect payment ausführt, wenn Cashier Demand other form of payment ausführt.

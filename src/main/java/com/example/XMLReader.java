@@ -50,6 +50,8 @@ public class XMLReader {
             for (SequenceFlow flow : sequenceFlows) {
                 FlowNode source = flow.getSource();
                 FlowNode target = flow.getTarget();
+                String sourceRole = getRoleForNode(source, lanes);
+                String targetRole = getRoleForNode(target, lanes);
 
                 if (source instanceof StartEvent) {
                     String message = "\"Start\" ist mit \"" + getName(target) + "\" verbunden.\n";
@@ -61,18 +63,28 @@ public class XMLReader {
                     output.append(message);
                     sbvrOutput.append(SBVRTransformer.transformEndEventToSBVR((EndEvent) source)).append("\n");
                     System.out.println(message);
-                } else if (source instanceof ExclusiveGateway) {
-                    String message = "XOR-Gateway: \"" + getName(source) + "\" ist mit \"" + getName(target)
-                            + "\" verbunden. Bedingung: " + (flow.getName() != null ? flow.getName() : "unbekannt") + "\n";
+                } else if (source instanceof ExclusiveGateway gateway) {
+                    // Rollen der Ziele ermitteln
+                    List<String> targetRoles = new ArrayList<>();
+                    List<SequenceFlow> outgoingFlows = new ArrayList<>(gateway.getOutgoing()); // Liste der ausgehenden Flows
+                    for (SequenceFlow outgoingFlow : outgoingFlows) {
+                        targetRoles.add(getRoleForNode(outgoingFlow.getTarget(), lanes));
+                    }
+
+                    // Standardausgabe
+                    String message = "XOR-Gateway \"" + getName(source) + "\" hat folgende Bedingungen:\n";
+                    for (SequenceFlow outgoingFlow : outgoingFlows) {
+                        message += "- Bedingung: " + (outgoingFlow.getName() != null ? outgoingFlow.getName() : "unbekannt") + "\n";
+                    }
                     output.append(message);
-                    sbvrOutput.append(SBVRTransformer.transformXORGatewayToSBVR((ExclusiveGateway) source,
-                                    Collections.singletonList(flow)))
-                            .append("\n");
+
+                    // SBVR-Ausgabe
+                    sbvrOutput.append(SBVRTransformer.transformXORGatewayToSBVR(gateway, outgoingFlows, sourceRole, targetRoles, lanes)).append("\n");
                     System.out.println(message);
                 } else if (target instanceof ExclusiveGateway) {
                     String message = "\"" + getName(source) + "\" ist mit XOR-Gateway: \"" + getName(target) + "\" verbunden.\n";
                     output.append(message);
-                    sbvrOutput.append(SBVRTransformer.transformSequenceFlowToSBVR(source, target)).append("\n");
+                    sbvrOutput.append(SBVRTransformer.transformSequenceFlowToSBVR(source, target, sourceRole, targetRole)).append("\n");
                     System.out.println(message);
                 } else if (source instanceof ParallelGateway) {
                     String message = "UND-Gateway: \"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
@@ -84,7 +96,7 @@ public class XMLReader {
                 } else {
                     String message = "\"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
                     output.append(message);
-                    sbvrOutput.append(SBVRTransformer.transformSequenceFlowToSBVR(source, target)).append("\n");
+                    sbvrOutput.append(SBVRTransformer.transformSequenceFlowToSBVR(source, target, sourceRole, targetRole)).append("\n");
                     System.out.println(message);
                 }
             }
@@ -172,5 +184,14 @@ public class XMLReader {
     private static void classifyFlow(String actor, String action, String object) {
         // Klare Ausgabe für Actor, Action und Object
         System.out.println("Actor: " + actor + ", Action: " + action + ", Object: " + object);
+    }
+
+    static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {
+        for(Lane lane: lanes) {
+            if(lane.getFlowNodeRefs().contains(node)) {
+                return lane.getName();
+            }
+        }
+        return "Unbekannte Rolle";
     }
 }
