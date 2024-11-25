@@ -1,9 +1,15 @@
-"Start" ist mit "Determine customer preferences " verbunden.
-"Determine customer preferences " ist mit "Prepare sale slip" verbunden.
-"Prepare sale slip" ist mit "Collect payment" verbunden.
-"Collect payment" ist mit XOR-Gateway: "XOR-Gateway" verbunden.
-"Clean Car" ist mit "Dry Car" verbunden.
-"Dry Car" ist mit "Ende" verbunden.
-XOR-Gateway: "XOR-Gateway" ist mit "Demand other form of payment" verbunden. Bedingung: no
-XOR-Gateway: "XOR-Gateway" ist mit "Clean Car" verbunden. Bedingung: yes
-"Demand other form of payment" ist mit "Collect payment" verbunden.
+"Start" ist mit "Send receipt confirmation" verbunden.
+"Applicant verified" ist mit XOR-Gateway: "Application status?" verbunden.
+"Invite to job interview" ist mit "Prepare employment agreement" verbunden.
+"Unbekannt" ist mit XOR-Gateway: "XOR-Gateway" verbunden.
+"Send receipt confirmation" ist mit "Applicant verified" verbunden.
+"Prepare employment agreement" ist mit "Carry out job interview" verbunden.
+"Carry out job interview" ist mit XOR-Gateway: "Applicant suitable?" verbunden.
+"Send employment contract" ist mit "Unbekannt" verbunden.
+"Unbekannt" ist mit "Ende" verbunden.
+XOR-Gateway: "Applicant suitable?" ist mit "Send employment contract" verbunden. Bedingung: Yes
+XOR-Gateway: "Applicant suitable?" ist mit "Send rejection" verbunden. Bedingung: No
+XOR-Gateway: "Application status?" ist mit "Invite to job interview" verbunden. Bedingung: Accept
+XOR-Gateway: "Application status?" ist mit "Unbekannt" verbunden. Bedingung: Reject 
+"Send rejection" ist mit XOR-Gateway: "XOR-Gateway" verbunden.
+XOR-Gateway: "XOR-Gateway" ist mit "Ende" verbunden. Bedingung: unknown

@@ -1,28 +1,40 @@
-Sales Person is a role.
-Car Wash Owner is a role.
-Cashier is a role.
-Automated Car Wash Lane
- is a role.
-Detailing Crew
- is a role.
+Human Resources Department is a role.
+Head of Human Resources  is a role.
+Applicant verified ist eine Service Story.
+Invite to job interview ist eine SendTask
+Invite to job interview ist eine Service Story.
+Rejection sent ist ein IntermediateThrowEvent 
+Send receipt confirmation ist eine SendTask
 Der Prozess startet.
-Es ist notwendig, dass Sales Person Prepare sale slip ausführt, wenn Sales Person Determine customer preferences  ausführt.
-Es ist notwendig, dass Cashier Collect payment ausführt, wenn Sales Person Prepare sale slip ausführt.
-Es ist notwendig, dass Cashier XOR-Gateway ausführt, wenn Cashier Collect payment ausführt.
-Es ist notwendig, dass Detailing Crew
- Dry Car ausführt, wenn Automated Car Wash Lane
- Clean Car ausführt.
-Es ist notwendig, dass Detailing Crew
- Ende ausführt, wenn Detailing Crew
- Dry Car ausführt.
-Es ist notwendig, dass Cashier Demand other form of payment ausführt oder Automated Car Wash Lane
- Clean Car ausführt, aber nicht beides, wenn Cashier Collect payment ausführt.
-Bedingungen: Cashier Bedingung: no, Automated Car Wash Lane
- Bedingung: yes
+Send receipt confirmation ist eine SendTask
+Send receipt confirmation ist eine Service Story.
+Prepare employment agreement ist eine Service Story.
+Carry out job interview ist eine Service Story.
+Send employment contract ist eine SendTask
+Send employment contract ist eine Service Story.
+Standard Output:
+IntermediateCatchEvent: Receipt of signed
+ employment contract
 
-Es ist notwendig, dass Cashier Demand other form of payment ausführt oder Automated Car Wash Lane
- Clean Car ausführt, aber nicht beides, wenn Cashier Collect payment ausführt.
-Bedingungen: Cashier Bedingung: no, Automated Car Wash Lane
- Bedingung: yes
+SBVR Output:
+Receipt of signed
+ employment contract ist ein IntermediateCatchEvent 
+Send employment contract ist eine SendTask
+Es ist notwendig, dass Human Resources Department Send employment contract ausführt oder Human Resources Department Send rejection ausführt, aber nicht beides, wenn Human Resources Department Carry out job interview ausführt.
+Bedingungen: Human Resources Department Bedingung: Yes, Human Resources Department Bedingung: No
 
-Es ist notwendig, dass Cashier Collect payment ausführt, wenn Cashier Demand other form of payment ausführt.
+Send rejection ist eine SendTask
+Es ist notwendig, dass Human Resources Department Send employment contract ausführt oder Human Resources Department Send rejection ausführt, aber nicht beides, wenn Human Resources Department Carry out job interview ausführt.
+Bedingungen: Human Resources Department Bedingung: Yes, Human Resources Department Bedingung: No
+
+Invite to job interview ist eine SendTask
+Es ist notwendig, dass Human Resources Department Invite to job interview ausführt oder Head of Human Resources  Unbekannter Knoten ausführt, aber nicht beides, wenn Head of Human Resources  Applicant verified ausführt.
+Bedingungen: Human Resources Department Bedingung: Accept, Head of Human Resources  Bedingung: Reject 
+
+Es ist notwendig, dass Human Resources Department Invite to job interview ausführt oder Head of Human Resources  Unbekannter Knoten ausführt, aber nicht beides, wenn Head of Human Resources  Applicant verified ausführt.
+Bedingungen: Human Resources Department Bedingung: Accept, Head of Human Resources  Bedingung: Reject 
+
+Send rejection ist eine SendTask
+Send rejection ist eine Service Story.
+
+Employment contract template ist ein Datenobjekt.

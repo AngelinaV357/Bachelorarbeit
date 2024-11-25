@@ -11,9 +11,12 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
 
+import static com.example.SBVRTransformer.transformDataObject;
+import static com.example.SBVRTransformer.transformDataObjectToSBVR;
+
 public class XMLReader {
     public static void main(String[] args) {
-        File file = new File("src/main/resources/Car Wash Process.bpmn");
+        File file = new File("src/main/resources/Receipt of Application.bpmn");
         File outputFile = new File("src/main/resources/output.txt");
         File sbvr_output = new File("src/main/resources/sbvr_output.txt");
 
@@ -52,6 +55,23 @@ public class XMLReader {
                 FlowNode target = flow.getTarget();
                 String sourceRole = getRoleForNode(source, lanes);
                 String targetRole = getRoleForNode(target, lanes);
+                Set<String> processedGateways = new HashSet<>();
+
+                if (source != null) {
+                    String sbvrDataObjectOutput = transformDataObjectToSBVR((BaseElement) source);
+                    if (!sbvrDataObjectOutput.isEmpty()) {
+                        sbvrOutput.append(sbvrDataObjectOutput).append("\n");
+                        System.out.println(sbvrDataObjectOutput);
+                    }
+                }
+
+                if (target != null) {
+                    String sbvrDataObjectOutput = transformDataObjectToSBVR((BaseElement) target);
+                    if (!sbvrDataObjectOutput.isEmpty()) {
+                        sbvrOutput.append(sbvrDataObjectOutput).append("\n");
+                        System.out.println(sbvrDataObjectOutput);
+                    }
+                }
 
                 if (source instanceof StartEvent) {
                     String message = "\"Start\" ist mit \"" + getName(target) + "\" verbunden.\n";
@@ -79,12 +99,7 @@ public class XMLReader {
                     output.append(message);
 
                     // SBVR-Ausgabe
-                    sbvrOutput.append(SBVRTransformer.transformXORGatewayToSBVR(gateway, outgoingFlows, sourceRole, targetRoles, lanes)).append("\n");
-                    System.out.println(message);
-                } else if (target instanceof ExclusiveGateway) {
-                    String message = "\"" + getName(source) + "\" ist mit XOR-Gateway: \"" + getName(target) + "\" verbunden.\n";
-                    output.append(message);
-                    sbvrOutput.append(SBVRTransformer.transformSequenceFlowToSBVR(source, target, sourceRole, targetRole)).append("\n");
+                    sbvrOutput.append(SBVRTransformer.transformXORGatewayToSBVR(gateway, outgoingFlows, sourceRole, targetRoles, lanes, processedGateways)).append("\n");
                     System.out.println(message);
                 } else if (source instanceof ParallelGateway) {
                     String message = "UND-Gateway: \"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
@@ -93,6 +108,21 @@ public class XMLReader {
                                     Collections.singletonList(flow)))
                             .append("\n");
                     System.out.println(message);
+                } else if (source instanceof Activity) {
+                    // Standardausgabe
+                    String message = "\"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
+                    output.append(message);
+
+                    // SBVR-Ausgabe für Aktivität
+                    sbvrOutput.append(SBVRTransformer.transformActivityToSBVR((Activity) source)).append("\n");
+
+                    System.out.println(message);
+                }else if (source instanceof IntermediateCatchEvent intermediateCatchEvent) {
+                // Übergebe das BpmnModelInstance an die Methode
+                sbvrOutput.append(SBVRTransformer.processAndTransformIntermediateCatchEvents(modelInstance));
+                }else if (source instanceof IntermediateThrowEvent intermediateThrowEvent) {
+                    // Übergebe das BpmnModelInstance an die Methode
+                    SBVRTransformer.processAndTransformIntermediateThrowEvents(modelInstance, output, sbvrOutput);
                 } else {
                     String message = "\"" + getName(source) + "\" ist mit \"" + getName(target) + "\" verbunden.\n";
                     output.append(message);
@@ -100,6 +130,32 @@ public class XMLReader {
                     System.out.println(message);
                 }
             }
+
+            // Sammlung von DataObjectReference-Elementen
+            Collection<DataObjectReference> dataObjectReferences = modelInstance.getModelElementsByType(DataObjectReference.class);
+
+            for (DataObjectReference dataObjectReference : dataObjectReferences) {
+                DataObject dataObject = dataObjectReference.getDataObject();
+                if (dataObject != null) {
+                    // Transformation und Ausgabe des DataObjects
+                    String transformedDataObject = transformDataObject(dataObject);
+                    output.append(transformedDataObject).append("\n");
+
+                    // SBVR-Transformation
+                    String sbvrTransformed = SBVRTransformer.transformDataObjectToSBVR(dataObject);
+                    sbvrOutput.append(sbvrTransformed).append("\n");
+
+                    // Konsolenausgabe
+                    System.out.println(transformedDataObject);
+                } else {
+                    // Handling, falls das referenzierte DataObject nicht gefunden wird
+                    String message = "DataObjectReference \"" + dataObjectReference.getId() + "\" verweist auf kein DataObject.\n";
+                    output.append(message);
+                    sbvrOutput.append(message);
+                    System.out.println(message);
+                }
+            }
+
 
             // Ergebnisse in Dateien schreiben
             writeToFile(output.toString(), outputFile, "Standard-Ausgaben");
@@ -109,7 +165,7 @@ public class XMLReader {
             StringBuilder additionalOutput = new StringBuilder();
             List<SequenceFlow> startFlows = sequenceFlows.stream()
                     .filter(flow -> flow.getSource() instanceof StartEvent)
-                    .collect(Collectors.toList());
+                    .toList();
 
             for (SequenceFlow flow : startFlows) {
                 FlowNode target = flow.getTarget();
@@ -187,8 +243,8 @@ public class XMLReader {
     }
 
     static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {
-        for(Lane lane: lanes) {
-            if(lane.getFlowNodeRefs().contains(node)) {
+        for (Lane lane : lanes) {
+            if (lane.getFlowNodeRefs().contains(node)) {
                 return lane.getName();
             }
         }
