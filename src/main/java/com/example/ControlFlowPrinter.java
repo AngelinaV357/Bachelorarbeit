@@ -2,19 +2,20 @@ package com.example;
 
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
 
-import static com.example.SBVRTransformer.*;
+import static com.example.Hilfsmethoden.getCondition;
+import static com.example.Hilfsmethoden.getName;
 
 public class ControlFlowPrinter {
 
     public static void main(String[] args) {
         File file = new File("src/main/resources/Employee Onboarding.bpmn");
         File outputFile = new File("src/main/resources/output.txt");
+
         try {
             // Datei für das BPMN-Modell festlegen
             BpmnModelInstance modelInstance = Bpmn.readModelFromFile(file);
@@ -26,7 +27,7 @@ public class ControlFlowPrinter {
             // Zuerst die Verbindungen vom Start-Event ausgeben
             List<SequenceFlow> startFlows = sequenceFlows.stream()
                     .filter(flow -> flow.getSource() instanceof StartEvent)
-                    .collect(Collectors.toList());
+                    .toList();
 
             for (SequenceFlow flow : startFlows) {
                 FlowNode target = flow.getTarget();
@@ -58,28 +59,5 @@ public class ControlFlowPrinter {
         } catch (Exception e) {
             System.out.println("Ein unerwarteter Fehler ist aufgetreten: " + e.getMessage());
         }
-    }
-
-    // Hilfsmethode zum Abrufen des Namens von Flussknoten
-    private static String getName(FlowNode node) {
-        if (node instanceof Activity activity) {
-            return activity.getName();
-        } else if (node instanceof StartEvent) {
-            return "Start";
-        } else if (node instanceof EndEvent) {
-            return "Ende";
-        } else if (node instanceof ExclusiveGateway) {
-            return "XOR-Gateway";
-        }
-        return "Unbekannt"; // Für andere Knoten, die keine Aktivität, Start- oder End-Ereignisse sind
-    }
-
-    // Hilfsmethode zum Abrufen der Bedingung für einen Sequenzfluss
-    private static String getCondition(SequenceFlow flow) {
-        ConditionExpression condition = flow.getConditionExpression();
-        if (condition != null) {
-            return condition.getTextContent(); // Rückgabe des Textinhalts der Bedingung
-        }
-        return "keine Bedingung"; // Falls keine Bedingung vorhanden ist
     }
 }

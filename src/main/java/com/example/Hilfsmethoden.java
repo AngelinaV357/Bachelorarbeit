@@ -33,28 +33,13 @@ public class Hilfsmethoden {
         return "Unbekannter Knoten";
     }
 
-    public static String transformRoleToSBVR(String roleName) {
-        return roleName + " is a role.";
-    }
+//    public static String transformRoleToSBVR(String roleName) {
+//        return roleName + " is a role.";
+//    }
 
     static String getParticipantName(String nodeId, Map<String, String> participants) {
         // Hier wird angenommen, dass 'participants' eine Map ist, die nodeId -> participantName abbildet
         return participants.getOrDefault(nodeId, "unbekannter Teilnehmer");
-    }
-
-    static void writeToFile(String content, File file, String type) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write(content);
-            System.out.println(type + " wurden erfolgreich in die Datei geschrieben: " + file.getAbsolutePath());
-        } catch (IOException e) {
-            System.out.println("Fehler beim Schreiben in die Datei: " + e.getMessage());
-        }
-    }
-
-    // Hilfsmethode zur Klassifizierung von Actor, Action und Object
-    static void classifyFlow(String actor, String action, String object) {
-        // Klare Ausgabe für Actor, Action und Object
-        System.out.println("Actor: " + actor + ", Action: " + action + ", Object: " + object);
     }
 
     static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {
@@ -65,4 +50,14 @@ public class Hilfsmethoden {
         }
         return "Unbekannte Rolle";
     }
+
+    // Hilfsmethode zum Abrufen der Bedingung für einen Sequenzfluss
+    static String getCondition(SequenceFlow flow) {
+        ConditionExpression condition = flow.getConditionExpression();
+        if (condition != null) {
+            return condition.getTextContent(); // Rückgabe des Textinhalts der Bedingung
+        }
+        return "keine Bedingung"; // Falls keine Bedingung vorhanden ist
+    }
+
 }

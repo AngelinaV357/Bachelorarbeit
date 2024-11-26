@@ -2,13 +2,12 @@ package com.example;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 import java.util.*;
 
+import static com.example.Hilfsmethoden.getName;
 import static com.example.Hilfsmethoden.getParticipantName;
 import static com.example.Hilfsmethoden.getRoleForNode;
-import static com.example.TreeXMLReader.getName;
 
 public class SBVRTransformer {
 
@@ -86,18 +85,16 @@ public class SBVRTransformer {
             String flowStatement2 = "Es ist notwendig, dass " + targetRole2 + " " + targetName2 + " ausführt, wenn " +
                     sourceRole + " " + sourceName + " ausführt und " + condition2 + " gilt.\n";
 
-            if (!uniqueStatements.contains(flowStatement1)) {
-                uniqueStatements.add(flowStatement1);
-                sbvrStatements.append(flowStatement1);
-            }
+            uniqueStatements.add(flowStatement1);
+            sbvrStatements.append(flowStatement1);
             if (!uniqueStatements.contains(flowStatement2)) {
                 uniqueStatements.add(flowStatement2);
                 sbvrStatements.append(flowStatement2);
             }
 
-            // Regel für das Ausschlussprinzip des XOR-Gateways
+            // Regel für das XOR-Gateways
             String exclusionStatement = "Es ist notwendig, dass " + targetRole1 + " " + targetName1 + " ausführt oder " +
-                    targetRole2 + " " + targetName2 + " ausführt, aber nicht beides gleichzeitig.\n";
+                    targetRole2 + " " + targetName2 + " ausführt, aber nicht beides gleichzeitig, wenn " + sourceName + "ausführt";
 
             if (!uniqueStatements.contains(exclusionStatement)) {
                 uniqueStatements.add(exclusionStatement);
@@ -107,51 +104,11 @@ public class SBVRTransformer {
 
         return sbvrStatements.toString();
     }
-//        StringBuilder sbvrStatements = new StringBuilder();
-//
-//        // Verhindere Dopplungen: Überprüfe, ob das Gateway bereits verarbeitet wurde
-//        String gatewayId = gateway.getId();
-//        if (processedGateways.contains(gatewayId)) {
-//            return sbvrStatements.toString();
-//        }
-//
-//        processedGateways.add(gatewayId);
-//        String gatewayName = getName(gateway);
-//        String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
-//
-//        // Wenn die Anzahl der ausgehenden Flows genau 2 beträgt
-//        if (outgoingFlows.size() == 2) {
-//            SequenceFlow flow1 = outgoingFlows.get(0);
-//            SequenceFlow flow2 = outgoingFlows.get(1);
-//
-//            String targetRole1 = getRoleForNode(flow1.getTarget(), lanes);
-//            String targetRole2 = getRoleForNode(flow2.getTarget(), lanes);
-//
-//            String targetName1 = getName(flow1.getTarget());
-//            String targetName2 = getName(flow2.getTarget());
-//
-//            String condition1 = flow1.getName() != null ? flow1.getName() : "unbekannte Bedingung";
-//            String condition2 = flow2.getName() != null ? flow2.getName() : "unbekannte Bedingung";
-//
-//            sbvrStatements.append("Es ist notwendig, dass ")
-//                    .append(targetRole1).append(" ").append(targetName1).append(" ausführt oder ")
-//                    .append(targetRole2).append(" ").append(targetName2).append(" ausführt, ")
-//                    .append("aber nicht beides, wenn ").append(sourceRole).append(" ")
-//                    .append(sourceName).append(" ausführt.\n");
-//
-//            sbvrStatements.append("Bedingungen: ")
-//                    .append(targetRole1).append(" Bedingung: ").append(condition1).append(", ")
-//                    .append(targetRole2).append(" Bedingung: ").append(condition2).append("\n");
-//        }
-//        return sbvrStatements.toString();
-//    }
 
     public static String transformANDGatewayToSBVR(ParallelGateway gateway, List<SequenceFlow> outgoingFlows, List<Lane> lanes) {
         StringBuilder sbvrStatements = new StringBuilder();
         Set<String> uniqueStatements = new HashSet<>(); // Set für Duplikatprüfung
 
-        String gatewayId = gateway.getId();
-        String gatewayName = getName(gateway);
         String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
 
         // Bestimmen der Rolle automatisch, basierend auf der Lane des Gateways
@@ -284,7 +241,6 @@ public class SBVRTransformer {
 
     public static String transformRoleToSBVR(String roleName) {
         // SBVR-Ausdruck für eine Rolle im Format "Role X is a role"
-        String sbvrRole = roleName + " is a role.";
-        return sbvrRole;
+        return roleName + " is a role.";
     }
 }
