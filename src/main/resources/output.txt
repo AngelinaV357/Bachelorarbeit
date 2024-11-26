@@ -1,15 +1,14 @@
-"Start" ist mit "Send receipt confirmation" verbunden.
-"Applicant verified" ist mit XOR-Gateway: "Application status?" verbunden.
-"Invite to job interview" ist mit "Prepare employment agreement" verbunden.
-"Unbekannt" ist mit XOR-Gateway: "XOR-Gateway" verbunden.
-"Send receipt confirmation" ist mit "Applicant verified" verbunden.
-"Prepare employment agreement" ist mit "Carry out job interview" verbunden.
-"Carry out job interview" ist mit XOR-Gateway: "Applicant suitable?" verbunden.
-"Send employment contract" ist mit "Unbekannt" verbunden.
-"Unbekannt" ist mit "Ende" verbunden.
-XOR-Gateway: "Applicant suitable?" ist mit "Send employment contract" verbunden. Bedingung: Yes
-XOR-Gateway: "Applicant suitable?" ist mit "Send rejection" verbunden. Bedingung: No
-XOR-Gateway: "Application status?" ist mit "Invite to job interview" verbunden. Bedingung: Accept
-XOR-Gateway: "Application status?" ist mit "Unbekannt" verbunden. Bedingung: Reject 
-"Send rejection" ist mit XOR-Gateway: "XOR-Gateway" verbunden.
-XOR-Gateway: "XOR-Gateway" ist mit "Ende" verbunden. Bedingung: unknown
+Rolle: "Procurement"
+Rolle: "Human Resources Department"
+Rolle: "IT-Department"
+"Start" ist mit "Add personal data" verbunden.
+"Add personal data" ist mit "Select necessary work equipment" verbunden.
+UND-Gateway: "UND-Gateway" ist mit "Procure work equipment" verbunden.
+"Select necessary work equipment" ist mit "UND-Gateway" verbunden.
+UND-Gateway: "UND-Gateway" ist mit "Set up access rights, hardware and software" verbunden.
+"Set up access rights, hardware and software" ist mit "UND-Gateway" verbunden.
+"Procure work equipment" ist mit "UND-Gateway" verbunden.
+UND-Gateway: "UND-Gateway" ist mit "Ende" verbunden.
+Work equipment ist ein Datenobjekt.
+Start Flow: Signed employment 
+contract on file -> Add personal data

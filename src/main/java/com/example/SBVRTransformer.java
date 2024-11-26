@@ -4,166 +4,45 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
-import java.util.List;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
-import static com.example.XMLReader.getRoleForNode;
+import static com.example.Hilfsmethoden.getParticipantName;
+import static com.example.Hilfsmethoden.getRoleForNode;
+import static com.example.TreeXMLReader.getName;
 
 public class SBVRTransformer {
 
-    public static String transformRoleToSBVR(String roleName) {
-        // SBVR-Ausdruck für eine Rolle im Format "Role X is a role"
-        String sbvrRole = roleName + " is a role.";
-        return sbvrRole;
-    }
-    public static String transformActivityToSBVR(Activity activity) {
-        String action = activity.getName() != null ? activity.getName() : "führt eine Aktivität aus";
-
-        // Überprüfen, ob es sich um eine Benutzeraufgabe oder eine Servicetask handelt
-        if (activity instanceof UserTask) {
-            return action + " ist eine User Story.";
-        }
-        {
-            return action + " ist eine Service Story.";
-        }
-    }
-
-    /**
-     * Transforms a Start Event into an SBVR-compliant statement.
-     * @param startEvent The BPMN start event node.
-     * @return SBVR-compliant statement describing the start event.
-     */
+    // --- Start/Ende Events ---
     public static String transformStartEventToSBVR(StartEvent startEvent) {
         return "Der Prozess startet.";
     }
 
-    /**
-     * Transforms an End Event into an SBVR-compliant statement.
-     * @param endEvent The BPMN end event node.
-     * @return SBVR-compliant statement describing the end event.
-     */
     public static String transformEndEventToSBVR(EndEvent endEvent) {
         return "Der Prozess endet.";
     }
 
-    /**
-     * Transforms an Exclusive Gateway (XOR) node and a sequence flow into an SBVR-compliant statement.
-     * @param gateway The XOR Gateway node.
-     * @param outgoingFlows The sequence flow connected to the gateway.
-     * @return SBVR-compliant conditional statement based on the gateway.
-     */
+    //!ÜBERARBEITEN!
+    public static String transformActivityToSBVR(Activity activity, Set<String> processedActivities) {
+        String action = activity.getName() != null ? activity.getName() : " aus";
 
-    public static String transformXORGatewayToSBVR(ExclusiveGateway gateway, List<SequenceFlow> outgoingFlows, String sourceRole, List<String> targetRoles, Collection<Lane> lanes, Set<String> processedGateways) {
-        StringBuilder sbvrStatements = new StringBuilder();
-
-        // Verhindere Dopplungen: Überprüfe, ob das Gateway bereits verarbeitet wurde
-        String gatewayId = gateway.getId(); // ID des Gateways holen
-        if (processedGateways.contains(gatewayId)) {
-            // Gateway wurde bereits verarbeitet, keine Ausgabe mehr
-            return sbvrStatements.toString();
+        String activityStatement = action + " ist eine ";
+        if (activity instanceof UserTask) {
+            activityStatement += "User Story.";
+        } else if (activity instanceof SendTask) {
+            activityStatement += "SendTask.";
+        } else {
+            activityStatement += "normale Aktivität";
         }
 
-        // Markiere das Gateway als verarbeitet
-        processedGateways.add(gatewayId);
-
-        // Hole den Namen des Gateways
-        String gatewayName = getName(gateway);
-
-        // Hole den Namen der Quelle des Gateways
-        String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
-
-        // Wenn die Anzahl der ausgehenden Flows genau 2 beträgt
-        if (outgoingFlows.size() == 2) {
-            SequenceFlow flow1 = outgoingFlows.get(0);
-            SequenceFlow flow2 = outgoingFlows.get(1);
-
-            String targetRole1 = getRoleForNode(flow1.getTarget(), lanes);
-            String targetRole2 = getRoleForNode(flow2.getTarget(), lanes);
-
-            String targetName1 = getName(flow1.getTarget());
-            String targetName2 = getName(flow2.getTarget());
-
-            String condition1 = flow1.getName() != null ? flow1.getName() : "unbekannte Bedingung";
-            String condition2 = flow2.getName() != null ? flow2.getName() : "unbekannte Bedingung";
-
-            sbvrStatements.append("Es ist notwendig, dass ")
-                    .append(targetRole1).append(" ").append(targetName1).append(" ausführt oder ")
-                    .append(targetRole2).append(" ").append(targetName2).append(" ausführt, ")
-                    .append("aber nicht beides, wenn ").append(sourceRole).append(" ")
-                    .append(sourceName).append(" ausführt.\n");
-
-            sbvrStatements.append("Bedingungen: ")
-                    .append(targetRole1).append(" Bedingung: ").append(condition1).append(", ")
-                    .append(targetRole2).append(" Bedingung: ").append(condition2).append("\n");
-        }
-        return sbvrStatements.toString();
-    }
-
-    /**
-     * Transforms a Parallel Gateway (AND) node into multiple necessity statements.
-     * @param gateway The AND Gateway node.
-     * @param outgoingFlows List of outgoing sequence flows.
-     * @return Multiple necessity statements concatenated for the AND condition.
-     */
-    public static String transformANDGatewayToSBVR(ParallelGateway gateway, List<SequenceFlow> outgoingFlows) {
-        String sbvrStatements = "";
-
-        // Wir extrahieren den Namen der Quelle der ausgehenden Flows
-        String sourceName = getName(outgoingFlows.get(0).getSource()); // Quelle des AND-Gateways (Activity davor)
-        String role = "Rolle"; // Platzhalter für die Rolle (kann angepasst werden, wenn mehr Informationen vorhanden sind)
-
-        for (SequenceFlow flow : outgoingFlows) {
-            String targetName = getName(flow.getTarget());
-
-            // Für jeden ausgehenden Flow erstellen wir eine Regel
-            sbvrStatements += "Es ist notwendig, dass " + role + " " + targetName + " ausführt, wenn " +
-                    role + " " + sourceName + " ausführt. ";
+        // Duplikatprüfung für Aktivitäten
+        if (!processedActivities.contains(activityStatement)) {
+            processedActivities.add(activityStatement);
+            return activityStatement;
         }
 
-        return sbvrStatements;
+        return ""; // Leeres Statement, wenn bereits verarbeitet
     }
 
-    /**
-     * Transforms a generic flow node connection into an SBVR-compliant necessity statement.
-     * @param source The source node of the sequence flow.
-     * @param target The target node of the sequence flow.
-     * @return SBVR-compliant statement describing the flow between source and target.
-     */
-    public static String transformSequenceFlowToSBVR(FlowNode source, FlowNode target, String sourceRole, String targetRole) {
-        String sourceName = getName(source);
-        String targetName = getName(target);
-
-        // Showing the sequence flow more explicitly
-        return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " +
-                sourceRole + " " + sourceName + " ausführt.";
-    }
-
-    /**
-     * Retrieves the name of the node, with default labels for unnamed nodes.
-     * @param node The BPMN node.
-     * @return The name of the node or a default label.
-     */
-    private static String getName(FlowNode node) {
-        if (node instanceof Activity activity) {
-            return activity.getName() != null ? activity.getName() : "Unbekannte Aktivität";
-        } else if (node instanceof StartEvent) {
-            return "Start";
-        } else if (node instanceof EndEvent) {
-            return "Ende";
-        } else if (node instanceof ExclusiveGateway) {
-            return "XOR-Gateway";
-        } else if (node instanceof ParallelGateway) {
-            return "UND-Gateway";
-        }
-        return "Unbekannter Knoten";
-    }
-
-    /**
-     * Transforms the task type into an SBVR-compliant statement specifying whether it is a UserTask or ServiceTask.
-     * @param activity The BPMN activity node.
-     * @return SBVR-compliant statement describing the type of task.
-     */
     public static String transformTaskTypeToSBVR(Activity activity) {
         if (activity instanceof UserTask) {
             return "Es handelt sich um eine Benutzeraufgabe.";
@@ -174,16 +53,153 @@ public class SBVRTransformer {
         }
     }
 
+    //XOR Gateway ausgabe
+    public static String transformXORGatewayToSBVR(ExclusiveGateway gateway, List<SequenceFlow> outgoingFlows, String sourceRole, List<String> targetRoles, Collection<Lane> lanes, Set<String> processedGateways) {
+        StringBuilder sbvrStatements = new StringBuilder();
+        Set<String> uniqueStatements = new HashSet<>(); // Set für Duplikatprüfung
+
+        // Verhindere Dopplungen: Überprüfe, ob das Gateway bereits verarbeitet wurde
+        String gatewayId = gateway.getId();
+        if (processedGateways.contains(gatewayId)) {
+            return sbvrStatements.toString();
+        }
+        processedGateways.add(gatewayId);
+
+        String gatewayName = getName(gateway);
+        String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
+
+        // Wenn die Anzahl der ausgehenden Flows genau 2 beträgt
+        if (outgoingFlows.size() == 2) {
+            // Variablen für die Flows und Bedingungen
+            String targetRole1 = getRoleForNode(outgoingFlows.get(0).getTarget(), lanes);
+            String targetRole2 = getRoleForNode(outgoingFlows.get(1).getTarget(), lanes);
+
+            String targetName1 = getName(outgoingFlows.get(0).getTarget());
+            String targetName2 = getName(outgoingFlows.get(1).getTarget());
+
+            String condition1 = outgoingFlows.get(0).getName() != null ? outgoingFlows.get(0).getName() : "unbekannte Bedingung";
+            String condition2 = outgoingFlows.get(1).getName() != null ? outgoingFlows.get(1).getName() : "unbekannte Bedingung";
+
+            // Vermeidung von Duplikaten durch Set
+            String flowStatement1 = "Es ist notwendig, dass " + targetRole1 + " " + targetName1 + " ausführt, wenn " +
+                    sourceRole + " " + sourceName + " ausführt und " + condition1 + " gilt.\n";
+            String flowStatement2 = "Es ist notwendig, dass " + targetRole2 + " " + targetName2 + " ausführt, wenn " +
+                    sourceRole + " " + sourceName + " ausführt und " + condition2 + " gilt.\n";
+
+            if (!uniqueStatements.contains(flowStatement1)) {
+                uniqueStatements.add(flowStatement1);
+                sbvrStatements.append(flowStatement1);
+            }
+            if (!uniqueStatements.contains(flowStatement2)) {
+                uniqueStatements.add(flowStatement2);
+                sbvrStatements.append(flowStatement2);
+            }
+
+            // Regel für das Ausschlussprinzip des XOR-Gateways
+            String exclusionStatement = "Es ist notwendig, dass " + targetRole1 + " " + targetName1 + " ausführt oder " +
+                    targetRole2 + " " + targetName2 + " ausführt, aber nicht beides gleichzeitig.\n";
+
+            if (!uniqueStatements.contains(exclusionStatement)) {
+                uniqueStatements.add(exclusionStatement);
+                sbvrStatements.append(exclusionStatement);
+            }
+        }
+
+        return sbvrStatements.toString();
+    }
+//        StringBuilder sbvrStatements = new StringBuilder();
+//
+//        // Verhindere Dopplungen: Überprüfe, ob das Gateway bereits verarbeitet wurde
+//        String gatewayId = gateway.getId();
+//        if (processedGateways.contains(gatewayId)) {
+//            return sbvrStatements.toString();
+//        }
+//
+//        processedGateways.add(gatewayId);
+//        String gatewayName = getName(gateway);
+//        String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
+//
+//        // Wenn die Anzahl der ausgehenden Flows genau 2 beträgt
+//        if (outgoingFlows.size() == 2) {
+//            SequenceFlow flow1 = outgoingFlows.get(0);
+//            SequenceFlow flow2 = outgoingFlows.get(1);
+//
+//            String targetRole1 = getRoleForNode(flow1.getTarget(), lanes);
+//            String targetRole2 = getRoleForNode(flow2.getTarget(), lanes);
+//
+//            String targetName1 = getName(flow1.getTarget());
+//            String targetName2 = getName(flow2.getTarget());
+//
+//            String condition1 = flow1.getName() != null ? flow1.getName() : "unbekannte Bedingung";
+//            String condition2 = flow2.getName() != null ? flow2.getName() : "unbekannte Bedingung";
+//
+//            sbvrStatements.append("Es ist notwendig, dass ")
+//                    .append(targetRole1).append(" ").append(targetName1).append(" ausführt oder ")
+//                    .append(targetRole2).append(" ").append(targetName2).append(" ausführt, ")
+//                    .append("aber nicht beides, wenn ").append(sourceRole).append(" ")
+//                    .append(sourceName).append(" ausführt.\n");
+//
+//            sbvrStatements.append("Bedingungen: ")
+//                    .append(targetRole1).append(" Bedingung: ").append(condition1).append(", ")
+//                    .append(targetRole2).append(" Bedingung: ").append(condition2).append("\n");
+//        }
+//        return sbvrStatements.toString();
+//    }
+
+    public static String transformANDGatewayToSBVR(ParallelGateway gateway, List<SequenceFlow> outgoingFlows, List<Lane> lanes) {
+        StringBuilder sbvrStatements = new StringBuilder();
+        Set<String> uniqueStatements = new HashSet<>(); // Set für Duplikatprüfung
+
+        String gatewayId = gateway.getId();
+        String gatewayName = getName(gateway);
+        String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
+
+        // Bestimmen der Rolle automatisch, basierend auf der Lane des Gateways
+        String role = getRoleForNode(gateway, lanes);
+
+        // Iteriere über alle ausgehenden Flows
+        for (SequenceFlow flow : outgoingFlows) {
+            String targetName = getName(flow.getTarget());
+
+            // Erstelle das SBVR-Statement
+            String sbvrStatement = "Es ist notwendig, dass " + role + " " + targetName + " ausführt, wenn " +
+                    role + " " + sourceName + " ausführt.";
+
+            // Vermeide Duplikate
+            if (!uniqueStatements.contains(sbvrStatement)) {
+                uniqueStatements.add(sbvrStatement);
+                sbvrStatements.append(sbvrStatement).append(" ");
+            }
+        }
+
+        return sbvrStatements.toString();
+    }
+
+    // --- Sequence Flow Transformation ---
+    public static String transformSequenceFlowToSBVR(FlowNode source, FlowNode target, String sourceRole, String targetRole, Set<String> processedFlows) {
+        String sourceName = getName(source);
+        String targetName = getName(target);
+
+        String flowStatement = "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " +
+                sourceRole + " " + sourceName + " ausführt.";
+
+        // Verhindere Duplikate durch Set
+        if (!processedFlows.contains(flowStatement)) {
+            processedFlows.add(flowStatement);
+            return flowStatement;
+        }
+        return ""; // Leeres Statement, wenn bereits verarbeitet
+    }
+
+    // --- Data Objects & SendTask Transformation ---
     public static String transformDataObjectToSBVR(BaseElement node) {
         if (node instanceof DataObject) {
             return transformDataObject((DataObject) node);
-        } else if (node instanceof SendTask) {
-            return transformSendTask((SendTask) node);
         }
+        // Entferne die Behandlung von SendTask hier
         return "";
     }
 
-    // Methode zur Verarbeitung von DataObject oder DataObjectReference
     static String transformDataObject(BaseElement element) {
         if (element instanceof DataObject dataObject) {
             String dataObjectName = dataObject.getName() != null ? dataObject.getName() : "Unbekanntes DataObject";
@@ -196,57 +212,79 @@ public class SBVRTransformer {
         return "Unbekanntes Element.";
     }
 
-    // Methode zur Verarbeitung von SendTask
     private static String transformSendTask(SendTask sendTask) {
         String taskName = sendTask.getName() != null ? sendTask.getName() : "Unbekannte SendTask";
-        // SBVR-Regel für SendTask
-        String sbvrRule = taskName + " ist eine SendTask";
-        return sbvrRule;
+        return taskName + " ist eine SendTask";
     }
 
-    static String processAndTransformIntermediateCatchEvents(BpmnModelInstance modelInstance) {
-        StringBuilder output = new StringBuilder();
-        StringBuilder sbvrOutput = new StringBuilder();
+    //Catch event sendet etwas an die Betroffene Nachricht; Nachricht nicht ausgefüllt
+    public static String processAndTransformIntermediateCatchEvents(MessageFlow messageFlow, Collection<Lane> lanes, Map<String, String> participants) {
+        StringBuilder sbvrStatement = new StringBuilder();
 
-        // Sammlung von IntermediateCatchEvent-Elementen
-        Collection<IntermediateCatchEvent> intermediateCatchEvents = modelInstance.getModelElementsByType(IntermediateCatchEvent.class);
+        // Name des Senders und Empfängers
+        String senderName = getName((FlowNode) messageFlow.getSource());
+        String receiverName = getName((FlowNode) messageFlow.getTarget());
 
-        for (IntermediateCatchEvent event : intermediateCatchEvents) {
-            String eventName = event.getName() != null ? event.getName() : "Unbenanntes, Event";
-            String eventId = event.getId();
+        // Hole die Teilnehmerrollen basierend auf der XML-Datenstruktur
+        String senderRole = getParticipantName(senderName, participants);
+        String receiverRole = getParticipantName(receiverName, participants);
 
-            // Standardausgabe und Transformation
-            String transformedEvent = "IntermediateCatchEvent: " + eventName;
-            output.append(transformedEvent).append("\n");
-            System.out.println(transformedEvent);
+        // Nachrichtenname
+        String messageName = messageFlow.getName() != null ? messageFlow.getName() : "unbekannte Nachricht";
 
-            // SBVR-Transformation und Ausgabe
-            String sbvrTransformed = eventName + " ist ein IntermediateCatchEvent ";
-            sbvrOutput.append(sbvrTransformed).append("\n");
-            System.out.println(sbvrTransformed);
-        }
+        // Erstellen der SBVR-Regel mit den erkannten Teilnehmernamen
+        sbvrStatement.append("Es ist notwendig, dass ")
+                .append(senderRole).append(" ")
+                .append(senderName)
+                .append(" die Nachricht ")
+                .append(messageName)
+                .append(" an ")
+                .append(receiverRole).append(" ")
+                .append(receiverName)
+                .append(" sendet.\n");
 
-        // Rückgabe der Ausgaben
-        return "Standard Output:\n" + output.toString() + "\nSBVR Output:\n" + sbvrOutput.toString();
+        // Ausgabe zur Konsole
+        System.out.println(sbvrStatement);
+
+        return sbvrStatement.toString();  // Gibt die vollständige Ausgabe zurück, wenn benötigt
     }
 
+
+    //Throw event empfängt etwas von dem Participant; ausgemaltes Nachrichtenzeichen
     static void processAndTransformIntermediateThrowEvents(BpmnModelInstance modelInstance, StringBuilder output, StringBuilder sbvrOutput) {
-        // Sammlung von IntermediateThrowEvent-Elementen
+        // Sammlung aller IntermediateThrowEvents im Modell
         Collection<IntermediateThrowEvent> intermediateThrowEvents = modelInstance.getModelElementsByType(IntermediateThrowEvent.class);
 
+        // Durchlaufe alle IntermediateThrowEvents
         for (IntermediateThrowEvent event : intermediateThrowEvents) {
             String eventName = event.getName() != null ? event.getName() : "Unbenanntes Event";
             String eventId = event.getId();
 
-            // Standardausgabe und Transformation
+            // Event in Standardausgabe hinzufügen
             String transformedEvent = "IntermediateThrowEvent: " + eventName + " (ID: " + eventId + ")";
             output.append(transformedEvent).append("\n");
+
+            // Ausgabe in der Konsole
             System.out.println(transformedEvent);
 
-            // SBVR-Transformation und Ausgabe
+            // SBVR Transformation hinzufügen
             String sbvrTransformed = eventName + " ist ein IntermediateThrowEvent ";
             sbvrOutput.append(sbvrTransformed).append("\n");
+
+            // Ausgabe in der Konsole
             System.out.println(sbvrTransformed);
         }
+    }
+
+    public static String processAndTransformBusinessRuleTask(BusinessRuleTask businessRuleTask) {
+        String taskName = businessRuleTask.getName();
+        String implementation = businessRuleTask.getImplementation();
+        return "\"" + taskName + "\" ist ein BusinessRuleTask\"";
+    }
+
+    public static String transformRoleToSBVR(String roleName) {
+        // SBVR-Ausdruck für eine Rolle im Format "Role X is a role"
+        String sbvrRole = roleName + " is a role.";
+        return sbvrRole;
     }
 }
