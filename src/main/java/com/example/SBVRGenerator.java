@@ -2,8 +2,9 @@ package com.example;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import java.io.File;
+import java.util.Map;
 
-import static com.example.BPMNProcessor.writeToFile;
+import static com.example.Hilfsmethoden.writeToFile;
 
 public class SBVRGenerator {
 
@@ -16,12 +17,17 @@ public class SBVRGenerator {
             StringBuilder standardOutput = new StringBuilder();
             StringBuilder sbvrOutput = new StringBuilder();
 
-            BPMNProcessor.processLanes(modelInstance, standardOutput, sbvrOutput);
             BPMNProcessor.processSequenceFlows(modelInstance, standardOutput, sbvrOutput);
 
+            //Map<String, String> participants = Hilfsmethoden.getParticipantName(modelInstance);
+            //BPMNProcessor.processLanes(modelInstance, standardOutput, sbvrOutput);
             // Weitere Verarbeitung von DataObjectReferences und zusätzlichen Sequenzflüssen
-            BPMNProcessor.processDataObjects(modelInstance, standardOutput, sbvrOutput);
-            BPMNProcessor.processStartFlows(modelInstance, standardOutput);
+            //BPMNProcessor.processDataObjects(modelInstance, standardOutput, sbvrOutput);
+            //BPMNProcessor.processStartFlows(modelInstance, sbvrOutput);
+            //BPMNProcessor.processBusinessRuleTasks(modelInstance, standardOutput, sbvrOutput);
+            //BPMNProcessor.processSubProcesses(modelInstance, standardOutput, sbvrOutput);
+            //BPMNProcessor.processAndTransformIntermediateThrowEvents(modelInstance, standardOutput, sbvrOutput);
+            //BPMNProcessor.processIntermediateCatchEvents(modelInstance, standardOutput, sbvrOutput, participants);
 
             writeToFile(sbvrOutput.toString(), sbvrOutputFile);
 

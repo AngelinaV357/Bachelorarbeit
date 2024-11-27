@@ -1,14 +1,8 @@
-Rolle: "Procurement"
-Rolle: "Human Resources Department"
-Rolle: "IT-Department"
 "Start" ist mit "Add personal data" verbunden.
 "Add personal data" ist mit "Select necessary work equipment" verbunden.
-UND-Gateway: "UND-Gateway" ist mit "Procure work equipment" verbunden.
-"Select necessary work equipment" ist mit "UND-Gateway" verbunden.
-UND-Gateway: "UND-Gateway" ist mit "Set up access rights, hardware and software" verbunden.
-"Set up access rights, hardware and software" ist mit "UND-Gateway" verbunden.
-"Procure work equipment" ist mit "UND-Gateway" verbunden.
-UND-Gateway: "UND-Gateway" ist mit "Ende" verbunden.
-Work equipment ist ein Datenobjekt.
-Start Flow: Signed employment 
-contract on file -> Add personal data
+"Unbekannt" ist mit "Procure work equipment" verbunden.
+"Select necessary work equipment" ist mit "Unbekannt" verbunden.
+"Unbekannt" ist mit "Set up access rights, hardware and software" verbunden.
+"Set up access rights, hardware and software" ist mit "Unbekannt" verbunden.
+"Procure work equipment" ist mit "Unbekannt" verbunden.
+"Unbekannt" ist mit "Ende" verbunden.

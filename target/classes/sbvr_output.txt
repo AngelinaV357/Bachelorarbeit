@@ -1,12 +1,4 @@
-Procurement is a role.
-Human Resources Department is a role.
-IT-Department is a role.
-Der Prozess startet.
-Add personal data ist eine normale Aktivität
-Es ist notwendig, dass Human Resources Department Procure work equipment ausführt, wenn Human Resources Department Select necessary work equipment ausführt. 
-Select necessary work equipment ist eine normale Aktivität
-Es ist notwendig, dass Human Resources Department Set up access rights, hardware and software ausführt, wenn Human Resources Department Select necessary work equipment ausführt. 
-Set up access rights, hardware and software ist eine normale Aktivität
-Procure work equipment ist eine normale Aktivität
-Es ist notwendig, dass Human Resources Department Ende ausführt, wenn Human Resources Department Set up access rights, hardware and software ausführt. 
-Work equipment ist ein Datenobjekt.
+Es ist notwendig, dass Start Human Resources Department ausführt, wenn Human Resources Department Add personal data ausführt.
+Es ist notwendig, dass Procurement Procure work equipment ausführt und IT-Department Set up access rights, hardware and software ausführt, wenn UND-Gateway ausführt.
+Es ist notwendig, dass Procurement Procure work equipment ausführt und IT-Department Set up access rights, hardware and software ausführt, wenn UND-Gateway ausführt.
+Es gibt nicht genau zwei Ausgangsflüsse für das Parallel-Gateway.
