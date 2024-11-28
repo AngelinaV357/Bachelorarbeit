@@ -3,7 +3,6 @@ package com.example;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,9 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Hilfsmethoden {
-    // --- Helper Methods ---
 
-    static String getEventType(FlowNode node) {
+    public static String getEventType(FlowNode node) {
         if (node instanceof IntermediateCatchEvent) {
             EventDefinition eventDefinition = ((IntermediateCatchEvent) node).getEventDefinitions().iterator().next();
             if (eventDefinition instanceof MessageEventDefinition) {
@@ -28,7 +26,17 @@ public class Hilfsmethoden {
         return "unbekannter Ereignistyp";
     }
 
-    static String getName(FlowNode node) {
+    public static MessageFlow getMessageFlowForEvent(IntermediateCatchEvent event, BpmnModelInstance modelInstance) {
+        // Durchlaufen aller MessageFlows und Überprüfen, ob das IntermediateCatchEvent als Quelle des MessageFlows festgelegt ist
+        for (MessageFlow flow : modelInstance.getModelElementsByType(MessageFlow.class)) {
+            if (flow.getSource().equals(event)) {
+                return flow; // Der MessageFlow wurde gefunden
+            }
+        }
+        return null; // Kein passender MessageFlow gefunden
+    }
+
+    public static String getName(FlowNode node) {
         if (node instanceof Activity activity) {
             String name = activity.getName();
             if (name == null || name.isEmpty()) {
@@ -94,7 +102,7 @@ public class Hilfsmethoden {
         return participants.getOrDefault(nodeId, "Unbekannter Teilnehmer");
     }
 
-    static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {
+    public static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {
         for (Lane lane : lanes) {
             if (lane.getFlowNodeRefs().contains(node)) {
                 return lane.getName();
@@ -103,7 +111,10 @@ public class Hilfsmethoden {
         return "Unbekannte Rolle";
     }
 
-    // Hilfsmethode zum Abrufen der Bedingung für einen Sequenzfluss
+
+    /**
+     * Hilfsmethode zum Abrufen der Bedingung für einen Sequenzfluss
+     */
     static String getCondition(SequenceFlow flow) {
         ConditionExpression condition = flow.getConditionExpression();
         if (condition != null) {
@@ -111,7 +122,10 @@ public class Hilfsmethoden {
         }
         return "keine Bedingung"; // Falls keine Bedingung vorhanden ist
     }
-    // Schreibt Text in eine Datei
+
+    /**
+     * Schreibt Text in die Datei
+     */
     static void writeToFile(String content, File file) {
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(content);
@@ -120,5 +134,4 @@ public class Hilfsmethoden {
             System.out.println("Fehler beim Schreiben der Datei: " + e.getMessage());
         }
     }
-
 }

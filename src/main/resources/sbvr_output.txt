@@ -1,13 +1,8 @@
-Es ist notwendig, dass Start Central Purchasing ausführt, wenn Central Purchasing XOR-Gateway ausführt.
-Warnung: XOR-Gateway 'XOR-Gateway' hat nicht genau zwei ausgehende Flows.
-Es ist notwendig, dass die Aufgabe Unbekannter Knoten startet, wenn das Datenereignis Nachricht eintritt.
-Es ist notwendig, dass die Aufgabe Unbekannter Knoten startet, wenn das Datenereignis Timer eintritt.
-Es ist notwendig, dass Central Purchasing Ende ausführt, wenn Central Purchasing Raise inquiry with the supplier ausführt und No gilt.
-Es ist notwendig, dass Central Purchasing XOR-Gateway ausführt, wenn Central Purchasing Raise inquiry with the supplier ausführt und Yes gilt.
-Es ist notwendig, dass Central Purchasing Ende ausführt oder Central Purchasing XOR-Gateway ausführt, aber nicht beides gleichzeitig, wenn Raise inquiry with the supplier ausführtEs ist notwendig, dass Central Purchasing Request
- for 
-replacement ausführt, wenn Central Purchasing Check quantity and quality  ausführt und Failed gilt.
-Es ist notwendig, dass Central Purchasing Ende ausführt, wenn Central Purchasing Check quantity and quality  ausführt und Passed gilt.
-Es ist notwendig, dass Central Purchasing Request
- for 
-replacement ausführt oder Central Purchasing Ende ausführt, aber nicht beides gleichzeitig, wenn Check quantity and quality  ausführt
+Es ist notwendig, dass Human Resources Department Start ausführt, wenn Human Resources Department Add personal data ausführt.
+Es ist notwendig, dass Procurement Procure work equipment ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
+Es ist notwendig, dass IT-Department Set up access rights, hardware and software ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
+Es ist notwendig, dass Procurement Procure work equipment ausführt und IT-Department Set up access rights, hardware and software ausführt, wenn UND-Gateway ausführt.
+Es ist notwendig, dass Procurement Procure work equipment ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
+Es ist notwendig, dass IT-Department Set up access rights, hardware and software ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
+Es ist notwendig, dass Procurement Procure work equipment ausführt und IT-Department Set up access rights, hardware and software ausführt, wenn UND-Gateway ausführt.
+

@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.Interfaces.*;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
@@ -34,25 +35,39 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
             String sourceRole = Hilfsmethoden.getRoleForNode(source, lanes);
             String targetRole = Hilfsmethoden.getRoleForNode(target, lanes);
 
-            // Überprüft den Typ des Quellknotens und ruft die passende Verarbeitungsmethode auf
-            if (source instanceof StartEvent) {
-                sbvrOutput.append(transformStartEventToSBVR((StartEvent) source, sourceRole, targetRole, lanes)).append("\n");
-            } else if (source instanceof EndEvent) {
-                sbvrOutput.append(transformEndEventToSBVR((EndEvent) source, sourceRole, targetRole, lanes)).append("\n");
-            } else if (source instanceof ExclusiveGateway) {
-                // Für XOR-Gateways wird eine spezielle Verarbeitung durchgeführt
-                transformXORGatewayToSBVR((ExclusiveGateway) source, sbvrOutput, sourceRole, lanes, processedGateways);
-            } else if (source instanceof ParallelGateway) {
-                List<SequenceFlow> outgoingFlows = new ArrayList<>(((ParallelGateway) source).getOutgoing());
-                sbvrOutput.append(transformANDGatewayToSBVR((ParallelGateway) source, outgoingFlows, (List<Lane>) lanes)).append("\n");
-            } else if (source instanceof InclusiveGateway) {
-                // Verarbeitet Inklusive Gateways
-                List<SequenceFlow> outgoingFlows = new ArrayList<>(((InclusiveGateway) source).getOutgoing());
-                sbvrOutput.append(transformInklusiveGatewayToSBVR((InclusiveGateway) source, outgoingFlows, (List<Lane>) lanes)).append("\n");
-            } else if (source instanceof EventBasedGateway) {
-                // Für Event-Gateways wird die neue Methode aufgerufen
-                transformEventGatewayToSBVR((EventBasedGateway) source, sbvrOutput, lanes, processedGateways);
-//            } else if (source instanceof SubProcess) {
+//            // Überprüft den Typ des Quellknotens und ruft die passende Verarbeitungsmethode auf
+//            switch (source.getClass().getSimpleName()) {
+//                case "StartEvent" ->
+//                        sbvrOutput.append(new StartEventTransformer().transformFlowNode((StartEvent) source, sourceRole, targetRole, lanes)).append("\n");
+//                case "EndEvent" ->
+//                        sbvrOutput.append(transformEndEventToSBVR((EndEvent) source, sourceRole, targetRole, lanes)).append("\n");
+//
+//            }
+
+            if (source instanceof StartEvent startEvent) {
+                sbvrOutput.append(new StartEventTransformer().transformFlowNode(startEvent, sourceRole, targetRole, lanes)).append("\n");
+            } else if (source instanceof EndEvent endEvent) {
+                sbvrOutput.append(new EndEventTransformer().transformFlowNode(endEvent, sourceRole, targetRole, lanes)).append("\n");
+            } else if (source instanceof ExclusiveGateway exclusiveGateway) {
+                sbvrOutput.append(new XORGatewayTransformer().transformFlowNode(exclusiveGateway, sourceRole, targetRole, lanes)).append("\n");
+            } else if (source instanceof ParallelGateway parallelGateway) {
+                sbvrOutput.append(new ANDGatewayTransformer().transformFlowNode(parallelGateway, sourceRole, targetRole, lanes)).append("\n");
+            } else if (source instanceof InclusiveGateway inclusiveGateway) {
+                sbvrOutput.append(new ORGatewayTransformer().transformFlowNode(inclusiveGateway, sourceRole, targetRole, lanes)).append("\n");
+            } else if (source instanceof EventBasedGateway eventBasedGateway) {
+                sbvrOutput.append(new EventBasedTransformer().transformFlowNode(eventBasedGateway, sourceRole, targetRole, lanes));
+//            } else if (source instanceof IntermediateCatchEvent intermediateCatchEvent) {
+//                    String sbvrStatement = processAndTransformIntermediateThrowEvents(messageFlow, lanes, modelInstance, sbvrOutput);
+//                    sbvrOutput.append(sbvrStatement).append("\n");
+//                } else {
+//                    System.out.println("Kein MessageFlow für das IntermediateCatchEvent gefunden.");
+//                }
+//            } else if (source instanceof IntermediateThrowEvent intermediateThrowEvent) {
+                // Hole den MessageFlow für das IntermediateThrowEvent (dies muss entsprechend deinem Modell implementiert werden)
+                //MessageFlow messageFlow = getMessageFlowForEvent((IntermediateCatchEvent) intermediateThrowEvent, modelInstance);
+                // Rufe die Methode auf, um die SBVR-Transformation durchzuführen
+                //processAndTransformIntermediateThrowEvents(messageFlow, lanes, modelInstance, sbvrOutput);
+            } else if (source instanceof SubProcess) {
 //                processSubProcesses((SubProcess) source, standardOutput, sbvrOutput);
             } else {
                 // Für alle anderen Knoten wird ein generisches Logging eingefügt
@@ -61,112 +76,50 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
         }
     }
 
-    public static String transformANDGatewayToSBVR(ParallelGateway gateway, List<SequenceFlow> outgoingFlows, List<Lane> lanes) {
-        StringBuilder sbvrStatements = new StringBuilder();
-        Set<String> uniqueStatements = new HashSet<>(); // Set für Duplikatprüfung
+        //    Throw event empfängt etwas von dem Participant; ausgemaltes Nachrichtenzeichen
+        static String processAndTransformIntermediateThrowEvents(
+                MessageFlow messageFlow, // Verwenden des MessageFlow-Parameters
+                Collection<Lane> lanes,
+                BpmnModelInstance modelInstance,
+                StringBuilder sbvrOutput) {
 
-        // Bestimme den Namen des Quellknotens (Eingang des Gateways)
-        String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
+            // Hole die Namen des Senders und Empfängers
+            String senderName = Hilfsmethoden.getName((FlowNode) messageFlow.getSource());
+            String receiverName = Hilfsmethoden.getName((FlowNode) messageFlow.getTarget());
 
-        // Bestimme die Rolle des Gateways
-        String role = getRoleForNode(gateway, lanes);
+            // Hole die Teilnehmerrollen basierend auf der XML-Datenstruktur und dem BpmnModelInstance
+            String senderRole = getParticipantRole(senderName, modelInstance);
+            String receiverRole = getParticipantRole(receiverName, modelInstance);
 
-        // Überprüfe, ob es zwei Ausgangsflüsse gibt
-        if (outgoingFlows.size() == 2) {
-            // Hole die Zielnamen und Zielrollen für beide Ausgangsflüsse
-            String targetName1 = getName(outgoingFlows.get(0).getTarget());
-            String targetRole1 = getRoleForNode(outgoingFlows.get(0).getTarget(), lanes);
+            // Hole den Nachrichtenname (falls vorhanden, ansonsten "unbekannte Nachricht")
+            String messageName = messageFlow.getName() != null ? messageFlow.getName() : "unbekannte Nachricht";
 
-            String targetName2 = getName(outgoingFlows.get(1).getTarget());
-            String targetRole2 = getRoleForNode(outgoingFlows.get(1).getTarget(), lanes);
+            // Erstelle die SBVR-Regel mit der neuen Methode
+            String sbvrStatement = createIntermediateThrowEventStatement(senderRole, senderName, receiverRole, receiverName, messageName);
 
-            // Erstelle die SBVR-Aussage für das Parallel-Gateway
-            String sbvrStatement = createParallelStatement(sourceName, targetRole1, targetName1, targetRole2, targetName2, getName(gateway));
+            // Ausgabe in der Konsole
+            System.out.println(sbvrStatement);
 
-            // Vermeide Duplikate
-            uniqueStatements.add(sbvrStatement);
-            sbvrStatements.append(sbvrStatement);
-        } else {
-            // Wenn es nicht genau zwei Ausgangsflüsse gibt, füge eine Standardnachricht hinzu oder behandle es anders
-            sbvrStatements.append("Es gibt nicht genau zwei Ausgangsflüsse für das Parallel-Gateway.");
+            // SBVR-Transformation hinzufügen
+            sbvrOutput.append(sbvrStatement).append("\n");
+            return senderName;
         }
 
-        return sbvrStatements.toString();
-    }
+        public static String processAndTransformIntermediateCatchEvents(MessageFlow messageFlow, Collection<Lane> lanes, BpmnModelInstance modelInstance) {
+        // Hole die Namen des Senders und Empfängers
+        String senderName = Hilfsmethoden.getName((FlowNode) messageFlow.getSource());
+        String receiverName = Hilfsmethoden.getName((FlowNode) messageFlow.getTarget());
 
-    public static String transformInklusiveGatewayToSBVR(InclusiveGateway gateway, List<SequenceFlow> outgoingFlows, List<Lane> lanes) {
-        StringBuilder sbvrStatements = new StringBuilder();
-        Set<String> uniqueStatements = new HashSet<>(); // Set für Duplikatprüfung
+        // Hole die Teilnehmerrollen basierend auf der XML-Datenstruktur und dem BpmnModelInstance
+        String senderRole = getParticipantRole(senderName, modelInstance);  // Verwendet getParticipantRole statt getParticipantName
+        String receiverRole = getParticipantRole(receiverName, modelInstance);  // Verwendet getParticipantRole statt getParticipantName
 
-        // Bestimme den Namen des Quellknotens (Eingang des Gateways)
-        String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
+        // Verwende die Methode createIntermediateCatchEventStatement zur Erstellung der SBVR-Regel
+        String sbvrStatement = createIntermediateCatchEventStatement(senderRole, senderName, receiverRole, receiverName);
 
-        // Bestimme die Rolle des Quellknotens
-        String sourceRole = getRoleForNode(gateway.getIncoming().iterator().next().getSource(), lanes);
+        // Ausgabe zur Konsole
+        System.out.println(sbvrStatement);
 
-        // Gehe alle Ausgangsflüsse durch
-        for (SequenceFlow outgoingFlow : outgoingFlows) {
-            // Hole die Zielnamen und Zielrollen für den aktuellen Ausgangsfluss
-            String targetName = getName(outgoingFlow.getTarget());
-            String targetRole = getRoleForNode(outgoingFlow.getTarget(), lanes);
-
-            // Hole die Bedingung des aktuellen Flusses (z.B. cond(1), cond(2), ...)
-            String condition = getCondition(outgoingFlow); // Diese Methode musst du ggf. definieren, um die Bedingung zu holen
-
-            // Erstelle die SBVR-Aussage für diesen Ausgangsfluss
-            String sbvrStatement = createInclusiveStatement(sourceRole, sourceName, targetRole, targetName, condition);
-
-            // Vermeide Duplikate
-            if (uniqueStatements.add(sbvrStatement)) {
-                sbvrStatements.append(sbvrStatement);
-            }
-        }
-
-        // Wenn keine Ausgangsflüsse vorhanden sind, füge eine Standardnachricht hinzu
-        if (outgoingFlows.isEmpty()) {
-            sbvrStatements.append("Es gibt keine Ausgangsflüsse für das Inklusive Gateway.");
-        }
-
-        return sbvrStatements.toString();
-    }
-
-    public static String transformEndEventToSBVR(EndEvent endEvent, String sourceRole, String targetRole, Collection<Lane> lanes) {
-        // Den Namen des EndEvents extrahieren
-        String endEventName = Hilfsmethoden.getName(endEvent);  // Aufruf der Hilfsmethode getName
-
-        // Konvertiere die Collection der Ausgangsflüsse in eine Liste, um auf die Elemente per Index zuzugreifen
-        List<SequenceFlow> outgoingFlows = new ArrayList<>(endEvent.getOutgoing());
-
-        // Überprüfe, ob es mindestens einen Ausgangsfluss gibt
-        if (!outgoingFlows.isEmpty()) {
-            // Bestimmt den Namen des Zielknotens (z.B. eine Aktivität oder ein anderes Event)
-            String targetName = Hilfsmethoden.getName(outgoingFlows.get(0).getTarget());
-
-            // Jetzt das SBVR-Statement mit der Methode createEndEventStatement generieren
-            return createEndEventStatement(endEvent, sourceRole, targetRole);
-        } else {
-            // Falls keine Ausgangsflüsse vorhanden sind, eine entsprechende Fehlermeldung oder Standardantwort zurückgeben
-            return "Fehler: EndEvent hat keine Ausgangsflüsse.";
-        }
-    }
-
-    public static String transformStartEventToSBVR(StartEvent startEvent, String sourceRole, String targetRole, Collection<Lane> lanes) {
-        // Den Namen des StartEvents extrahieren
-        String startEventName = Hilfsmethoden.getName(startEvent);  // Aufruf der Hilfsmethode getName
-
-        // Konvertiere die Collection der Ausgangsflüsse in eine Liste, um auf die Elemente per Index zuzugreifen
-        List<SequenceFlow> outgoingFlows = new ArrayList<>(startEvent.getOutgoing());
-
-        // Überprüfe, ob es mindestens einen Ausgangsfluss gibt
-        if (!outgoingFlows.isEmpty()) {
-            // Bestimmt den Namen des Zielknotens (z.B. eine Aktivität oder ein anderes Event)
-            String targetName = Hilfsmethoden.getName(outgoingFlows.get(0).getTarget());
-
-            // Jetzt das SBVR-Statement mit der Methode createStartEventStatement generieren
-            return createStartEventStatement(sourceRole, startEventName, targetRole, targetName);
-        } else {
-            // Falls keine Ausgangsflüsse vorhanden sind, eine entsprechende Fehlermeldung oder Standardantwort zurückgeben
-            return "Fehler: StartEvent hat keine Ausgangsflüsse.";
-        }
+        return sbvrStatement;  // Gibt die vollständige Ausgabe zurück, wenn benötigt
     }
 }

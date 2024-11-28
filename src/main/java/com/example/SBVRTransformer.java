@@ -107,6 +107,8 @@
 //        return sbvrStatement.toString();  // Gibt die vollständige Ausgabe zurück, wenn benötigt
 //    }
 //
+
+
 //    //    Throw event empfängt etwas von dem Participant; ausgemaltes Nachrichtenzeichen
 //    static void processAndTransformIntermediateThrowEvents(BpmnModelInstance modelInstance, StringBuilder output, StringBuilder sbvrOutput) {
 //        // Sammlung aller IntermediateThrowEvents im Modell
