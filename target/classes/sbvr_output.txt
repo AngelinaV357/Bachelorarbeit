@@ -1,8 +1,43 @@
-Es ist notwendig, dass Human Resources Department Start ausführt, wenn Human Resources Department Add personal data ausführt.
-Es ist notwendig, dass Procurement Procure work equipment ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
-Es ist notwendig, dass IT-Department Set up access rights, hardware and software ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
-Es ist notwendig, dass Procurement Procure work equipment ausführt und IT-Department Set up access rights, hardware and software ausführt, wenn UND-Gateway ausführt.
-Es ist notwendig, dass Procurement Procure work equipment ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
-Es ist notwendig, dass IT-Department Set up access rights, hardware and software ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
-Es ist notwendig, dass Procurement Procure work equipment ausführt und IT-Department Set up access rights, hardware and software ausführt, wenn UND-Gateway ausführt.
+Es ist notwendig, dass Head of Human Resources  Applicant verified ausführt, wenn Head of Human Resources  Send receipt confirmation ausführt.
+Es ist notwendig, dass die Ressource mit der Rolle Human Resources Department die Nachricht Invite to job interview an die Ressource mit der Rolle Human Resources Department sendet.
+
+Es ist notwendig, dass Human Resources Department Start ausführt, wenn Human Resources Department Send receipt confirmation ausführt.
+Es ist notwendig, dass die Ressource mit der Rolle Human Resources Department die Nachricht Send receipt confirmation an die Ressource mit der Rolle Head of Human Resources  sendet.
+
+Es ist notwendig, dass Human Resources Department Prepare employment agreement ausführt, wenn Human Resources Department Invite to job interview ausführt.
+Es ist notwendig, dass Human Resources Department Carry out job interview ausführt, wenn Human Resources Department Prepare employment agreement ausführt.
+Es ist notwendig, dass die Ressource mit der Rolle Human Resources Department die Nachricht Send employment contract an die Ressource mit der Rolle Human Resources Department sendet.
+
+Es ist notwendig, dass Human Resources Department Send employment contract ausführt, wenn Human Resources Department XOR-Gateway ausführt und Yes gilt.
+
+Es ist notwendig, dass Human Resources Department Send employment contract ausführt oder Human Resources Department Send rejection ausführt, aber nicht beides gleichzeitig, wenn XOR-Gateway ausgeführt wird.
+Es ist notwendig, dass Human Resources Department Send rejection ausführt, wenn Human Resources Department XOR-Gateway ausführt und No gilt.
+
+Es ist notwendig, dass Human Resources Department Send rejection ausführt oder Human Resources Department Send employment contract ausführt, aber nicht beides gleichzeitig, wenn XOR-Gateway ausgeführt wird.
+
+Es ist notwendig, dass Human Resources Department Send employment contract ausführt, wenn Human Resources Department XOR-Gateway ausführt und Yes gilt.
+
+Es ist notwendig, dass Human Resources Department Send employment contract ausführt oder Human Resources Department Send rejection ausführt, aber nicht beides gleichzeitig, wenn XOR-Gateway ausgeführt wird.
+Es ist notwendig, dass Human Resources Department Send rejection ausführt, wenn Human Resources Department XOR-Gateway ausführt und No gilt.
+
+Es ist notwendig, dass Human Resources Department Send rejection ausführt oder Human Resources Department Send employment contract ausführt, aber nicht beides gleichzeitig, wenn XOR-Gateway ausgeführt wird.
+
+Es ist notwendig, dass Human Resources Department Invite to job interview ausführt, wenn Head of Human Resources  XOR-Gateway ausführt und Accept gilt.
+
+Es ist notwendig, dass Human Resources Department Invite to job interview ausführt oder Human Resources Department Unbekannter Knoten ausführt, aber nicht beides gleichzeitig, wenn XOR-Gateway ausgeführt wird.
+Es ist notwendig, dass Head of Human Resources  Unbekannter Knoten ausführt, wenn Head of Human Resources  XOR-Gateway ausführt und Reject  gilt.
+
+Es ist notwendig, dass Head of Human Resources  Unbekannter Knoten ausführt oder Human Resources Department Invite to job interview ausführt, aber nicht beides gleichzeitig, wenn XOR-Gateway ausgeführt wird.
+
+Es ist notwendig, dass Human Resources Department Invite to job interview ausführt, wenn Head of Human Resources  XOR-Gateway ausführt und Accept gilt.
+
+Es ist notwendig, dass Human Resources Department Invite to job interview ausführt oder Head of Human Resources  Unbekannter Knoten ausführt, aber nicht beides gleichzeitig, wenn XOR-Gateway ausgeführt wird.
+Es ist notwendig, dass Head of Human Resources  Unbekannter Knoten ausführt, wenn Head of Human Resources  XOR-Gateway ausführt und Reject  gilt.
+
+Es ist notwendig, dass Head of Human Resources  Unbekannter Knoten ausführt oder Head of Human Resources  Invite to job interview ausführt, aber nicht beides gleichzeitig, wenn XOR-Gateway ausgeführt wird.
+
+Es ist notwendig, dass die Ressource mit der Rolle Human Resources Department die Nachricht Send rejection an die Ressource mit der Rolle Head of Human Resources  sendet.
+
+Es ist notwendig, dass Head of Human Resources  Ende ausführt, wenn Head of Human Resources  XOR-Gateway ausführt und unbekannte Bedingung gilt.
+
 

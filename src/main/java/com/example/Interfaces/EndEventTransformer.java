@@ -1,7 +1,6 @@
 package com.example.Interfaces;
 
 import com.example.Hilfsmethoden;
-import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Lane;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
@@ -28,10 +27,11 @@ public class EndEventTransformer implements FlowNodeTransformer {
             String targetName = Hilfsmethoden.getName(outgoingFlows.get(0).getTarget());
 
             // Jetzt das SBVR-Statement mit der Methode createEndEventStatement generieren
-            return createEndEventStatement((EndEvent) endEvent, sourceRole, targetRole);
+            return createEndEventStatement(sourceRole, targetRole, targetName, endEventName);  // Übergibt die richtigen Parameter
         } else {
-            // Falls keine Ausgangsflüsse vorhanden sind, eine entsprechende Fehlermeldung oder Standardantwort zurückgeben
-            return "Fehler: EndEvent hat keine Ausgangsflüsse.";
+            // Falls keine Ausgangsflüsse vorhanden sind, prüfen wir, ob es sich um ein Endevent handelt
+            // Bei einem EndEvent, das keine Ausgangsflüsse hat, könnte dies einfach das Ende des Prozesses sein
+            return "Es ist notwendig, dass der Prozess mit dem Endevent " + endEventName + " endet.";
         }
     }
 }

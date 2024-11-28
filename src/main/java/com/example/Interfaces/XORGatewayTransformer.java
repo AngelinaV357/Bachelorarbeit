@@ -13,54 +13,50 @@ import static com.example.Hilfsmethoden.getRoleForNode;
 
 public class XORGatewayTransformer implements FlowNodeTransformer {
 
-
     @Override
     public String transformFlowNode(FlowNode node, String sourceRole, String targetRole, Collection<Lane> lanes) {
         StringBuilder sbvrOutput = new StringBuilder();
-        StringBuilder sbvrStatements = new StringBuilder();
+        Set<String> processedFlows = new HashSet<>(); // Set zum Speichern bereits verarbeiteter Flüsse
 
         if (node instanceof ExclusiveGateway gateway) {
             List<SequenceFlow> outgoingFlows = new ArrayList<>(gateway.getOutgoing());
-            Set<String> uniqueStatements = new HashSet<>();
 
-            String gatewayId = gateway.getId();
-            String gatewayName = getName(gateway);
-            String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
+            // Verarbeite jeden ausgehenden Fluss des XOR-Gateways
+            for (SequenceFlow flow : outgoingFlows) {
+                String targetRoleCurrent = getRoleForNode(flow.getTarget(), lanes);
+                String targetNameCurrent = getName(flow.getTarget());
+                String condition = flow.getName() != null ? flow.getName() : "unbekannte Bedingung";
 
-            // Überprüfen, ob es genau zwei ausgehende Flüsse gibt
-            if (outgoingFlows.size() == 2) {
-                String targetRole1 = getRoleForNode(outgoingFlows.get(0).getTarget(), lanes);
-                String targetRole2 = getRoleForNode(outgoingFlows.get(1).getTarget(), lanes);
+                // Generiere eine eindeutige ID für diesen Fluss (Source, Target, und Condition)
+                String flowIdentifier = String.format("%s-%s-%s-%s", sourceRole, getName(flow.getSource()), targetRoleCurrent, condition);
 
-                String targetName1 = getName(outgoingFlows.get(0).getTarget());
-                String targetName2 = getName(outgoingFlows.get(1).getTarget());
+                // Wenn dieser Fluss noch nicht verarbeitet wurde
+                if (!processedFlows.contains(flowIdentifier)) {
+                    // Füge diesen Fluss zur Liste der verarbeiteten Flüsse hinzu
+                    processedFlows.add(flowIdentifier);
 
-                String condition1 = outgoingFlows.get(0).getName() != null ? outgoingFlows.get(0).getName() : "unbekannte Bedingung";
-                String condition2 = outgoingFlows.get(1).getName() != null ? outgoingFlows.get(1).getName() : "unbekannte Bedingung";
+                    // Erstelle die SBVR-Aussage für diesen Fluss
+                    String flowStatement = SBVRTransformerNEU.createFlowStatement(sourceRole, getName(flow.getSource()), targetRoleCurrent, targetNameCurrent, condition);
+                    sbvrOutput.append(flowStatement).append("\n");
 
-                // Erzeuge Flow-Statements
-                String flowStatement1 = SBVRTransformerNEU.createFlowStatement(sourceRole, sourceName, targetRole1, targetName1, condition1);
-                uniqueStatements.add(flowStatement1);
-                sbvrStatements.append(flowStatement1);
-
-                String flowStatement2 = SBVRTransformerNEU.createFlowStatement(sourceRole, sourceName, targetRole2, targetName2, condition2);
-                if (uniqueStatements.add(flowStatement2)) {
-                    sbvrStatements.append(flowStatement2);
+                    // Sonderfall für Exklusionsbedingungen
+                    if (outgoingFlows.size() > 1) {
+                        for (int i = 0; i < outgoingFlows.size(); i++) {
+                            // Überprüfe, ob der Fluss miteinander ausgeschlossen werden sollte
+                            SequenceFlow otherFlow = outgoingFlows.get(i);
+                            if (!otherFlow.equals(flow)) {
+                                String exclusionStatement = SBVRTransformerNEU.createExclusionStatement(getName(flow.getSource()), targetRoleCurrent, targetNameCurrent, targetRole, getName(otherFlow.getTarget()));
+                                if (!processedFlows.contains(exclusionStatement)) {
+                                    processedFlows.add(exclusionStatement);
+                                    sbvrOutput.append(exclusionStatement).append("\n");
+                                }
+                            }
+                        }
+                    }
                 }
-
-                // Erzeuge Exklusions-Statement (Ausschlussregel)
-                String exclusionStatement = SBVRTransformerNEU.createExclusionStatement(sourceName, targetRole1, targetName1, targetRole2, targetName2);
-                if (uniqueStatements.add(exclusionStatement)) {
-                    sbvrStatements.append(exclusionStatement);
-                }
-            } else {
-                sbvrStatements.append("Warnung: XOR-Gateway '").append(gatewayName).append("' hat nicht genau zwei ausgehende Flows.\n");
             }
-        } else {
-            sbvrStatements.append("Der Knoten ist kein ExclusiveGateway.\n");
         }
 
-        sbvrOutput.append(sbvrStatements);
         return sbvrOutput.toString();
     }
 }
