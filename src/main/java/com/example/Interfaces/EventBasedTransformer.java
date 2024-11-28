@@ -33,7 +33,7 @@ public class EventBasedTransformer implements FlowNodeTransformer {
             String eventType = Hilfsmethoden.getEventType(flow.getTarget()); // Methode, um den Ereignistyp zu bestimmen (Nachricht, Timer, Bedingung)
 
             // Generiere die SBVR-Aussage für den aktuellen Flow
-            String eventStatement = SBVRTransformerNEU.createEventGatewayStatement(targetName, eventType);
+            String eventStatement = SBVRTransformerNEU.createODEREventGatewayStatement(targetName, eventType);
 
             // Füge die Aussage hinzu, wenn sie noch nicht existiert
             if (!uniqueStatements.contains(eventStatement)) {

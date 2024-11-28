@@ -32,7 +32,10 @@ public class SBVRTransformerNEU {
         return "Es ist notwendig, dass " + targetRole1 + " " + targetName1 + " ausführt und " + targetRole2 + " " + targetName2 + " ausführt, wenn " + gatewayName + " ausführt.";
     }
 
-    public static String createEventGatewayStatement(String activityName, String eventType) {
+    /**
+     * Ein oder basiertes Gateway bedeutet, dass nur ein Ergebnis eintreffen muss, um den Prozess fortzusetzen
+     */
+    public static String createODEREventGatewayStatement(String activityName, String eventType) {
         // Formuliert die SBVR-Aussage basierend auf der Aktivität und dem Ereignis
         return "Es ist notwendig, dass die Aufgabe " + activityName + " startet, wenn das Datenereignis " + eventType + " eintritt.";
     }
