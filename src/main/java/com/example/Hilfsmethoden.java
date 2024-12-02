@@ -7,8 +7,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Hilfsmethoden {
 
@@ -58,9 +58,7 @@ public class Hilfsmethoden {
         return "Unbekannter Knoten";
     }
 
-//    public static String transformRoleToSBVR(String roleName) {
-//        return roleName + " is a role.";
-//    }
+
     /**
      * Diese Methode extrahiert die Teilnehmerrollen (Participants) aus dem BPMN-Modell und erstellt eine Map,
      * @return Eine Map, in der die Teilnehmer-ID (participantId) den Teilnehmernamen (participantName) zugeordnet ist.
@@ -103,12 +101,22 @@ public class Hilfsmethoden {
     }
 
     public static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {
+        Set<String> roles = new HashSet<>();
         for (Lane lane : lanes) {
             if (lane.getFlowNodeRefs().contains(node)) {
-                return lane.getName();
+                roles.add(lane.getName());
             }
         }
-        return "Unbekannte Rolle";
+
+        // Wenn mehrere Rollen gefunden werden, gib eine spezifische Fehlermeldung zurück
+        if (roles.isEmpty()) {
+            return "Unbekannte Rolle";
+        }
+        // Wenn mehrere Rollen vorhanden sind, könnte man z.B. die erste nehmen
+        if (roles.size() > 1) {
+            return "Mehrere Rollen zugeordnet";
+        }
+        return roles.iterator().next();
     }
 
 

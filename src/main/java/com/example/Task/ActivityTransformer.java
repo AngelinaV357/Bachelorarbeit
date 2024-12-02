@@ -4,18 +4,15 @@ import com.example.Interfaces.FlowNodeTransformer;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Lane;
 import org.camunda.bpm.model.bpmn.instance.Task;
+import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
 
 import java.util.*;
 
 import static com.example.Hilfsmethoden.getName;
+import static com.example.Hilfsmethoden.getRoleForNode;
 
 public class ActivityTransformer implements FlowNodeTransformer {
 
-    /**
-     * Dieser Code transformiert einen Aktivitätsknoten aus einem BPMN-Diagramm in SBVR-konforme Aussagen.
-     * Der `transformFlowNode`-Methoden nimmt einen FlowNode (Knoten) als Eingabe, prüft, ob es sich um eine Aktivität handelt,
-     * und erzeugt daraufhin eine SBVR-Aussage, die die Bedingungen für die Aktivität beschreibt.
-     */
     @Override
     public String transformFlowNode(FlowNode node, String sourceRole, String targetRole, Collection<Lane> lanes) {
         StringBuilder sbvrOutput = new StringBuilder();
@@ -32,13 +29,26 @@ public class ActivityTransformer implements FlowNodeTransformer {
                 sourceActivity = getName(task.getIncoming().iterator().next().getSource());
             }
 
-            // Hole den Namen der Zielaktivität (Aktivität 1)
-            String targetActivity = activityName;
+            // Hole die Rollen für die Quell- und Ziel-Aktivitäten
+            String sourceActivityRole = getRoleForNode(task.getIncoming().iterator().next().getSource(), lanes);
+            String targetActivityRole = getRoleForNode(task, lanes);
+
+            // Überprüfen, ob das XOR-Gateway in der Quellaktivität vorhanden ist
+            String gatewayName = null;
+            if (task.getIncoming().iterator().next().getSource() instanceof ExclusiveGateway gateway) {
+                gatewayName = gateway.getName();  // Holen des Namens des XOR-Gateways
+            }
 
             // Erstelle eine SBVR-Aussage für die Aktivität
             if (sourceActivity != null) {
-                String activityStatement = "Es ist notwendig, dass " + targetRole + " " + targetActivity + " ausführt, wenn " + sourceRole + " " + sourceActivity + " ausführt.";
-                sbvrOutput.append(activityStatement);
+                String activityStatement;
+                if (gatewayName != null) {
+                    // Wenn ein XOR-Gateway vorhanden ist, füge den Namen des Gateways in die Aussage ein
+                    activityStatement = "Es ist notwendig, dass " + targetActivityRole + " " + activityName + " ausführt, wenn " + sourceActivityRole + " " + sourceActivity + " ausführt und das XOR-Gateway '" + gatewayName + "' aktiv ist.";
+                } else {
+                    activityStatement = "Es ist notwendig, dass " + targetActivityRole + " " + activityName + " ausführt, wenn " + sourceActivityRole + " " + sourceActivity + " ausführt.";
+                }
+                sbvrOutput.append(activityStatement).append("\n");  // Absatz nach jedem Satz
             }
         }
 

@@ -1,14 +1,21 @@
-„Es ist notwendig, dass Procure work equipment die Nachricht [Nachricht] vom Supplier empfängt.“
-„Es ist notwendig, dass Procure work equipment die Nachricht [Nachricht] an Supplier sendet.“
-DataObject-Analyse:
-Gefundenes DataObject: Work equipment
-Es ist notwendig, dass die Aktivität Add personal data auf das DataObject Work equipment zugreift, wenn sie aufgerufen wird.
-Es ist notwendig, dass die Aktivität Select necessary work equipment auf das DataObject Work equipment zugreift, wenn sie aufgerufen wird.
-Es ist notwendig, dass die Aktivität Set up access rights, hardware and software auf das DataObject Work equipment zugreift, wenn sie aufgerufen wird.
-Gefundenes DataInput: employment contract
-Es ist notwendig, dass die Aktivität Add personal data auf das DataObject Work equipment zugreift, wenn sie aufgerufen wird.
-Es ist notwendig, dass die Aktivität Add personal data auf das DataInput employment contract zugreift, wenn sie aufgerufen wird.
-Es ist notwendig, dass die Aktivität Select necessary work equipment auf das DataObject Work equipment zugreift, wenn sie aufgerufen wird.
-Es ist notwendig, dass die Aktivität Select necessary work equipment auf das DataInput employment contract zugreift, wenn sie aufgerufen wird.
-Es ist notwendig, dass die Aktivität Set up access rights, hardware and software auf das DataObject Work equipment zugreift, wenn sie aufgerufen wird.
-Es ist notwendig, dass die Aktivität Set up access rights, hardware and software auf das DataInput employment contract zugreift, wenn sie aufgerufen wird.
+Es ist notwendig, dass Sales Person Start ausführt, wenn Sales Person Determine customer preferences  ausführt.
+Es ist notwendig, dass Sales Person Determine customer preferences  ausführt, wenn Sales Person Start ausführt.
+
+Es ist notwendig, dass die Aufgabe Prepare sale slip, einer Ressource mit der Rolle Cashier zugewiesen wird.
+
+Es ist notwendig, dass die Aufgabe Collect payment, einer Ressource mit der Rolle Cashier zugewiesen wird.
+
+Es ist notwendig, dass Automated Car Wash Lane
+ Clean Car ausführt, wenn Cashier XOR-Gateway ausführt.
+
+Subprozess erkannt: Dry Car
+Es ist notwendig, dass Cashier Demand other form of payment ausführt, wenn Cashier Collect payment ausführt und no gilt.
+Es ist notwendig, dass Automated Car Wash Lane
+ Clean Car ausführt, wenn Cashier Collect payment ausführt und yes gilt.
+
+Es ist notwendig, dass Cashier Demand other form of payment ausführt, wenn Cashier Collect payment ausführt und no gilt.
+Es ist notwendig, dass Automated Car Wash Lane
+ Clean Car ausführt, wenn Cashier Collect payment ausführt und yes gilt.
+
+Es ist notwendig, dass Cashier Demand other form of payment ausführt, wenn Cashier XOR-Gateway ausführt.
+

@@ -10,9 +10,9 @@ public class SBVRTransformerNEU {
         return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und " + condition + " gilt.\n";
     }
 
-    public static String createExclusionStatement(String sourceName, String targetRole1, String targetName1, String targetRole2, String targetName2) {
-        return "Es ist notwendig, dass " + targetRole1 + " " + targetName1 + " ausführt oder " + targetRole2 + " " + targetName2 + " ausführt, aber nicht beides gleichzeitig, wenn " + sourceName + " ausgeführt wird.";
-    }
+//    public static String createExclusionStatement(String sourceName, String targetRole1, String targetName1, String targetRole2, String targetName2) {
+//        return "Es ist notwendig, dass " + targetRole1 + " " + targetName1 + " ausführt oder " + targetRole2 + " " + targetName2 + " ausführt, aber nicht beides gleichzeitig, wenn " + sourceName + " ausgeführt wird.";
+//    }
 
     public static String createInclusiveStatement(String sourceRole, String sourceName, String targetRole, String targetName, String condition) {
         return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und " + condition + " gilt.\n";
