@@ -63,26 +63,22 @@ public class Hilfsmethoden {
 //    }
     /**
      * Diese Methode extrahiert die Teilnehmerrollen (Participants) aus dem BPMN-Modell und erstellt eine Map,
-     * die die IDs der Teilnehmer den entsprechenden Namen zuordnet.
-     *
-     * @param modelInstance Das BpmnModelInstance, das die BPMN-Daten enthält.
      * @return Eine Map, in der die Teilnehmer-ID (participantId) den Teilnehmernamen (participantName) zugeordnet ist.
      */
-    public static Map<String, String> getParticipantName(BpmnModelInstance modelInstance) {
-        Map<String, String> participants = new HashMap<>();
-
-        // Extrahieren der Teilnehmerrollen aus dem Modell
-        Collection<Participant> participantElements = modelInstance.getModelElementsByType(Participant.class);
-
-        for (Participant participant : participantElements) {
-            String participantId = participant.getId();
-            String participantName = participant.getName() != null ? participant.getName() : "Unbekannter Teilnehmer";
-
-            // Zuordnung von participantId zu participantName
-            participants.put(participantId, participantName);
+    public static String getMessageFlowParticipantName(BaseElement element, Collection<Participant> participants) {
+        // Prüfe, ob das Element ein Participant ist
+        if (element instanceof Participant participant) {
+            return participant.getName() != null ? participant.getName() : "Unbenannter Teilnehmer";
         }
 
-        return participants;  // Gibt die Map zurück
+        // Falls nicht, überprüfe die zugehörigen Teilnehmer anhand der Prozesse
+        for (Participant participant : participants) {
+            if (participant.getProcess() != null && participant.getProcess().equals(element)) {
+                return participant.getName() != null ? participant.getName() : "Unbenannter Teilnehmer";
+            }
+        }
+
+        return "Unbekannte Quelle/Ziel";
     }
 
     /**

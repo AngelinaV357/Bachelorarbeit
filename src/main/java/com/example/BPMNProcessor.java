@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.Data.DataObjectAnalysis;
 import com.example.Task.ActivityTransformer;
 import com.example.Task.EndEventTransformer;
 import com.example.Data.UserTaskTransformer;
@@ -37,6 +38,12 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
         Set<String> processedGateways = new HashSet<>();
 
         processSubProcessesAndMessageFlows(modelInstance, sbvrOutput);
+
+        DataObjectAnalysis dataObjectAnalysis = new DataObjectAnalysis();
+
+        // Rufe die Methode analyzeDataObjects auf und übergebe sbvrOutput, um die Ergebnisse zu integrieren
+        sbvrOutput.append("DataObject-Analyse:\n");
+        dataObjectAnalysis.analyzeDataObjects(modelInstance, sbvrOutput);
 
         for (SequenceFlow flow : sequenceFlows) {
             FlowNode source = flow.getSource();
