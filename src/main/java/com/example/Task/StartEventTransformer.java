@@ -1,6 +1,7 @@
-package com.example.Interfaces;
+package com.example.Task;
 
 import com.example.Hilfsmethoden;
+import com.example.Interfaces.FlowNodeTransformer;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Lane;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;

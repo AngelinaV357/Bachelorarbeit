@@ -16,7 +16,7 @@ public class SBVRGenerator {
             StringBuilder standardOutput = new StringBuilder();
             StringBuilder sbvrOutput = new StringBuilder();
 
-            BPMNProcessor.processSequenceFlows(modelInstance, standardOutput, sbvrOutput);
+            BPMNProcessor.processSequenceFlows(modelInstance, sbvrOutput);
 
             writeToFile(sbvrOutput.toString(), sbvrOutputFile);
 

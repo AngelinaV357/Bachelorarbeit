@@ -41,13 +41,18 @@ public class SBVRTransformerNEU {
     }
 
     //Datenobjekte:
-    /**
-     * Erzeugt die SBVR-Regel für einen Data Input.
-     * @param dataName Name des Data Inputs
-     * @return SBVR-Regel für den Data Input
-     */
-    public static String createDataInputStatement(String dataName) {
-        return "Es ist notwendig, dass die Eingabedaten " + dataName + " einer Aktivität zur Verfügung gestellt werden.\n";
+//    /**
+//     * Erzeugt die SBVR-Regel für einen Data Input.
+//     * @param dataName Name des Data Inputs
+//     * @return SBVR-Regel für den Data Input
+//     */
+//    public static String createDataInputStatement(String dataName) {
+//        return "Es ist notwendig, dass die Eingabedaten " + dataName + " einer Aktivität zur Verfügung gestellt werden.\n";
+//    }
+
+    public static String createDataInputStatementWithRoles(String dataName, String sourceId, String targetId, String sourceRole, String targetRole) {
+        return String.format("DataInput '%s' wird von '%s' generiert und an '%s' übermittelt. Quelle: %s, Ziel: %s.",
+                dataName, sourceRole, targetRole, sourceId, targetId);
     }
 
     /**

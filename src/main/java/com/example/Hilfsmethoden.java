@@ -90,16 +90,20 @@ public class Hilfsmethoden {
      * Sie verwendet das BPMN-Modell, um die Teilnehmerrolle anhand der FlowNodes (Sender und Empfänger)
      * zu ermitteln.
      *
-     * @param nodeId Die ID des FlowNodes, der einem Teilnehmer zugeordnet ist.
+     * @param name Die ID des FlowNodes, der einem Teilnehmer zugeordnet ist.
      * @param modelInstance Das BPMN-Modell, das die Teilnehmerinformationen enthält.
      * @return Der Name des Teilnehmers oder "Unbekannter Teilnehmer", wenn keine Zuordnung gefunden wurde.
      */
-    public static String getParticipantRole(String nodeId, BpmnModelInstance modelInstance) {
-        // Extrahieren der Teilnehmerrollen aus dem Modell
-        Map<String, String> participants = getParticipantName(modelInstance);
-
-        // Rückgabe des Teilnehmernamens basierend auf der nodeId
-        return participants.getOrDefault(nodeId, "Unbekannter Teilnehmer");
+    public static String getParticipantRole(String name, BpmnModelInstance modelInstance) {
+        // Suche nach dem Participant-Element, nicht nach FlowNode
+        Collection<Participant> participants = modelInstance.getModelElementsByType(Participant.class);
+        for (Participant participant : participants) {
+            if (participant.getName().equals(name)) {
+                // Hier handelt es sich um einen Teilnehmer, nicht um einen FlowNode
+                return participant.getName(); // Oder eine andere Rolle
+            }
+        }
+        return "Unbekannte Rolle"; // Standardwert
     }
 
     public static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {

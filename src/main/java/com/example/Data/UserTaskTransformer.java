@@ -1,16 +1,15 @@
-package com.example.Interfaces;
+package com.example.Data;
 
+import com.example.Interfaces.FlowNodeTransformer;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.SendTask;
 import org.camunda.bpm.model.bpmn.instance.Lane;
-import com.example.SBVRTransformerNEU;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 
 import java.util.Collection;
 
 import static com.example.SBVRTransformerNEU.createUserTaskStatement;
 
-public class UserTaskTransformer implements FlowNodeTransformer{
+public class UserTaskTransformer implements FlowNodeTransformer {
 
     /**
      * Wandelt einen UserTask in eine SBVR-Regel um.

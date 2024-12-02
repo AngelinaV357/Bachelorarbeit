@@ -1,9 +1,8 @@
-package com.example.Interfaces;
+package com.example.Task;
 
-import com.example.SBVRTransformerNEU;
+import com.example.Interfaces.FlowNodeTransformer;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Lane;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.Task;
 
 import java.util.*;
