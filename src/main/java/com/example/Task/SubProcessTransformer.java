@@ -8,47 +8,45 @@ import java.util.Collection;
 public class SubProcessTransformer {
 
     public static void processSubProcessesAndMessageFlows(BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {
-        // Hole alle Subprozesse aus dem BPMN-Modell
+        // Hole alle Subprozesse, Nachrichtenflüsse und Teilnehmer aus dem Modell
         Collection<SubProcess> subProcesses = modelInstance.getModelElementsByType(SubProcess.class);
+        Collection<MessageFlow> messageFlows = modelInstance.getModelElementsByType(MessageFlow.class);
+        Collection<Participant> participants = modelInstance.getModelElementsByType(Participant.class);
 
-        // Iteriere durch alle gefundenen Subprozesse
+        // Iteriere durch alle Subprozesse
         for (SubProcess subProcess : subProcesses) {
+            // Name des Subprozesses (mit Fallback)
             String subProcessName = subProcess.getName() != null ? subProcess.getName() : "Unbekannter Subprozess";
 
-            // Füge den Subprozess zur Ausgabe hinzu
+            // Füge Subprozess-Informationen zur Ausgabe hinzu
             sbvrOutput.append("Subprozess erkannt: ").append(subProcessName).append("\n");
 
-            // Ausgabe der enthaltenen FlowNodes
-            Collection<FlowNode> flowNodes = subProcess.getChildElementsByType(FlowNode.class);
+            // Verarbeitung der enthaltenen FlowNodes
             sbvrOutput.append("  Enthält folgende FlowNodes:\n");
+            Collection<FlowNode> flowNodes = subProcess.getChildElementsByType(FlowNode.class);
             for (FlowNode flowNode : flowNodes) {
                 String flowNodeName = flowNode.getName() != null ? flowNode.getName() : "Unbekannter FlowNode";
                 sbvrOutput.append("    - ").append(flowNodeName)
                         .append(" (Typ: ").append(flowNode.getElementType().getTypeName()).append(")").append("\n");
             }
 
-            // Verarbeite Nachrichtenflüsse, die den Subprozess betreffen
-            Collection<MessageFlow> messageFlows = modelInstance.getModelElementsByType(MessageFlow.class);
+            // Verarbeitung der Nachrichtenflüsse, die den Subprozess betreffen
             sbvrOutput.append("  Zugehörige Nachrichtenflüsse:\n");
             for (MessageFlow messageFlow : messageFlows) {
                 BaseElement source = (BaseElement) messageFlow.getSource();
                 BaseElement target = (BaseElement) messageFlow.getTarget();
 
-                // Prüfen, ob der Subprozess Quelle oder Ziel ist
-                if (source.equals(subProcess) || target.equals(subProcess)) {
-                    String sourceName = source instanceof FlowNode && ((FlowNode) source).getName() != null
-                            ? ((FlowNode) source).getName()
-                            : "Unbekannte Quelle";
-                    String targetName = target instanceof FlowNode && ((FlowNode) target).getName() != null
-                            ? ((FlowNode) target).getName()
-                            : "Unbekanntes Ziel";
+                // Prüfen, ob der Subprozess Quelle oder Ziel des Nachrichtenflusses ist
+                if (subProcess.equals(source) || subProcess.equals(target)) {
+                    String sourceName = getMessageFlowName(source, participants);
+                    String targetName = getMessageFlowName(target, participants);
 
                     sbvrOutput.append("    - Nachrichtenfluss von ").append(sourceName)
                             .append(" nach ").append(targetName).append("\n");
                 }
             }
 
-            // Rekursives Verarbeiten von verschachtelten Subprozessen
+            // Rekursive Verarbeitung verschachtelter Subprozesse
             processNestedSubProcesses(subProcess, sbvrOutput);
         }
     }
@@ -68,6 +66,16 @@ public class SubProcessTransformer {
             String nestedName = nestedSubProcess.getName() != null ? nestedSubProcess.getName() : "Unbekannter Subprozess";
             sbvrOutput.append("  Verschachtelter Subprozess: ").append(nestedName).append("\n");
             processNestedSubProcesses(nestedSubProcess, sbvrOutput); // Rekursion für weitere verschachtelte Subprozesse
+        }
+    }
+
+    private static String getMessageFlowName(BaseElement element, Collection<Participant> participants) {
+        if (element instanceof FlowNode flowNode) {
+            return flowNode.getName() != null ? flowNode.getName() : "Unbekannter FlowNode";
+        } else if (element instanceof Participant participant) {
+            return participant.getName() != null ? participant.getName() : "Unbekannter Teilnehmer";
+        } else {
+            return "Unbekannte Quelle/Ziel";
         }
     }
 

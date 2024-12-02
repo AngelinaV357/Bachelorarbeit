@@ -1,8 +1,8 @@
 Subprozess erkannt: Procure work equipment
   Enthält folgende FlowNodes:
   Zugehörige Nachrichtenflüsse:
-    - Nachrichtenfluss von Supplier nach Unbekannte Quelle/Ziel
-    - Nachrichtenfluss von Unbekannte Quelle/Ziel nach Supplier
+    - Nachrichtenfluss von Supplier nach Procure work equipment
+    - Nachrichtenfluss von Procure work equipment nach Supplier
 Es ist notwendig, dass Human Resources Department Start ausführt, wenn Human Resources Department Add personal data ausführt.
 Es ist notwendig, dass Human Resources Department Add personal data ausführt, wenn Human Resources Department Start ausführt.
 Es ist notwendig, dass Procurement Procure work equipment ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
