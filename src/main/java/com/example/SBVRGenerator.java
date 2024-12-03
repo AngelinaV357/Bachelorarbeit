@@ -8,12 +8,11 @@ import static com.example.Hilfsmethoden.writeToFile;
 public class SBVRGenerator {
 
     public static void main(String[] args) {
-        File file = new File("src/main/resources/Employee Onboarding.bpmn");
+        File file = new File("src/main/resources/Arbeitsmittel beschaffen.bpmn");
         File sbvrOutputFile = new File("src/main/resources/sbvr_output.txt");
 
         try {
             BpmnModelInstance modelInstance = BPMNProcessor.readBpmnFile(file);
-            StringBuilder standardOutput = new StringBuilder();
             StringBuilder sbvrOutput = new StringBuilder();
 
             BPMNProcessor.processSequenceFlows(modelInstance, sbvrOutput);

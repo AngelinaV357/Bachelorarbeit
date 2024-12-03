@@ -1,19 +1,35 @@
-„Es ist notwendig, dass der Subprozess Procure work equipment die Nachricht [Unbekannte Nachricht] vom Supplier empfängt.“
-„Es ist notwendig, dass der Subprozess Procure work equipment die Nachricht [Unbekannte Nachricht] an Supplier sendet.“
-DataObject: Work equipment
-DataInput: employment contract
-Es ist notwendig, dass Human Resources Department Start ausführt, wenn Human Resources Department Add personal data ausführt.
-Es ist notwendig, dass Human Resources Department Add personal data ausführt, wenn Human Resources Department Start ausführt.
+Es ist notwendig, dass System Start ausführt, wenn Employee Entering Room Requirements ausführt.
+Es ist notwendig, dass System Entering Room Requirements ausführt, wenn Employee Start ausführt.
 
-Es ist notwendig, dass Procurement Procure work equipment ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
-Es ist notwendig, dass IT-Department Set up access rights, hardware and software ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
-Es ist notwendig, dass Procurement Procure work equipment ausführt und IT-Department Set up access rights, hardware and software ausführt, wenn UND-Gateway ausführt.
-Es ist notwendig, dass Human Resources Department Select necessary work equipment ausführt, wenn Human Resources Department Add personal data ausführt.
 
-Es ist notwendig, dass Procurement Procure work equipment ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
-Es ist notwendig, dass IT-Department Set up access rights, hardware and software ausführt, wenn Human Resources Department Select necessary work equipment ausführt und unbekannte Bedingung gilt.
-Es ist notwendig, dass Procurement Procure work equipment ausführt und IT-Department Set up access rights, hardware and software ausführt, wenn UND-Gateway ausführt.
-Es ist notwendig, dass IT-Department Set up access rights, hardware and software ausführt, wenn Human Resources Department UND-Gateway ausführt.
 
-Subprozess erkannt: Procure work equipment
+
+Es ist notwendig, dass System Show Alternative ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
+
+Es ist notwendig, dass System Display rooms ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
+
+Es ist notwendig, dass System Check Later ausführt, wenn System Show Alternative ausführt und No gilt.
+Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Show Alternative ausführt und Yes gilt.
+
+Es ist notwendig, dass System Check Later ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
+
+Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Display rooms ausführt.
+
+Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Display rooms ausführt.
+
+Es ist notwendig, dass System Check Later ausführt, wenn System Show Alternative ausführt und No gilt.
+Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Show Alternative ausführt und Yes gilt.
+
+Es ist notwendig, dass System Enter Order Requirements ausführt, wenn System Selecting Room and Time Slot ausführt.
+
+Es ist notwendig, dass Support Service
+ Inventory and Food Required ausführt, wenn System Enter Order Requirements ausführt.
+
+Es ist notwendig, dass System Inventory Confirmed ausführt, wenn Support Service
+ Inventory and Food Required ausführt.
+
+Es ist notwendig, dass System Inventory Confirmed ausführt, wenn Support Service
+ Inventory and Food Required ausführt.
+
+Es ist notwendig, dass Employee Confirmation of room and inventory ausführt, wenn System Inventory Confirmed ausführt.
 

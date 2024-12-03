@@ -10,22 +10,11 @@ public class SBVRTransformerNEU {
         return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und " + condition + " gilt.\n";
     }
 
-//    public static String createExclusionStatement(String sourceName, String targetRole1, String targetName1, String targetRole2, String targetName2) {
-//        return "Es ist notwendig, dass " + targetRole1 + " " + targetName1 + " ausführt oder " + targetRole2 + " " + targetName2 + " ausführt, aber nicht beides gleichzeitig, wenn " + sourceName + " ausgeführt wird.";
-//    }
 
     public static String createInclusiveStatement(String sourceRole, String sourceName, String targetRole, String targetName, String condition) {
         return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und " + condition + " gilt.\n";
     }
 
-    public static String createIntermediateCatchEventStatement(String senderRole, String senderName, String receiverRole, String receiverName) {
-        return "Es ist notwendig, dass " + senderRole + " " + senderName + " an " + receiverRole + " " + receiverName + " sendet.\n";
-    }
-
-    public static String createIntermediateThrowEventStatement(String senderRole, String senderName, String receiverRole, String receiverName, String messageName) {
-        // Diese Methode erstellt eine SBVR-Regel für das IntermediateThrowEvent
-        return "Es ist notwendig, dass " + senderRole + " " + senderName + " die Nachricht " + messageName + " an " + receiverRole + " " + receiverName + " sendet.";
-    }
 
     public static String createParallelStatement(String sourceName, String targetRole1, String targetName1, String targetRole2, String targetName2, String gatewayName) {
         // Gateway-Name wird nun korrekt in der SBVR-Aussage verwendet
@@ -65,15 +54,6 @@ public class SBVRTransformerNEU {
     }
 
     /**
-     * Erzeugt die SBVR-Regel für eine Data Object Reference.
-     * @param dataName Name des referenzierten Data Objects
-     * @return SBVR-Regel
-     */
-    public static String createDataObjectReferenceStatement(String dataName) {
-        return "Es ist notwendig, dass die Referenz auf das Datenobjekt " + dataName + " von der Aktivität verwendet wird.\n";
-    }
-
-    /**
      * Erzeugt die SBVR-Regel für einen User Task.
      * @param taskName Name der Aufgabe
      * @param role Die Rolle, die für diese Aufgabe verantwortlich ist
@@ -93,16 +73,16 @@ public class SBVRTransformerNEU {
         return "Es ist notwendig, dass die Aufgabe " + taskName + " automatisch durch das System " + sourceRole + " ausgeführt wird, wenn " + targetRole + " diese Aufgabe erwartet.\n";
     }
 
-    /**
-     * Erzeugt die SBVR-Regel für einen Send Task, wobei die sendende und empfangende Ressource berücksichtigt werden.
-     * @param taskName Name der Aufgabe
-     * @param senderRole Die Rolle, die die Nachricht sendet
-     * @param receiverRole Die Rolle, die die Nachricht empfängt
-     * @return SBVR-Regel für den Send Task
-     */
-    public static String createSendTaskStatement(String taskName, String senderRole, String receiverRole) {
-        return "Es ist notwendig, dass die Ressource mit der Rolle " + senderRole + " die Nachricht " + taskName + " an die Ressource mit der Rolle " + receiverRole + " sendet.\n";
-    }
+//    /**
+//     * Erzeugt die SBVR-Regel für einen Send Task, wobei die sendende und empfangende Ressource berücksichtigt werden.
+//     * @param taskName Name der Aufgabe
+//     * @param senderRole Die Rolle, die die Nachricht sendet
+//     * @param receiverRole Die Rolle, die die Nachricht empfängt
+//     * @return SBVR-Regel für den Send Task
+//     */
+//    public static String createSendTaskStatement(String taskName, String senderRole, String receiverRole) {
+//        return "Es ist notwendig, dass die Ressource mit der Rolle " + senderRole + " die Nachricht " + taskName + " an die Ressource mit der Rolle " + receiverRole + " sendet.\n";
+//    }
 
 
     public static String createEndEventStatement(String sourceRole, String targetRole, String targetName, String endEventName) {

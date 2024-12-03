@@ -72,6 +72,7 @@ public class ANDGatewayTransformer implements FlowNodeTransformer {
                 }
             }
         }
+        assert sbvrOutput != null;
         sbvrOutput.append(sbvrStatements);
         return sbvrOutput.toString();
     }

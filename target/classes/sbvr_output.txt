@@ -1,21 +1,35 @@
-Es ist notwendig, dass Sales Person Start ausführt, wenn Sales Person Determine customer preferences  ausführt.
-Es ist notwendig, dass Sales Person Determine customer preferences  ausführt, wenn Sales Person Start ausführt.
+Es ist notwendig, dass System Start ausführt, wenn Employee Entering Room Requirements ausführt.
+Es ist notwendig, dass System Entering Room Requirements ausführt, wenn Employee Start ausführt.
 
-Es ist notwendig, dass die Aufgabe Prepare sale slip, einer Ressource mit der Rolle Cashier zugewiesen wird.
 
-Es ist notwendig, dass die Aufgabe Collect payment, einer Ressource mit der Rolle Cashier zugewiesen wird.
 
-Es ist notwendig, dass Automated Car Wash Lane
- Clean Car ausführt, wenn Cashier XOR-Gateway ausführt.
 
-Subprozess erkannt: Dry Car
-Es ist notwendig, dass Cashier Demand other form of payment ausführt, wenn Cashier Collect payment ausführt und no gilt.
-Es ist notwendig, dass Automated Car Wash Lane
- Clean Car ausführt, wenn Cashier Collect payment ausführt und yes gilt.
+Es ist notwendig, dass System Show Alternative ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
 
-Es ist notwendig, dass Cashier Demand other form of payment ausführt, wenn Cashier Collect payment ausführt und no gilt.
-Es ist notwendig, dass Automated Car Wash Lane
- Clean Car ausführt, wenn Cashier Collect payment ausführt und yes gilt.
+Es ist notwendig, dass System Display rooms ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
 
-Es ist notwendig, dass Cashier Demand other form of payment ausführt, wenn Cashier XOR-Gateway ausführt.
+Es ist notwendig, dass System Check Later ausführt, wenn System Show Alternative ausführt und No gilt.
+Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Show Alternative ausführt und Yes gilt.
+
+Es ist notwendig, dass System Check Later ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
+
+Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Display rooms ausführt.
+
+Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Display rooms ausführt.
+
+Es ist notwendig, dass System Check Later ausführt, wenn System Show Alternative ausführt und No gilt.
+Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Show Alternative ausführt und Yes gilt.
+
+Es ist notwendig, dass System Enter Order Requirements ausführt, wenn System Selecting Room and Time Slot ausführt.
+
+Es ist notwendig, dass Support Service
+ Inventory and Food Required ausführt, wenn System Enter Order Requirements ausführt.
+
+Es ist notwendig, dass System Inventory Confirmed ausführt, wenn Support Service
+ Inventory and Food Required ausführt.
+
+Es ist notwendig, dass System Inventory Confirmed ausführt, wenn Support Service
+ Inventory and Food Required ausführt.
+
+Es ist notwendig, dass Employee Confirmation of room and inventory ausführt, wenn System Inventory Confirmed ausführt.
 
