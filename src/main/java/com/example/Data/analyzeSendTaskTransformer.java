@@ -12,7 +12,7 @@ import java.util.Collection;
 import static com.example.Hilfsmethoden.getMessageFlowParticipantName;
 import static com.example.Hilfsmethoden.getRoleForNode;
 
-public class analyzeSendTask {
+public class analyzeSendTaskTransformer {
     public static void analyzeSendTasks(BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {
         // Alle SendTasks abrufen
         Collection<SendTask> sendTasks = modelInstance.getModelElementsByType(SendTask.class);

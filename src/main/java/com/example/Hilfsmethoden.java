@@ -1,6 +1,7 @@
 package com.example;
 
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.impl.instance.IntermediateCatchEventImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.TaskImpl;
 import org.camunda.bpm.model.bpmn.instance.*;
 
 import java.io.File;
@@ -26,16 +27,6 @@ public class Hilfsmethoden {
         return "unbekannter Ereignistyp";
     }
 
-    public static MessageFlow getMessageFlowForEvent(IntermediateCatchEvent event, BpmnModelInstance modelInstance) {
-        // Durchlaufen aller MessageFlows und Überprüfen, ob das IntermediateCatchEvent als Quelle des MessageFlows festgelegt ist
-        for (MessageFlow flow : modelInstance.getModelElementsByType(MessageFlow.class)) {
-            if (flow.getSource().equals(event)) {
-                return flow; // Der MessageFlow wurde gefunden
-            }
-        }
-        return null; // Kein passender MessageFlow gefunden
-    }
-
     public static String getName(FlowNode node) {
         if (node instanceof Activity activity) {
             String name = activity.getName();
@@ -52,10 +43,21 @@ public class Hilfsmethoden {
             return "XOR-Gateway";
         } else if (node instanceof ParallelGateway) {
             return "UND-Gateway";
-        } else {
-            System.out.println("Warnung: Unbekannter Knotentyp: " + node.getClass().getSimpleName());
+        }else if (node instanceof EventBasedGateway) {
+            return "Event";
+        }else if (node instanceof IntermediateCatchEventImpl) {
+            return "CatchEvent";
+        }else if (node instanceof IntermediateCatchEvent) {
+            return "CatchEvent";
+        }else if (node instanceof IntermediateThrowEvent) {
+            return "ThrowEvent";
+        }else if (node instanceof TaskImpl) {
+            return "Task";
+        }else if (node instanceof BusinessRuleTask) {
+            return "BusinessRuleTask";
+        }else {
+            return "Nicht unterstützter Knotentyp";
         }
-        return "Unbekannter Knoten";
     }
 
 
@@ -77,27 +79,6 @@ public class Hilfsmethoden {
         }
 
         return "Unbekannte Quelle/Ziel";
-    }
-
-    /**
-     * Diese Methode gibt den Namen des Teilnehmers basierend auf der Teilnehmer-ID zurück.
-     * Sie verwendet das BPMN-Modell, um die Teilnehmerrolle anhand der FlowNodes (Sender und Empfänger)
-     * zu ermitteln.
-     *
-     * @param name Die ID des FlowNodes, der einem Teilnehmer zugeordnet ist.
-     * @param modelInstance Das BPMN-Modell, das die Teilnehmerinformationen enthält.
-     * @return Der Name des Teilnehmers oder "Unbekannter Teilnehmer", wenn keine Zuordnung gefunden wurde.
-     */
-    public static String getParticipantRole(String name, BpmnModelInstance modelInstance) {
-        // Suche nach dem Participant-Element, nicht nach FlowNode
-        Collection<Participant> participants = modelInstance.getModelElementsByType(Participant.class);
-        for (Participant participant : participants) {
-            if (participant.getName().equals(name)) {
-                // Hier handelt es sich um einen Teilnehmer, nicht um einen FlowNode
-                return participant.getName(); // Oder eine andere Rolle
-            }
-        }
-        return "Unbekannte Rolle"; // Standardwert
     }
 
     public static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {

@@ -4,6 +4,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import static com.example.Hilfsmethoden.getEventType;
 import static com.example.Hilfsmethoden.getMessageFlowParticipantName;
@@ -23,11 +24,41 @@ public class IntermediateCatchEventAnalyzer {
             // Namen des IntermediateCatchEvents abrufen
             String catchEventName = sanitizeName(catchEvent.getName());
 
-//            sbvrOutput.append("IntermediateCatchEvent: ").append(catchEventName).append("\n");
-
             // Ereignistyp ermitteln (z. B. Timer, Message, Signal etc.)
             String eventType = getEventType(catchEvent);
-//            sbvrOutput.append("  Ereignistyp: ").append(eventType).append("\n");
+
+            // Überprüfen, ob es sich um ein TimerEvent handelt
+            boolean isTimerEvent = false;
+            for (EventDefinition eventDefinition : catchEvent.getEventDefinitions()) {
+                if (eventDefinition instanceof TimerEventDefinition) {
+                    isTimerEvent = true; // Es handelt sich um ein Timer Event
+                    eventType = "Timer"; // Ereignistyp auf "Timer" setzen
+//                    sbvrOutput.append("Es handelt sich um ein Timer Event: ")
+//                            .append(sanitizeName(catchEventName))
+//                            .append("\n");
+
+                    // SBVR-Regel für Timer Event hinzufügen
+                    sbvrOutput.append("Es ist notwendig, dass das IntermediateCatchEvent ")
+                            .append(sanitizeName(catchEventName))
+                            .append(" ")
+                            .append(" ausgeführt wird, nachdem die festgelegte Zeit abgelaufen ist.\n");
+
+                    break;
+                }
+            }
+
+            // Wenn es sich nicht um ein Timer Event handelt, prüfen wir auf Message Event
+            if (!isTimerEvent) {
+                for (EventDefinition eventDefinition : catchEvent.getEventDefinitions()) {
+                    if (eventDefinition instanceof MessageEventDefinition) {
+                        eventType = "Message"; // Ereignistyp auf "Message" setzen
+//                        sbvrOutput.append("Es handelt sich um ein Message Event: ")
+//                                .append(sanitizeName(catchEventName))
+//                                .append("\n");
+                        break;
+                    }
+                }
+            }
 
             // Verknüpfte MessageFlows analysieren
             for (MessageFlow messageFlow : messageFlows) {
@@ -37,7 +68,7 @@ public class IntermediateCatchEventAnalyzer {
                 // Wenn das Ziel des MessageFlows das aktuelle IntermediateCatchEvent ist
                 if (target.equals(catchEvent)) {
                     String sourceName = getMessageFlowParticipantName(source, participants);
-                    sbvrOutput.append(" Es ist notwendig, dass das IntermediateCatchEvent ")
+                    sbvrOutput.append("Es ist notwendig, dass das IntermediateCatchEvent ")
                             .append(sanitizeName(eventType))
                             .append(" ")
                             .append(catchEventName)
@@ -46,19 +77,8 @@ public class IntermediateCatchEventAnalyzer {
                             .append(" empfängt, bevor fortgeführt wird.\n");
                 }
             }
-
-//            // Ausgangssequenzflüsse analysieren
-//            Collection<SequenceFlow> outgoingFlows = catchEvent.getOutgoing();
-//            for (SequenceFlow flow : outgoingFlows) {
-//                FlowNode targetNode = flow.getTarget();
-
-//                // Ziel des Sequenzflusses hinzufügen
-//                if (targetNode != null) {
-//                    sbvrOutput.append("  Sequenzfluss führt zu: ").append(sanitizeName(targetNode.getName())).append("\n");
-                }
-            }
-
-
+        }
+    }
 
     /**
      * Bereinigt den Namen, entfernt unerwünschte Zeilenumbrüche oder Sonderzeichen.

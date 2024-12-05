@@ -14,11 +14,15 @@ import static com.example.SBVRTransformerNEU.createStartEventStatement;
 
 public class StartEventTransformer implements FlowNodeTransformer {
 
-
     @Override
     public String transformFlowNode(FlowNode startEvent, String sourceRole, String targetRole, Collection<Lane> lanes) {
-        // Den Namen des StartEvents extrahieren
-        String startEventName = Hilfsmethoden.getName(startEvent);  // Aufruf der Hilfsmethode getName
+        // Den Namen des StartEvents direkt aus dem BPMN-Modell extrahieren
+        String startEventName = startEvent.getAttributeValue("name"); // Holt den Attributwert "name" des Start-Events
+
+        // Überprüfen, ob der StartEventName existiert und nicht leer ist
+        if (startEventName == null || startEventName.trim().isEmpty()) {
+            return "Fehler: StartEvent hat keinen Namen.";
+        }
 
         // Konvertiere die Collection der Ausgangsflüsse in eine Liste, um auf die Elemente per Index zuzugreifen
         List<SequenceFlow> outgoingFlows = new ArrayList<>(startEvent.getOutgoing());
@@ -29,10 +33,10 @@ public class StartEventTransformer implements FlowNodeTransformer {
             String targetName = Hilfsmethoden.getName(outgoingFlows.get(0).getTarget());
 
             // Jetzt das SBVR-Statement mit der Methode createStartEventStatement generieren
-            return createStartEventStatement(sourceRole, startEventName, targetRole, targetName);
+            return createStartEventStatement(startEventName);
         } else {
             // Falls keine Ausgangsflüsse vorhanden sind, eine entsprechende Fehlermeldung oder Standardantwort zurückgeben
-            return "Fehler: StartEvent hat keine Ausgangsflüsse.";
+            return "Es ist notwendig, dass der Prozess mit dem Startevent " + startEventName + " startet. ";
         }
     }
 }

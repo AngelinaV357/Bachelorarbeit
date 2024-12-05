@@ -47,8 +47,4 @@ public class SubProcessTransformer {
             }
         }
     }
-
-    public static void processSubProcessesForFlowNode(SubProcess subProcess, StringBuilder sbvrOutput, Collection<Lane> lanes) {
-        sbvrOutput.append("Subprozess erkannt: ").append(subProcess.getName() != null ? subProcess.getName() : "Unbenannter Subprozess");
-    }
 }

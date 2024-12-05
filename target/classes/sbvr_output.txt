@@ -1,35 +1,33 @@
-Es ist notwendig, dass System Start ausführt, wenn Employee Entering Room Requirements ausführt.
-Es ist notwendig, dass System Entering Room Requirements ausführt, wenn Employee Start ausführt.
+Es ist notwendig, dass Unbekannte Rolle Check paperwork ausführt, wenn Unbekannte Rolle Start ausführt.
 
+Es ist notwendig, dass Unbekannte Rolle Answer questions ausführt, wenn Unbekannte Rolle Check paperwork ausführt.
 
+Es ist notwendig, dass die Aktivität Seek senior Clinic Clinician’s advice ausgeführt wird, wenn das XOR Gateway XOR-Gateway ausgeführt wird.
 
+Es ist notwendig, dass Unbekannte Rolle XOR-Gateway ausführt, wenn Unbekannte Rolle Seek senior Clinic Clinician’s advice ausführt und Continue vaccination gilt.
+Es ist notwendig, dass Unbekannte Rolle Inform vaccinee to leave clinic ausführt, wenn Unbekannte Rolle Seek senior Clinic Clinician’s advice ausführt und No vaccination gilt.
 
-Es ist notwendig, dass System Show Alternative ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
+Es ist notwendig, dass die Aktivität Ask for missing information ausgeführt wird, wenn das XOR Gateway XOR-Gateway ausgeführt wird.
 
-Es ist notwendig, dass System Display rooms ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
+Es ist notwendig, dass die Aktivität Ask to complete form at home ausgeführt wird, wenn das XOR Gateway XOR-Gateway ausgeführt wird.
 
-Es ist notwendig, dass System Check Later ausführt, wenn System Show Alternative ausführt und No gilt.
-Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Show Alternative ausführt und Yes gilt.
+Es ist notwendig, dass Unbekannte Rolle Call Vaccinees to register ausführt, wenn Unbekannte Rolle XOR-Gateway ausführt und No further questions gilt.
+Es ist notwendig, dass Unbekannte Rolle Ask for missing information ausführt, wenn Unbekannte Rolle XOR-Gateway ausführt und Vaccinee did not complete all questions gilt.
 
-Es ist notwendig, dass System Check Later ausführt, wenn System XOR-Gateway ausführt und das XOR-Gateway 'Find fit?' aktiv ist.
+Es ist notwendig, dass Unbekannte Rolle Ask to return tomorrow ausführt, wenn Unbekannte Rolle Ask to complete form at home ausführt.
 
-Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Display rooms ausführt.
+Nicht unterstützter Knoten-Typ: IntermediateCatchEventImpl
+Es ist notwendig, dass Unbekannte Rolle Ask to complete form at home ausführt, wenn Unbekannte Rolle Ask for missing information ausführt und Can't finish before 6pm gilt.
+Es ist notwendig, dass Unbekannte Rolle Call Vaccinees to register ausführt, wenn Unbekannte Rolle Ask for missing information ausführt und No further questions gilt.
 
-Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Display rooms ausführt.
+Es ist notwendig, dass der Prozess mit dem Startevent Response received startet. 
+Es ist notwendig, dass Unbekannte Rolle XOR-Gateway ausführt, wenn Unbekannte Rolle Answer questions ausführt und Can answer gilt.
+Es ist notwendig, dass Unbekannte Rolle Seek senior Clinic Clinician’s advice ausführt, wenn Unbekannte Rolle Answer questions ausführt und Can't answer gilt.
 
-Es ist notwendig, dass System Check Later ausführt, wenn System Show Alternative ausführt und No gilt.
-Es ist notwendig, dass System Selecting Room and Time Slot ausführt, wenn System Show Alternative ausführt und Yes gilt.
+Es ist notwendig, dass die Aktivität Call Vaccinees to register ausgeführt wird, wenn das XOR Gateway XOR-Gateway ausgeführt wird.
 
-Es ist notwendig, dass System Enter Order Requirements ausführt, wenn System Selecting Room and Time Slot ausführt.
+Es ist notwendig, dass Unbekannte Rolle der Subprozess Inform vaccinee to leave clinic ausführt, wenn Unbekannte Rolle XOR-Gateway ausführt.
 
-Es ist notwendig, dass Support Service
- Inventory and Food Required ausführt, wenn System Enter Order Requirements ausführt.
-
-Es ist notwendig, dass System Inventory Confirmed ausführt, wenn Support Service
- Inventory and Food Required ausführt.
-
-Es ist notwendig, dass System Inventory Confirmed ausführt, wenn Support Service
- Inventory and Food Required ausführt.
-
-Es ist notwendig, dass Employee Confirmation of room and inventory ausführt, wenn System Inventory Confirmed ausführt.
-
+Es ist notwendig, dass das IntermediateCatchEvent Next day  ausgeführt wird, nachdem die festgelegte Zeit abgelaufen ist.
+Es ist notwendig, dass der Prozess mit dem EndEvent "Register vaccinee" endet, nachdem die Aktivität "Call Vaccinees to register" abgeschlossen wurde.
+Es ist notwendig, dass der Prozess mit dem EndEvent "unbenanntes Endevent" endet, nachdem die Aktivität "Inform vaccinee to leave clinic" abgeschlossen wurde.

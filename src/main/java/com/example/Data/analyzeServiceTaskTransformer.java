@@ -13,7 +13,7 @@ import java.util.Collection;
 import static com.example.Hilfsmethoden.getMessageFlowParticipantName;
 import static com.example.Hilfsmethoden.getRoleForNode;
 
-public class analyzeServiceTask {
+public class analyzeServiceTaskTransformer {
     public static void analyzeServiceTasks(BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {
         // Alle ServiceTasks abrufen
         Collection<ServiceTask> serviceTasks = modelInstance.getModelElementsByType(ServiceTask.class);
@@ -39,7 +39,7 @@ public class analyzeServiceTask {
             String targetRole = getMessageFlowParticipantNameFromServiceTask(serviceTask, messageFlows, participants);
 
             // Generiere das Statement für den ServiceTask
-            String serviceTaskStatement = SBVRTransformerNEU.createServiceTaskStatement(taskName, sourceRole, targetRole);
+            String serviceTaskStatement = SBVRTransformerNEU.createServiceTaskStatement(taskName, sourceRole);
 
             // Füge das Statement zum sbvrOutput hinzu
             sbvrOutput.append(serviceTaskStatement);

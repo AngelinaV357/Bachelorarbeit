@@ -2,12 +2,21 @@ package com.example;
 
 public class SBVRTransformerNEU {
 
-    public static String createStartEventStatement(String sourceRole, String targetRole, String targetName, String startEventName) {
-        return "Es ist notwendig, dass " + targetName + " " + targetRole + " ausführt, wenn " + sourceRole + " " + startEventName + " ausführt.";
+    public static String createStartEventStatement(String startEventName) {
+//        return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " das Startevent " + startEventName + " ausführt.";
+        return "Es ist notwendig, dass der Prozess mit dem Startevent " + startEventName + " startet. ";
     }
+
+//    public static String createStartEventStatement(String sourceRole, String targetRole, String targetName, String startEventName) {
+//        return "Es ist notwendig, dass " + sourceRole + " das Ereignis '" + startEventName + "' ausführt, um " + targetRole + " für " + targetName + " zu starten.";
+//    }
 
     public static String createFlowStatement(String sourceRole, String sourceName, String targetRole, String targetName, String condition) {
         return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und " + condition + " gilt.\n";
+    }
+
+    public static String createBusinessRule(String sourceRole, String sourceName, String targetRole, String targetName, String condition) {
+        return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und alle Anforderungen geprüft wurden";
     }
 
 
@@ -66,11 +75,10 @@ public class SBVRTransformerNEU {
     /**
      * Erzeugt die SBVR-Regel für einen Service Task.
      * @param taskName Name der Aufgabe
-     * @param targetRole Die Rolle des Systems
      * @return SBVR-Regel für den Service Task
      */
-    public static String createServiceTaskStatement(String taskName, String sourceRole, String targetRole) {
-        return "Es ist notwendig, dass die Aufgabe " + taskName + " automatisch durch das System " + sourceRole + " ausgeführt wird, wenn " + targetRole + " diese Aufgabe erwartet.\n";
+    public static String createServiceTaskStatement(String taskName, String sourceRole) {
+        return "Es ist notwendig, dass die Aufgabe " + taskName + " automatisch durch das System " + sourceRole + " ausgeführt wird.\n";
     }
 
 //    /**

@@ -1,5 +1,6 @@
 package com.example.Data;
 
+import com.example.SBVRTransformerNEU;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Lane;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
@@ -10,7 +11,7 @@ import java.util.Collection;
 
 import static com.example.Hilfsmethoden.getRoleForNode;
 
-public class analyzeUserTask {
+public class analyzeUserTaskTransformer {
 
     public static void analyzeUserTasks(BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {
         // Alle UserTasks abrufen
@@ -34,7 +35,7 @@ public class analyzeUserTask {
             String userRole = getRoleForNode(userTask, lanes);
 
             // Generiere das Statement für den UserTask
-            String userTaskStatement = createUserTaskStatement(taskName, userRole);
+            String userTaskStatement = SBVRTransformerNEU.createUserTaskStatement(taskName, userRole);
 
             // Füge das Statement zum sbvrOutput hinzu
             sbvrOutput.append(userTaskStatement);
@@ -50,12 +51,5 @@ public class analyzeUserTask {
         }
         // Entfernt Zeilenumbrüche und überflüssige Leerzeichen
         return name.replaceAll("[\\r\\n]+", " ").trim();
-    }
-
-    /**
-     * Erzeugt eine SBVR-Aussage für den UserTask.
-     */
-    public static String createUserTaskStatement(String taskName, String role) {
-        return "Es ist notwendig, dass die Aufgabe " + taskName + ", einer Ressource mit der Rolle " + role + " zugewiesen wird.\n";
     }
 }

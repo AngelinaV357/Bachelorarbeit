@@ -30,7 +30,6 @@ import static com.example.Hilfsmethoden.getRoleForNode;
                 StringBuilder sbvrStatements = new StringBuilder();
 
                 List<SequenceFlow> outgoingFlows = new ArrayList<>(gateway.getOutgoing());
-                String gatewayName = getName(gateway);
                 String sourceName = getName(gateway.getIncoming().iterator().next().getSource());
 
                 // Generiere Statements für alle ausgehenden Flows

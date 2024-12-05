@@ -1,12 +1,13 @@
 package com.example;
 
 import com.example.Data.DataObjectAnalysis;
+import com.example.Data.analyzeMessageFlowsForActivities;
+import com.example.Data.analyzeUserTaskTransformer;
 import com.example.Event.IntermediateCatchEventAnalyzer;
 import com.example.Event.IntermediateThrowEventAnalyzer;
 import com.example.Gateways.*;
 import com.example.Task.ActivityTransformer;
 import com.example.Task.EndEventTransformer;
-import com.example.Data.analyzeUserTask;
 import com.example.Task.StartEventTransformer;
 import com.example.Task.SubProcessTransformer;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -16,9 +17,9 @@ import org.camunda.bpm.model.bpmn.instance.*;
 import java.io.*;
 import java.util.*;
 
-import static com.example.Data.analyzeSendTask.analyzeSendTasks;
-import static com.example.Data.analyzeServiceTask.analyzeServiceTasks;
-import static com.example.Task.SubProcessTransformer.processSubProcessesAndMessageFlows;
+import static com.example.Data.analyzeBusinessTaskTransformer.analyzeBusinessTasks;
+import static com.example.Data.analyzeSendTaskTransformer.analyzeSendTasks;
+import static com.example.Data.analyzeServiceTaskTransformer.analyzeServiceTasks;
 
 public class BPMNProcessor { //BPMN Modell verarbeiten
     // Liest die BPMN-Datei ein und gibt das BpmnModelInstance zurück
@@ -40,22 +41,27 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
         // Holt alle Teilnehmer
         Collection<Participant> participants = modelInstance.getModelElementsByType(Participant.class);
 
-        // Aufruf der Methode zur Verarbeitung von Subprozessen und MessageFlows
-        processSubProcessesAndMessageFlows(modelInstance, sbvrOutput);
+        // Verwende Sets, um Duplikate zu vermeiden
+        Set<FlowNode> processedNodes = new HashSet<>();
+        Set<String> processedTasks = new HashSet<>();
 
         // Aufruf zur Analyse von Datenobjekten
-        DataObjectAnalysis dataObjectAnalysis = new DataObjectAnalysis();
-        dataObjectAnalysis.analyzeDataObjects(modelInstance, sbvrOutput);
-
-        // Aufruf zur Analyse der IntermediateCatchEvents
-        IntermediateCatchEventAnalyzer.analyzeCatchEvents(modelInstance, sbvrOutput);
-
-        IntermediateThrowEventAnalyzer.analyzeThrowEvents(modelInstance, sbvrOutput);
-
-        // Aufruf zur Analyse von SendTasks
-        analyzeSendTasks(modelInstance, sbvrOutput);
-        analyzeUserTask.analyzeUserTasks(modelInstance, sbvrOutput);
-        analyzeServiceTasks(modelInstance, sbvrOutput);
+//        DataObjectAnalysis dataObjectAnalysis = new DataObjectAnalysis();
+//        dataObjectAnalysis.analyzeDataObjects(modelInstance, sbvrOutput);
+//
+//        // Event-Analyser
+//        IntermediateCatchEventAnalyzer.analyzeCatchEvents(modelInstance, sbvrOutput);
+//        IntermediateThrowEventAnalyzer.analyzeThrowEvents(modelInstance, sbvrOutput);
+//
+//        // Aufruf zur Analyse von SendTasks und weiteren Tasks
+//        analyzeSendTasks(modelInstance, sbvrOutput);
+//        analyzeUserTaskTransformer.analyzeUserTasks(modelInstance, sbvrOutput);
+//        analyzeServiceTasks(modelInstance, sbvrOutput);
+//        analyzeBusinessTasks(modelInstance, sbvrOutput);
+//
+//        analyzeMessageFlowsForActivities.analyzeActivities(modelInstance, sbvrOutput);
+//
+//        SubProcessTransformer.processSubProcessesAndMessageFlows(modelInstance, sbvrOutput);
 
         for (SequenceFlow flow : sequenceFlows) {
             FlowNode source = flow.getSource();
@@ -63,10 +69,12 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
             String sourceRole = Hilfsmethoden.getRoleForNode(source, lanes);
             String targetRole = Hilfsmethoden.getRoleForNode(target, lanes);
 
-            // Verarbeite Subprozesse (falls der Source-Knoten oder Target-Knoten ein Subprozess ist)
-            if (source instanceof SubProcess subProcess) {
-                SubProcessTransformer.processSubProcessesForFlowNode(subProcess, sbvrOutput, lanes); // Methode speziell für Subprozess-FlowNodes
+            // Überspringe bereits verarbeitete Knoten
+            if (processedNodes.contains(source)) {
+                continue;
             }
+
+            processedNodes.add(source);  // Markiere diesen Knoten als verarbeitet
 
             // Verarbeite reguläre Knoten
             if (source instanceof StartEvent startEvent) {
@@ -78,7 +86,7 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
             } else if (source instanceof InclusiveGateway inclusiveGateway) {
                 sbvrOutput.append(new ORGatewayTransformer().transformFlowNode(inclusiveGateway, sourceRole, targetRole, lanes)).append("\n");
             } else if (source instanceof EventBasedGateway eventBasedGateway) {
-                EventBasedGatewayTransformer.EventGatewayTransformer((BpmnModelInstance) eventBasedGateway, sbvrOutput);
+                EventBasedGatewayTransformer.EventGatewayTransformer(eventBasedGateway, sbvrOutput);
             } else if (source instanceof Activity activity) {
                 sbvrOutput.append(new ActivityTransformer().transformFlowNode(activity, sourceRole, targetRole, lanes)).append("\n");
             } else if (source instanceof EndEvent endEvent) {
@@ -86,8 +94,47 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
             } else {
                 sbvrOutput.append("Nicht unterstützter Knoten-Typ: ").append(source.getClass().getSimpleName()).append("\n");
             }
+
+            // Verarbeite spezielle Tasks, falls sie noch nicht bearbeitet wurden
+            if (source instanceof UserTask userTask) {
+                if (!processedTasks.contains(userTask.getId())) {
+                    sbvrOutput.append(new ActivityTransformer().transformFlowNode(userTask, sourceRole, targetRole, lanes)).append("\n");
+                    processedTasks.add(userTask.getId());
+                }
+            } else if (source instanceof ServiceTask serviceTask) {
+                if (!processedTasks.contains(serviceTask.getId())) {
+                    sbvrOutput.append(new ActivityTransformer().transformFlowNode(serviceTask, sourceRole, targetRole, lanes)).append("\n");
+                    processedTasks.add(serviceTask.getId());
+                }
+            }
+        }
+
+        DataObjectAnalysis dataObjectAnalysis = new DataObjectAnalysis();
+        dataObjectAnalysis.analyzeDataObjects(modelInstance, sbvrOutput);
+
+        // Event-Analyser
+        IntermediateCatchEventAnalyzer.analyzeCatchEvents(modelInstance, sbvrOutput);
+        IntermediateThrowEventAnalyzer.analyzeThrowEvents(modelInstance, sbvrOutput);
+
+        // Aufruf zur Analyse von SendTasks und weiteren Tasks
+        analyzeSendTasks(modelInstance, sbvrOutput);
+        analyzeUserTaskTransformer.analyzeUserTasks(modelInstance, sbvrOutput);
+        analyzeServiceTasks(modelInstance, sbvrOutput);
+        analyzeBusinessTasks(modelInstance, sbvrOutput);
+
+        analyzeMessageFlowsForActivities.analyzeActivities(modelInstance, sbvrOutput);
+
+        SubProcessTransformer.processSubProcessesAndMessageFlows(modelInstance, sbvrOutput);
+
+        // Stelle sicher, dass EndEvents auch ohne ausgehende SequenceFlows berücksichtigt werden
+        for (FlowNode node : modelInstance.getModelElementsByType(FlowNode.class)) {
+            if (node instanceof EndEvent && !processedNodes.contains(node)) {
+                String sourceRole = Hilfsmethoden.getRoleForNode(node, lanes);
+                sbvrOutput.append(new EndEventTransformer().transformFlowNode((EndEvent) node, sourceRole, null, lanes)).append("\n");
+            }
         }
     }
+
 }
 
 
