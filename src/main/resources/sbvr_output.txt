@@ -1,33 +1,11 @@
-Es ist notwendig, dass Unbekannte Rolle Check paperwork ausführt, wenn Unbekannte Rolle Start ausführt.
-
-Es ist notwendig, dass Unbekannte Rolle Answer questions ausführt, wenn Unbekannte Rolle Check paperwork ausführt.
-
-Es ist notwendig, dass die Aktivität Seek senior Clinic Clinician’s advice ausgeführt wird, wenn das XOR Gateway XOR-Gateway ausgeführt wird.
-
-Es ist notwendig, dass Unbekannte Rolle XOR-Gateway ausführt, wenn Unbekannte Rolle Seek senior Clinic Clinician’s advice ausführt und Continue vaccination gilt.
-Es ist notwendig, dass Unbekannte Rolle Inform vaccinee to leave clinic ausführt, wenn Unbekannte Rolle Seek senior Clinic Clinician’s advice ausführt und No vaccination gilt.
-
-Es ist notwendig, dass die Aktivität Ask for missing information ausgeführt wird, wenn das XOR Gateway XOR-Gateway ausgeführt wird.
-
-Es ist notwendig, dass die Aktivität Ask to complete form at home ausgeführt wird, wenn das XOR Gateway XOR-Gateway ausgeführt wird.
-
-Es ist notwendig, dass Unbekannte Rolle Call Vaccinees to register ausführt, wenn Unbekannte Rolle XOR-Gateway ausführt und No further questions gilt.
-Es ist notwendig, dass Unbekannte Rolle Ask for missing information ausführt, wenn Unbekannte Rolle XOR-Gateway ausführt und Vaccinee did not complete all questions gilt.
-
-Es ist notwendig, dass Unbekannte Rolle Ask to return tomorrow ausführt, wenn Unbekannte Rolle Ask to complete form at home ausführt.
-
-Nicht unterstützter Knoten-Typ: IntermediateCatchEventImpl
-Es ist notwendig, dass Unbekannte Rolle Ask to complete form at home ausführt, wenn Unbekannte Rolle Ask for missing information ausführt und Can't finish before 6pm gilt.
-Es ist notwendig, dass Unbekannte Rolle Call Vaccinees to register ausführt, wenn Unbekannte Rolle Ask for missing information ausführt und No further questions gilt.
-
-Es ist notwendig, dass der Prozess mit dem Startevent Response received startet. 
-Es ist notwendig, dass Unbekannte Rolle XOR-Gateway ausführt, wenn Unbekannte Rolle Answer questions ausführt und Can answer gilt.
-Es ist notwendig, dass Unbekannte Rolle Seek senior Clinic Clinician’s advice ausführt, wenn Unbekannte Rolle Answer questions ausführt und Can't answer gilt.
-
-Es ist notwendig, dass die Aktivität Call Vaccinees to register ausgeführt wird, wenn das XOR Gateway XOR-Gateway ausgeführt wird.
-
-Es ist notwendig, dass Unbekannte Rolle der Subprozess Inform vaccinee to leave clinic ausführt, wenn Unbekannte Rolle XOR-Gateway ausführt.
-
-Es ist notwendig, dass das IntermediateCatchEvent Next day  ausgeführt wird, nachdem die festgelegte Zeit abgelaufen ist.
-Es ist notwendig, dass der Prozess mit dem EndEvent "Register vaccinee" endet, nachdem die Aktivität "Call Vaccinees to register" abgeschlossen wurde.
-Es ist notwendig, dass der Prozess mit dem EndEvent "unbenanntes Endevent" endet, nachdem die Aktivität "Inform vaccinee to leave clinic" abgeschlossen wurde.
+Es ist notwendig, dass der Prozess mit dem Startevent Signed employment 
+contract on file startet. 
+Es ist notwendig, dass das DataInput 'employment contract' der Aktivität 'Add personal data' zugeordnet ist.
+Die Aktivität 'Select necessary work equipment' erzeugt das Datenobjekt 'Work equipment', welches als Ausgabe dient.
+Es ist notwendig, dass die Aktivität 'Procure work equipment' das Datenobjekt 'Work equipment' als Eingabe verwendet.
+Es ist notwendig, dass die Aktivität Procure work equipment eine Nachricht von Supplier empfängt, bevor fortgeführt wird.
+Es ist notwendig, dass die Aktivität Procure work equipment eine Nachricht an Supplier sendet, bevor fortgeführt wird.
+„Es ist notwendig, dass der Subprozess Procure work equipment die Nachricht [Unbekannte Nachricht] vom Supplier empfängt.“
+„Es ist notwendig, dass der Subprozess Procure work equipment die Nachricht [Unbekannte Nachricht] an Supplier sendet.“
+Es ist notwendig, dass der Prozess mit dem EndEvent "Prepared for
+ employee to start" endet, nachdem die Aktivität "unbenannte Aktivität" abgeschlossen wurde.

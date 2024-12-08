@@ -79,20 +79,20 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
             // Verarbeite reguläre Knoten
             if (source instanceof StartEvent startEvent) {
                 sbvrOutput.append(new StartEventTransformer().transformFlowNode(startEvent, sourceRole, targetRole, lanes)).append("\n");
-            } else if (source instanceof ExclusiveGateway exclusiveGateway) {
-                sbvrOutput.append(new XORGatewayTransformer().transformFlowNode(exclusiveGateway, sourceRole, targetRole, lanes)).append("\n");
-            } else if (source instanceof ParallelGateway parallelGateway) {
-                sbvrOutput.append(new ANDGatewayTransformer().transformFlowNode(parallelGateway, sourceRole, targetRole, lanes)).append("\n");
-            } else if (source instanceof InclusiveGateway inclusiveGateway) {
-                sbvrOutput.append(new ORGatewayTransformer().transformFlowNode(inclusiveGateway, sourceRole, targetRole, lanes)).append("\n");
-            } else if (source instanceof EventBasedGateway eventBasedGateway) {
-                EventBasedGatewayTransformer.EventGatewayTransformer(eventBasedGateway, sbvrOutput);
-            } else if (source instanceof Activity activity) {
-                sbvrOutput.append(new ActivityTransformer().transformFlowNode(activity, sourceRole, targetRole, lanes)).append("\n");
+//            } else if (source instanceof ExclusiveGateway exclusiveGateway) {
+//                sbvrOutput.append(new XORGatewayTransformer().transformFlowNode(exclusiveGateway, sourceRole, targetRole, lanes)).append("\n");
+//            } else if (source instanceof ParallelGateway parallelGateway) {
+//                sbvrOutput.append(new ANDGatewayTransformer().transformFlowNode(parallelGateway, sourceRole, targetRole, lanes)).append("\n");
+//            } else if (source instanceof InclusiveGateway inclusiveGateway) {
+//                sbvrOutput.append(new ORGatewayTransformer().transformFlowNode(inclusiveGateway, sourceRole, targetRole, lanes)).append("\n");
+//            } else if (source instanceof EventBasedGateway eventBasedGateway) {
+//                EventBasedGatewayTransformer.EventGatewayTransformer(eventBasedGateway, sbvrOutput);
+//            } else if (source instanceof Activity activity) {
+//                sbvrOutput.append(new ActivityTransformer().transformFlowNode(activity, sourceRole, targetRole, lanes)).append("\n");
             } else if (source instanceof EndEvent endEvent) {
                 sbvrOutput.append(new EndEventTransformer().transformFlowNode(endEvent, sourceRole, targetRole, lanes)).append("\n");
             } else {
-                sbvrOutput.append("Nicht unterstützter Knoten-Typ: ").append(source.getClass().getSimpleName()).append("\n");
+                sbvrOutput.append("");
             }
 
             // Verarbeite spezielle Tasks, falls sie noch nicht bearbeitet wurden
