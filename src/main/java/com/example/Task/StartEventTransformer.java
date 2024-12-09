@@ -29,14 +29,11 @@ public class StartEventTransformer implements FlowNodeTransformer {
 
         // Überprüfe, ob es mindestens einen Ausgangsfluss gibt
         if (!outgoingFlows.isEmpty()) {
-            // Bestimmt den Namen des Zielknotens (z.B. eine Aktivität oder ein anderes Event)
-            String targetName = Hilfsmethoden.getName(outgoingFlows.get(0).getTarget());
-
             // Jetzt das SBVR-Statement mit der Methode createStartEventStatement generieren
             return createStartEventStatement(startEventName);
         } else {
             // Falls keine Ausgangsflüsse vorhanden sind, eine entsprechende Fehlermeldung oder Standardantwort zurückgeben
-            return "Es ist notwendig, dass der Prozess mit dem Startevent " + startEventName + " startet. ";
+            return "Es ist notwendig, dass der Prozess mit dem Startevent '" + startEventName + "' startet. ";
         }
     }
 }

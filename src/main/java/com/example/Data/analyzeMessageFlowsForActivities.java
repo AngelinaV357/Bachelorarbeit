@@ -34,20 +34,20 @@ public class analyzeMessageFlowsForActivities {
                     // Wenn das Ziel des MessageFlows die Aktivität ist
                     if (target.equals(activity)) {
                         String sourceName = getMessageFlowParticipantName(source, participants);
-                        sbvrOutput.append("Es ist notwendig, dass die Aktivität ")
+                        sbvrOutput.append("Es ist notwendig, dass die Aktivität '")
                                 .append(activityName)
-                                .append(" eine Nachricht von ")
+                                .append("' eine Nachricht von '")
                                 .append(sourceName)
-                                .append(" empfängt, bevor fortgeführt wird.\n");
+                                .append("' empfängt, bevor fortgeführt wird.\n");
                     }
                     // Wenn die Quelle des MessageFlows die Aktivität ist
                     else if (source.equals(activity)) {
                         String targetName = getMessageFlowParticipantName(target, participants);
-                        sbvrOutput.append("Es ist notwendig, dass die Aktivität ")
+                        sbvrOutput.append("Es ist notwendig, dass die Aktivität '")
                                 .append(activityName)
-                                .append(" eine Nachricht an ")
+                                .append("' eine Nachricht an '")
                                 .append(targetName)
-                                .append(" sendet, bevor fortgeführt wird.\n");
+                                .append("' sendet, bevor fortgeführt wird.\n");
                     }
                 }
             }

@@ -1,11 +1,33 @@
-Es ist notwendig, dass der Prozess mit dem Startevent Signed employment 
-contract on file startet. 
-DataInput 'employment contract' ist Eingabe für Aktivität 'Add personal data'.
-DataObject 'Work equipment' ist Ausgabe von Aktivität 'Select necessary work equipment'.
- Es ist notwendig, dass die Aktivität 'Procure work equipment' das Datenobject'Work equipment' erzeugt.
-Es ist notwendig, dass die Aktivität Procure work equipment eine Nachricht von Supplier empfängt, bevor fortgeführt wird.
-Es ist notwendig, dass die Aktivität Procure work equipment eine Nachricht an Supplier sendet, bevor fortgeführt wird.
-„Es ist notwendig, dass der Subprozess Procure work equipment die Nachricht [Unbekannte Nachricht] vom Supplier empfängt.“
-„Es ist notwendig, dass der Subprozess Procure work equipment die Nachricht [Unbekannte Nachricht] an Supplier sendet.“
-Es ist notwendig, dass der Prozess mit dem EndEvent "Prepared for
- employee to start" endet, nachdem die Aktivität "unbenannte Aktivität" abgeschlossen wurde.
+Es ist notwendig, dass der Prozess mit dem Startevent 'Customer arrives' startet. 
+Es ist notwendig, dass 'Sales Person' 'Determine customer preferences ' ausführt, wenn 'Sales Person' 'Start' ausführt.
+
+Es ist notwendig, dass 'Sales Person' 'Prepare sale slip' ausführt, wenn 'Sales Person' 'Determine customer preferences ' ausführt.
+
+Es ist notwendig, dass 'Sales Person' 'Prepare sale slip' ausführt, wenn 'Sales Person' 'Determine customer preferences ' ausführt.
+
+Es ist notwendig, dass 'Cashier' 'Collect payment' ausführt, wenn 'Sales Person' 'Prepare sale slip' ausführt.
+
+Es ist notwendig, dass 'Cashier' 'Collect payment' ausführt, wenn 'Sales Person' 'Prepare sale slip' ausführt.
+
+Es ist notwendig, dass die Aktivität 'Clean Car' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
+
+Es ist notwendig, dass die Aktivität 'Clean Car' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
+
+Es ist notwendig, dass 'Detailing Crew
+' der Subprozess 'Dry Car' ausführt, wenn 'Automated Car Wash Lane
+' Clean Car' ausführt.
+
+Es ist notwendig, dass 'Cashier' 'Demand other form of payment' ausführt, wenn 'Cashier' 'Collect payment' ausführt und 'no' gilt.
+Es ist notwendig, dass 'Automated Car Wash Lane
+' 'Clean Car' ausführt, wenn 'Cashier' 'Collect payment' ausführt und 'yes' gilt.
+
+Es ist notwendig, dass die Aktivität 'Demand other form of payment' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
+
+
+
+
+Es ist notwendig, dass die Aufgabe 'Collect payment', einer Ressource mit der Rolle 'Cashier' zugewiesen wird.
+Es ist notwendig, dass die Aufgabe 'Prepare sale slip', einer Ressource mit der Rolle 'Sales Person' zugewiesen wird.
+Es ist notwendig, dass die Aufgabe 'Clean Car' automatisch durch das System 'Automated Car Wash Lane
+' ausgeführt wird.
+Es ist notwendig, dass der Prozess mit dem EndEvent 'Car is washed' endet, nachdem die Aktivität 'Dry Car' abgeschlossen wurde.

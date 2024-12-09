@@ -53,7 +53,7 @@ public class analyzeBusinessTaskTransformer {
      * Erstellt die BusinessRule für einen BusinessRuleTask.
      */
     public static String createBusinessRule(String sourceRole, String sourceName, String targetRole, String targetName) {
-        return "Es ist notwendig, dass " + sourceRole + " " + sourceName + " ausführt, bevor " + targetRole + " " + targetName + " ausführt und alle Anforderungen geprüft wurden.\n";
+        return "Es ist notwendig, dass '" + sourceRole + "' '" + sourceName + "' ausführt, bevor '" + targetRole + "' '" + targetName + "' ausführt und alle Anforderungen geprüft wurden.\n";
     }
 
     /**

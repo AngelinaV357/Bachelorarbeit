@@ -17,17 +17,6 @@ public class analyzeSendTaskTransformer {
         // Alle SendTasks abrufen
         Collection<SendTask> sendTasks = modelInstance.getModelElementsByType(SendTask.class);
 
-//        // Wenn keine SendTasks gefunden wurden
-//        if (sendTasks.isEmpty()) {
-//            sbvrOutput.append("Keine SendTasks gefunden.\n");
-//        } else {
-//            sbvrOutput.append("Gefundene SendTasks:\n");
-//            // Durch alle SendTasks iterieren und die Namen auflisten
-//            for (SendTask sendTask : sendTasks) {
-//                sbvrOutput.append("SendTask: ").append(sanitizeName(sendTask.getName())).append("\n");
-//            }
-//        }
-
         // Holt alle Lane-Elemente, die für die Zuweisung von Rollen verwendet werden
         Collection<Lane> lanes = modelInstance.getModelElementsByType(Lane.class);
 
@@ -54,6 +43,7 @@ public class analyzeSendTaskTransformer {
             // Füge das Statement zum sbvrOutput hinzu
             sbvrOutput.append(sendTaskStatement);
         }
+        sbvrOutput.append("\n");
     }
 
     /**
@@ -71,7 +61,7 @@ public class analyzeSendTaskTransformer {
      * Erstellt die Aussage für einen SendTask
      */
     public static String createSendTaskStatement(String taskName, String senderRole, String receiverRole) {
-        return "Es ist notwendig, dass die Ressource mit der Rolle " + senderRole + " die Nachricht " + taskName + " an die Ressource mit der Rolle " + receiverRole + " sendet.\n";
+        return "Es ist notwendig, dass die Ressource mit der Rolle '" + senderRole + "' die Nachricht '" + taskName + "' an die Ressource mit der Rolle '" + receiverRole + "' sendet.\n";
     }
 
     /**

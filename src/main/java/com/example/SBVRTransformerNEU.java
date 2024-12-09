@@ -4,7 +4,7 @@ public class SBVRTransformerNEU {
 
     public static String createStartEventStatement(String startEventName) {
 //        return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " das Startevent " + startEventName + " ausführt.";
-        return "Es ist notwendig, dass der Prozess mit dem Startevent " + startEventName + " startet. ";
+        return "Es ist notwendig, dass der Prozess mit dem Startevent '" + startEventName + "' startet. ";
     }
 
 //    public static String createStartEventStatement(String sourceRole, String targetRole, String targetName, String startEventName) {
@@ -12,22 +12,22 @@ public class SBVRTransformerNEU {
 //    }
 
     public static String createFlowStatement(String sourceRole, String sourceName, String targetRole, String targetName, String condition) {
-        return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und " + condition + " gilt.\n";
+        return "Es ist notwendig, dass '" + targetRole + "' '" + targetName + "' ausführt, wenn '" + sourceRole + "' '" + sourceName + "' ausführt und '" + condition + "' gilt.\n";
     }
 
     public static String createBusinessRule(String sourceRole, String sourceName, String targetRole, String targetName, String condition) {
-        return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und alle Anforderungen geprüft wurden";
+        return "Es ist notwendig, dass '" + targetRole + "' '" + targetName + "' ausführt, wenn '" + sourceRole + "' '" + sourceName + "' ausführt und alle Anforderungen geprüft wurden";
     }
 
 
     public static String createInclusiveStatement(String sourceRole, String sourceName, String targetRole, String targetName, String condition) {
-        return "Es ist notwendig, dass " + targetRole + " " + targetName + " ausführt, wenn " + sourceRole + " " + sourceName + " ausführt und " + condition + " gilt.\n";
+        return "Es ist notwendig, dass '" + targetRole + "' '" + targetName + "' ausführt, wenn '" + sourceRole + "' '" + sourceName + "' ausführt und '" + condition + "' gilt.\n";
     }
 
 
     public static String createParallelStatement(String sourceName, String targetRole1, String targetName1, String targetRole2, String targetName2, String gatewayName) {
         // Gateway-Name wird nun korrekt in der SBVR-Aussage verwendet
-        return "Es ist notwendig, dass " + targetRole1 + " " + targetName1 + " ausführt und " + targetRole2 + " " + targetName2 + " ausführt, wenn " + gatewayName + " ausführt.";
+        return "Es ist notwendig, dass '" + targetRole1 + "' '" + targetName1 + "' ausführt und '" + targetRole2 + "' '" + targetName2 + "' ausführt, wenn '" + gatewayName + "' ausführt.";
     }
 
     /**
@@ -35,7 +35,7 @@ public class SBVRTransformerNEU {
      */
     public static String createODEREventGatewayStatement(String activityName, String eventType) {
         // Formuliert die SBVR-Aussage basierend auf der Aktivität und dem Ereignis
-        return "Es ist notwendig, dass die Aufgabe " + activityName + " startet, wenn das Datenereignis " + eventType + " eintritt.";
+        return "Es ist notwendig, dass die Aufgabe '" + activityName + "' startet, wenn das Datenereignis '" + eventType + "' eintritt.";
     }
 
     //Datenobjekte:
@@ -59,7 +59,7 @@ public class SBVRTransformerNEU {
      * @return SBVR-Regel für das Data Object
      */
     public static String createDataObjectStatement(String dataName) {
-        return "Es ist notwendig, dass das Datenobjekt " + dataName + " nach der Ausführung der Aktivität erstellt oder verändert wird.\n";
+        return "Es ist notwendig, dass das Datenobjekt '" + dataName + "' nach der Ausführung der Aktivität erstellt oder verändert wird.\n";
     }
 
     /**
@@ -69,7 +69,7 @@ public class SBVRTransformerNEU {
      * @return SBVR-Regel für den User Task
      */
     public static String createUserTaskStatement(String taskName, String role) {
-        return "Es ist notwendig, dass die Aufgabe " + taskName + ", einer Ressource mit der Rolle " + role + " zugewiesen wird.\n";
+        return "Es ist notwendig, dass die Aufgabe '" + taskName + "', einer Ressource mit der Rolle '" + role + "' zugewiesen wird.\n";
     }
 
     /**
@@ -78,7 +78,7 @@ public class SBVRTransformerNEU {
      * @return SBVR-Regel für den Service Task
      */
     public static String createServiceTaskStatement(String taskName, String sourceRole) {
-        return "Es ist notwendig, dass die Aufgabe " + taskName + " automatisch durch das System " + sourceRole + " ausgeführt wird.\n";
+        return "Es ist notwendig, dass die Aufgabe '" + taskName + "' automatisch durch das System '" + sourceRole + "' ausgeführt wird.\n";
     }
 
 //    /**
@@ -96,10 +96,10 @@ public class SBVRTransformerNEU {
     public static String createEndEventStatement(String sourceRole, String targetRole, String targetName, String endEventName) {
         // Wenn Ausgangsflüsse vorhanden sind, das ursprüngliche Statement zurückgeben
         if (targetName != null && !targetName.isEmpty()) {
-            return "Es ist notwendig, dass " + targetName + " " + targetRole + " ausführt, wenn " + sourceRole + " das Endevent " + endEventName + " ausführt.";
+            return "Es ist notwendig, dass '" + targetName + "' '" + targetRole + "' ausführt, wenn '" + sourceRole + "' das Endevent '" + endEventName + "' ausführt.";
         } else {
             // Wenn keine Ausgangsflüsse vorhanden sind, das Statement für das Ende des Prozesses zurückgeben
-            return "Es ist notwendig, dass der Prozess mit dem Endevent " + endEventName + " endet.";
+            return "Es ist notwendig, dass der Prozess mit dem Endevent '" + endEventName + "' endet.";
         }
     }
 }

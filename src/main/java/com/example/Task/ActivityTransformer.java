@@ -29,12 +29,12 @@ public class ActivityTransformer implements FlowNodeTransformer {
                     sourceActivityRole = getRoleForNode(incomingNode, lanes);
 
                     // Regel für XOR Gateway
-                    sbvrOutput.append("Es ist notwendig, dass die Aktivität " + activityName + " ausgeführt wird, wenn das XOR Gateway " + gatewayName + " ausgeführt wird.").append("\n");
+                    sbvrOutput.append("Es ist notwendig, dass die Aktivität '" + activityName + "' ausgeführt wird, wenn das XOR Gateway '" + gatewayName + "' ausgeführt wird.").append("\n");
                 } else {
                     // Wenn der Vorgänger kein XOR Gateway ist, überprüfen wir den normalen Fluss
                     sourceActivity = getName(incomingNode);
                     sourceActivityRole = getRoleForNode(incomingNode, lanes);
-                    sbvrOutput.append("Es ist notwendig, dass " + targetActivityRole + " " + activityName + " ausführt, wenn " + sourceActivityRole + " " + sourceActivity + " ausführt.").append("\n");
+                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' '" + activityName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
                 }
             }
         }
@@ -53,7 +53,7 @@ public class ActivityTransformer implements FlowNodeTransformer {
             }
 
             if (sourceActivity != null) {
-                sbvrOutput.append("Es ist notwendig, dass " + targetActivityRole + " der Subprozess " + subProcessName + " ausführt, wenn " + sourceActivityRole + " " + sourceActivity + " ausführt.").append("\n");
+                sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' der Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
             }
         }
 
@@ -68,7 +68,7 @@ public class ActivityTransformer implements FlowNodeTransformer {
             String targetActivityRole = getRoleForNode(catchEvent, lanes);
 
             if (sourceActivity != null) {
-                sbvrOutput.append("Es ist notwendig, dass " + targetActivityRole + " das IntermediateCatchEvent " + catchEventName + " ausführt, wenn " + sourceActivityRole + " " + sourceActivity + " ausführt.").append("\n");
+                sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' das IntermediateCatchEvent '" + catchEventName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
             }
         }
 
@@ -83,7 +83,7 @@ public class ActivityTransformer implements FlowNodeTransformer {
             String targetActivityRole = getRoleForNode(throwEvent, lanes);
 
             if (sourceActivity != null) {
-                sbvrOutput.append("Es ist notwendig, dass " + targetActivityRole + " das IntermediateThrowEvent " + throwEventName + " ausführt, wenn " + sourceActivityRole + " " + sourceActivity + " ausführt.").append("\n");
+                sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' das IntermediateThrowEvent '" + throwEventName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
             }
         }
 
@@ -98,7 +98,7 @@ public class ActivityTransformer implements FlowNodeTransformer {
             String targetActivityRole = getRoleForNode(eventBasedGateway, lanes);
 
             if (sourceActivity != null) {
-                sbvrOutput.append("Es ist notwendig, dass " + targetActivityRole + " das Event-Based Gateway " + gatewayName + " ausführt, wenn " + sourceActivityRole + " " + sourceActivity + " ausführt.").append("\n");
+                sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' das Event-Based Gateway '" + gatewayName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
             }
         }
 

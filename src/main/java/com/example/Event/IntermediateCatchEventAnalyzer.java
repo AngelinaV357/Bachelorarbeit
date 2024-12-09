@@ -33,9 +33,6 @@ public class IntermediateCatchEventAnalyzer {
                 if (eventDefinition instanceof TimerEventDefinition) {
                     isTimerEvent = true; // Es handelt sich um ein Timer Event
                     eventType = "Timer"; // Ereignistyp auf "Timer" setzen
-//                    sbvrOutput.append("Es handelt sich um ein Timer Event: ")
-//                            .append(sanitizeName(catchEventName))
-//                            .append("\n");
 
                     // SBVR-Regel für Timer Event hinzufügen
                     sbvrOutput.append("Es ist notwendig, dass das IntermediateCatchEvent ")
@@ -52,9 +49,6 @@ public class IntermediateCatchEventAnalyzer {
                 for (EventDefinition eventDefinition : catchEvent.getEventDefinitions()) {
                     if (eventDefinition instanceof MessageEventDefinition) {
                         eventType = "Message"; // Ereignistyp auf "Message" setzen
-//                        sbvrOutput.append("Es handelt sich um ein Message Event: ")
-//                                .append(sanitizeName(catchEventName))
-//                                .append("\n");
                         break;
                     }
                 }
@@ -70,14 +64,15 @@ public class IntermediateCatchEventAnalyzer {
                     String sourceName = getMessageFlowParticipantName(source, participants);
                     sbvrOutput.append("Es ist notwendig, dass das IntermediateCatchEvent ")
                             .append(sanitizeName(eventType))
-                            .append(" ")
+                            .append(" '")
                             .append(catchEventName)
-                            .append(" eine Nachricht von ")
+                            .append("' eine Nachricht von '")
                             .append(sourceName)
-                            .append(" empfängt, bevor fortgeführt wird.\n");
+                            .append("' empfängt, bevor fortgeführt wird.\n");
                 }
             }
         }
+        sbvrOutput.append("\n");
     }
 
     /**

@@ -54,9 +54,9 @@ public class EndEventTransformer implements FlowNodeTransformer {
                 }
 
                 // Generiere das SBVR-Statement für ein Gateway
-                result = "Es ist notwendig, dass der Prozess mit dem EndEvent \"" + endEventName
-                        + "\" endet, wenn das Gateway \"" + precedingNodeName
-                        + "\" mit der Bedingung \"" + precedingCondition + "\" ausgewählt wird.";
+                result = "Es ist notwendig, dass der Prozess mit dem EndEvent '" + endEventName
+                        + "' endet, wenn das Gateway '" + precedingNodeName
+                        + "' mit der Bedingung '" + precedingCondition + "' ausgewählt wird.";
             }
             // Fall 2: Vorgänger ist eine Aktivität
             else {
@@ -64,14 +64,13 @@ public class EndEventTransformer implements FlowNodeTransformer {
                 precedingNodeName = sourceNode.getAttributeValue("name") != null ? sourceNode.getAttributeValue("name") : "unbenannte Aktivität";
 
                 // Generiere das SBVR-Statement für eine Aktivität
-                result = "Es ist notwendig, dass der Prozess mit dem EndEvent \"" + endEventName
-                        + "\" endet, nachdem die Aktivität \"" + precedingNodeName + "\" abgeschlossen wurde.";
+                result = "Es ist notwendig, dass der Prozess mit dem EndEvent '" + endEventName + "' endet, nachdem die Aktivität '" + precedingNodeName + "' abgeschlossen wurde.\n";
             }
         } else {
             // Kein Vorgängerknoten vorhanden
-            result = "Der Prozess endet mit dem Endevent \"" + endEventName + "\".";
+            result = "Der Prozess endet mit dem Endevent '" + endEventName + "'\n.";
         }
 
-        return result;
+        return result.replaceAll("[\\n\\r]+", " ").trim();
     }
 }

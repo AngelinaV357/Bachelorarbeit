@@ -14,6 +14,9 @@ public class SubProcessTransformer {
         Collection<MessageFlow> messageFlows = modelInstance.getModelElementsByType(MessageFlow.class);
         Collection<Participant> participants = modelInstance.getModelElementsByType(Participant.class);
 
+        // StringBuilder für die temporäre Sammlung der SBVR-Statements
+        StringBuilder result = new StringBuilder();
+
         for (SubProcess subProcess : subProcesses) {
             String subProcessName = subProcess.getName() != null ? subProcess.getName() : "Unbekannter Subprozess";
 
@@ -28,23 +31,24 @@ public class SubProcessTransformer {
                 // Wenn der Subprozess die Quelle ist
                 if (source.equals(subProcess)) {
                     String targetName = getMessageFlowParticipantName(target, participants);
-                    sbvrOutput.append("„Es ist notwendig, dass der Subprozess ")
+                    result.append("Es ist notwendig, dass der Subprozess '")
                             .append(subProcessName)
-                            .append(" die Nachricht [").append(messageName).append("] an ")
-                            .append(targetName)
-                            .append(" sendet.“\n");
+                            .append("' die Nachricht '").append(messageName)
+                            .append("' an ").append(targetName).append("' sendet.\n");
                 }
 
                 // Wenn der Subprozess das Ziel ist
                 if (target.equals(subProcess)) {
                     String sourceName = getMessageFlowParticipantName(source, participants);
-                    sbvrOutput.append("„Es ist notwendig, dass der Subprozess ")
+                    result.append("Es ist notwendig, dass der Subprozess '")
                             .append(subProcessName)
-                            .append(" die Nachricht [").append(messageName).append("] vom ")
-                            .append(sourceName)
-                            .append(" empfängt.“\n");
+                            .append("' die Nachricht ").append(messageName)
+                            .append("' vom ").append(sourceName).append(" empfängt.\n");
                 }
             }
         }
+
+        // Füge die gesammelten Aussagen an sbvrOutput an und stelle sicher, dass der Text korrekt formatiert ist
+        sbvrOutput.append(result.toString()); // Kein trim() hier, um die Absätze zu bewahren
     }
 }
