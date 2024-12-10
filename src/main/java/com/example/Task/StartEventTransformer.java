@@ -1,39 +1,77 @@
 package com.example.Task;
 
 import com.example.Hilfsmethoden;
-import com.example.Interfaces.FlowNodeTransformer;
-import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.Lane;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import static com.example.SBVRTransformerNEU.createStartEventStatement;
+public class StartEventTransformer {
 
-public class StartEventTransformer implements FlowNodeTransformer {
-
-    @Override
-    public String transformFlowNode(FlowNode startEvent, String sourceRole, String targetRole, Collection<Lane> lanes) {
+    public String processStartEvent(FlowNode startEvent, String sourceRole, String targetRole, Collection<Participant> participants) {
         // Den Namen des StartEvents direkt aus dem BPMN-Modell extrahieren
-        String startEventName = startEvent.getAttributeValue("name"); // Holt den Attributwert "name" des Start-Events
+        String startEventName = startEvent.getAttributeValue("name");
 
         // Überprüfen, ob der StartEventName existiert und nicht leer ist
         if (startEventName == null || startEventName.trim().isEmpty()) {
             return "Fehler: StartEvent hat keinen Namen.";
         }
 
-        // Konvertiere die Collection der Ausgangsflüsse in eine Liste, um auf die Elemente per Index zuzugreifen
-        List<SequenceFlow> outgoingFlows = new ArrayList<>(startEvent.getOutgoing());
+        // Prüfen, ob das StartEvent eine MessageEventDefinition hat
+        if (startEvent instanceof StartEvent) {
+            StartEvent start = (StartEvent) startEvent;
 
-        // Überprüfe, ob es mindestens einen Ausgangsfluss gibt
-        if (!outgoingFlows.isEmpty()) {
-            // Jetzt das SBVR-Statement mit der Methode createStartEventStatement generieren
-            return createStartEventStatement(startEventName);
-        } else {
-            // Falls keine Ausgangsflüsse vorhanden sind, eine entsprechende Fehlermeldung oder Standardantwort zurückgeben
-            return "Es ist notwendig, dass der Prozess mit dem Startevent '" + startEventName + "' startet. ";
+            // Schleife durch Event-Definitionen
+            for (EventDefinition eventDefinition : start.getEventDefinitions()) {
+                if (eventDefinition instanceof MessageEventDefinition) {
+                    // Extrahiere die Nachrichtendetails
+                    MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+                    Message message = messageEventDefinition.getMessage();
+                    String messageName = (message != null && message.getName() != null) ? message.getName() : "Unbekannte Nachricht";
+
+                    // Verknüpfte MessageFlows analysieren
+                    Collection<MessageFlow> messageFlows = start.getModelInstance().getModelElementsByType(MessageFlow.class);
+
+                    for (MessageFlow messageFlow : messageFlows) {
+                        BaseElement source = (BaseElement) messageFlow.getSource();
+                        BaseElement target = (BaseElement) messageFlow.getTarget();
+
+                        // Wenn das Ziel des MessageFlows das aktuelle StartEvent ist
+                        if (target.equals(start)) {
+                            // Hier verwenden wir 'participants' anstelle von 'lanes'
+                            String sourceName = getMessageFlowParticipantName(source, participants);
+
+                            // Generiere die SBVR-Ausgabe
+                            return "Es ist erforderlich, dass der Prozess mit '"
+                                    + startEventName
+                                    + "' startet, wenn die Nachricht '"
+                                    + messageName
+                                    + "' von '"
+                                    + sourceName
+                                    + "' empfangen wird.";
+                        }
+                    }
+                }
+            }
         }
+
+        // Standardausgabe, wenn keine MessageEventDefinition gefunden wird
+        return "Es ist notwendig, dass der Prozess mit dem StartEvent '" + startEventName + "' startet.";
+    }
+
+    private String getMessageFlowParticipantName(BaseElement element, Collection<Participant> participants) {
+        // Prüfe, ob das Element ein Participant ist
+        if (element instanceof Participant) {
+            Participant participant = (Participant) element;
+            return participant.getName() != null ? participant.getName() : "Unbenannter Teilnehmer";
+        }
+
+        // Falls das Element kein Participant ist, durchsuche die Teilnehmer nach einem passenden Element
+        for (Participant participant : participants) {
+            if (participant.getProcess() != null && participant.getProcess().equals(element)) {
+                return participant.getName() != null ? participant.getName() : "Unbenannter Teilnehmer";
+            }
+        }
+
+        return "Unbekannte Quelle/Ziel";
     }
 }

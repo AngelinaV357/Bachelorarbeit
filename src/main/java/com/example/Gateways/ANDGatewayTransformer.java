@@ -11,6 +11,7 @@ import java.util.*;
 
 import static com.example.Hilfsmethoden.getName;
 import static com.example.Hilfsmethoden.getRoleForNode;
+import static com.example.SBVRTransformerNEU.createANDGatewayStatement;
 
 public class ANDGatewayTransformer implements FlowNodeTransformer {
     /**
@@ -55,19 +56,21 @@ public class ANDGatewayTransformer implements FlowNodeTransformer {
                     String targetRole2 = getRoleForNode(flow2.getTarget(), lanes);
                     String condition2 = flow2.getName() != null ? flow2.getName() : "unbekannte Bedingung";
 
-                    String flowStatement1 = SBVRTransformerNEU.createFlowStatement(sourceRole, sourceName, targetRole1, targetName1, condition1);
-                    if (uniqueStatements.add(flowStatement1)) {
-                        sbvrStatements.append(flowStatement1);
-                    }
+                    // Anpassen der SBVR-Aussage auf die spezifischen Bedingungen für jede Aktivität
+//                    String flowStatement1 = SBVRTransformerNEU.createFlowStatement(sourceRole, sourceName, targetRole1, targetName1, condition1);
+//                    if (uniqueStatements.add(flowStatement1)) {
+//                        sbvrStatements.append(flowStatement1);
+//                    }
+//
+//                    String flowStatement2 = SBVRTransformerNEU.createFlowStatement(sourceRole, sourceName, targetRole2, targetName2, condition2);
+//                    if (uniqueStatements.add(flowStatement2)) {
+//                        sbvrStatements.append(flowStatement2);
+//                    }
 
-                    String flowStatement2 = SBVRTransformerNEU.createFlowStatement(sourceRole, sourceName, targetRole2, targetName2, condition2);
-                    if (uniqueStatements.add(flowStatement2)) {
-                        sbvrStatements.append(flowStatement2);
-                    }
-
-                    String exclusionStatement = SBVRTransformerNEU.createParallelStatement(sourceName, targetRole1, targetName1, targetRole2, targetName2, gatewayName);
-                    if (uniqueStatements.add(exclusionStatement)) {
-                        sbvrStatements.append(exclusionStatement);
+                    // Hier wird die AND-Gateway-Bedingung betrachtet
+                    String andGatewayStatement = createANDGatewayStatement(targetRole1, targetName1, targetRole2, targetName2, gatewayName, condition1, condition2);
+                    if (uniqueStatements.add(andGatewayStatement)) {
+                        sbvrStatements.append(andGatewayStatement);
                     }
                 }
             }
@@ -76,4 +79,5 @@ public class ANDGatewayTransformer implements FlowNodeTransformer {
         sbvrOutput.append(sbvrStatements);
         return sbvrOutput.toString();
     }
+
 }

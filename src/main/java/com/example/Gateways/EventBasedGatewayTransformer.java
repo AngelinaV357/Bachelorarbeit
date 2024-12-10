@@ -56,11 +56,11 @@ public class EventBasedGatewayTransformer {
 
                         if (target.equals(catchEvent)) {
                             String sourceName = getMessageFlowParticipantName(source, participants);
-                            sbvrOutput.append("Es ist notwendig, dass das Intermediate Catch Event ")
+                            sbvrOutput.append("Es ist notwendig, dass das Intermediate Catch Event '")
                                     .append(sanitizeName(catchEvent.getName()))
-                                    .append(" eine Nachricht von ")
+                                    .append("' eine Nachricht von '")
                                     .append(sourceName)
-                                    .append(" empfängt, bevor fortgeführt wird.\n");
+                                    .append("' empfängt, bevor fortgeführt wird.\n");
                         }
                     }
                 }
@@ -90,11 +90,11 @@ public class EventBasedGatewayTransformer {
 
                                     if (target.equals(catchEvent)) {
                                         String sourceName = getMessageFlowParticipantName(source, participants);
-                                        sbvrOutput.append("Es ist notwendig, dass das Timer Event nach Event-Based Gateway ")
+                                        sbvrOutput.append("Es ist notwendig, dass das Timer Event nach Event-Based Gateway '")
                                                 .append(sanitizeName(catchEvent.getName()))
-                                                .append(" eine Nachricht von ")
+                                                .append("' eine Nachricht von '")
                                                 .append(sourceName)
-                                                .append(" empfängt, bevor fortgeführt wird.\n");
+                                                .append("' empfängt, bevor fortgeführt wird.\n");
                                     }
                                 }
                             }
@@ -109,11 +109,11 @@ public class EventBasedGatewayTransformer {
 
                                 if (target.equals(catchEvent)) {
                                     String sourceName = getMessageFlowParticipantName(source, participants);
-                                    sbvrOutput.append("Es ist notwendig, dass das Intermediate Catch Event ")
+                                    sbvrOutput.append("Es ist notwendig, dass das Intermediate Catch Event '")
                                             .append(sanitizeName(catchEvent.getName()))
-                                            .append(" eine Nachricht von ")
+                                            .append("' eine Nachricht von '")
                                             .append(sourceName)
-                                            .append(" empfängt, bevor fortgeführt wird.\n");
+                                            .append("' empfängt, bevor fortgeführt wird.\n");
                                 }
                             }
                         }

@@ -50,10 +50,14 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
             if (source instanceof StartEvent startEvent && !processedNodes.contains(source)) {
                 String sourceRole = Hilfsmethoden.getRoleForNode(source, lanes);
                 String targetRole = Hilfsmethoden.getRoleForNode(flow.getTarget(), lanes);
-                sbvrOutput.append(new StartEventTransformer().transformFlowNode(startEvent, sourceRole, targetRole, lanes)).append("\n");
-                processedNodes.add(source);  // Markiere das StartEvent als verarbeitet
+
+                Collection<Participant> participants = startEvent.getModelInstance().getModelElementsByType(Participant.class);
+
+                sbvrOutput.append(new StartEventTransformer().processStartEvent(startEvent, sourceRole, targetRole, participants)).append("\n");
+                processedNodes.add(source);
             }
         }
+
 
         // Danach alle anderen Sequenzflüsse und Knoten verarbeiten
         for (SequenceFlow flow : sequenceFlows) {
@@ -78,10 +82,9 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
             } else if (source instanceof EndEvent endEvent) {
                 sbvrOutput.append(new EndEventTransformer().transformFlowNode(endEvent, sourceRole, targetRole, lanes)).append("\n");
             } else {
-                sbvrOutput.append(""); // Leerer Fall
+                sbvrOutput.append("");
             }
 
-            // Verarbeite spezielle Tasks, falls sie noch nicht bearbeitet wurden
             if (source instanceof UserTask userTask) {
                 if (!processedTasks.contains(userTask.getId())) {
                     sbvrOutput.append(new ActivityTransformer().transformFlowNode(userTask, sourceRole, targetRole, lanes)).append("\n");
@@ -94,7 +97,7 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
                 }
             }
 
-            processedNodes.add(source);  // Markiere diesen Knoten als verarbeitet
+            processedNodes.add(source);
         }
 
         // Zusätzliche Datenanalysen

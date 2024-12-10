@@ -1,5 +1,5 @@
-Es ist notwendig, dass der Prozess mit dem Startevent 'Customer arrives' startet. 
-Es ist notwendig, dass 'Sales Person' 'Determine customer preferences ' ausführt, wenn 'Sales Person' 'Start' ausführt.
+Es ist notwendig, dass der Prozess mit dem StartEvent 'Customer arrives' startet.
+Es ist notwendig, dass 'Sales Person' 'Determine customer preferences' ausführt, wenn 'Sales Person' 'Start' ausführt.
 
 Es ist notwendig, dass 'Sales Person' 'Prepare sale slip' ausführt, wenn 'Sales Person' 'Determine customer preferences ' ausführt.
 
@@ -9,27 +9,21 @@ Es ist notwendig, dass 'Cashier' 'Collect payment' ausführt, wenn 'Sales Person
 
 Es ist notwendig, dass 'Cashier' 'Collect payment' ausführt, wenn 'Sales Person' 'Prepare sale slip' ausführt.
 
-Es ist notwendig, dass die Aktivität 'Clean Car' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
+Es ist notwendig, dass 'Cashier' die Aktivität 'Clean Car' ausführt, wenn das XOR Gateway 'Unbenanntes XOR Gateway' aktiv ist.
 
-Es ist notwendig, dass die Aktivität 'Clean Car' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
+Es ist notwendig, dass 'Cashier' die Aktivität 'Clean Car' ausführt, wenn das XOR Gateway 'Unbenanntes XOR Gateway' aktiv ist.
 
-Es ist notwendig, dass 'Detailing Crew
-' der Subprozess 'Dry Car' ausführt, wenn 'Automated Car Wash Lane
-' 'Clean Car' ausführt.
+Es ist notwendig, dass 'Detailing Crew' der Subprozess 'Dry Car' ausführt, wenn 'Automated Car Wash Lane' 'Clean Car' ausführt.
 
 Es ist notwendig, dass 'Cashier' 'Demand other form of payment' ausführt, wenn 'Cashier' 'Collect payment' ausführt und 'no' gilt.
-Es ist notwendig, dass 'Automated Car Wash Lane
-' 'Clean Car' ausführt, wenn 'Cashier' 'Collect payment' ausführt und 'yes' gilt.
+Es ist notwendig, dass 'Automated Car Wash Lane' 'Clean Car' ausführt, wenn 'Cashier' 'Collect payment' ausführt und 'yes' gilt.
 
-Es ist notwendig, dass die Aktivität 'Demand other form of payment' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
-
-
-
+Es ist notwendig, dass 'Cashier' die Aktivität 'Demand other form of payment' ausführt, wenn das XOR Gateway 'Unbenanntes XOR Gateway' aktiv ist.
 
 Es ist notwendig, dass die Aufgabe 'Collect payment', einer Ressource mit der Rolle 'Cashier' zugewiesen wird.
 Es ist notwendig, dass die Aufgabe 'Prepare sale slip', einer Ressource mit der Rolle 'Sales Person' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Clean Car' automatisch durch das System 'Automated Car Wash Lane
-' ausgeführt wird.
+Es ist notwendig, dass die Aufgabe 'Clean Car' automatisch durch das System 'Automated Car Wash Lane' ausgeführt wird.
 Es ist notwendig, dass der Prozess mit dem EndEvent 'Car is washed' endet, nachdem die Aktivität 'Dry Car' abgeschlossen wurde.
+
 
 

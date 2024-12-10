@@ -25,9 +25,12 @@ public class SBVRTransformerNEU {
     }
 
 
-    public static String createParallelStatement(String sourceName, String targetRole1, String targetName1, String targetRole2, String targetName2, String gatewayName) {
-        // Gateway-Name wird nun korrekt in der SBVR-Aussage verwendet
-        return "Es ist notwendig, dass '" + targetRole1 + "' '" + targetName1 + "' ausführt und '" + targetRole2 + "' '" + targetName2 + "' ausführt, wenn '" + gatewayName + "' ausführt.";
+    /**
+     * Generiert eine SBVR-Aussage für das AND-Gateway, das mehrere Bedingungen berücksichtigt.
+     */
+    public static String createANDGatewayStatement(String targetRole1, String targetName1, String targetRole2, String targetName2, String gatewayName, String condition1, String condition2) {
+        // Generiere eine SBVR-Aussage, die beschreibt, dass beide Aktivitäten unter einer AND-Bedingung ausgeführt werden
+        return "Es ist notwendig, dass '" + targetRole1 + "' '" + targetName1 + "' ausführt und '" + targetRole2 + "' '" + targetName2 + "' ausführt, wenn '" + gatewayName + "' mit der Bedingung '" + condition1 + "' und '" + condition2 + "' erfüllt ist.";
     }
 
     /**
@@ -38,29 +41,6 @@ public class SBVRTransformerNEU {
         return "Es ist notwendig, dass die Aufgabe '" + activityName + "' startet, wenn das Datenereignis '" + eventType + "' eintritt.";
     }
 
-    //Datenobjekte:
-//    /**
-//     * Erzeugt die SBVR-Regel für einen Data Input.
-//     * @param dataName Name des Data Inputs
-//     * @return SBVR-Regel für den Data Input
-//     */
-//    public static String createDataInputStatement(String dataName) {
-//        return "Es ist notwendig, dass die Eingabedaten " + dataName + " einer Aktivität zur Verfügung gestellt werden.\n";
-//    }
-
-    public static String createDataInputStatementWithRoles(String dataName, String sourceId, String targetId, String sourceRole, String targetRole) {
-        return String.format("DataInput '%s' wird von '%s' generiert und an '%s' übermittelt. Quelle: %s, Ziel: %s.",
-                dataName, sourceRole, targetRole, sourceId, targetId);
-    }
-
-    /**
-     * Erzeugt die SBVR-Regel für ein Data Object.
-     * @param dataName Name des Data Objects
-     * @return SBVR-Regel für das Data Object
-     */
-    public static String createDataObjectStatement(String dataName) {
-        return "Es ist notwendig, dass das Datenobjekt '" + dataName + "' nach der Ausführung der Aktivität erstellt oder verändert wird.\n";
-    }
 
     /**
      * Erzeugt die SBVR-Regel für einen User Task.

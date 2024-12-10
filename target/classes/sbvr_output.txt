@@ -1,33 +1,33 @@
-Es ist notwendig, dass der Prozess mit dem Startevent 'Customer arrives' startet. 
-Es ist notwendig, dass 'Sales Person' 'Determine customer preferences ' ausführt, wenn 'Sales Person' 'Start' ausführt.
+Es ist notwendig, dass der Prozess mit dem StartEvent 'Need arises' startet.
+Es ist notwendig, dass 'Procurement' die Aktivität 'Retrieve work equipment from the storeroom' ausführt, wenn das XOR Gateway 'Unbenanntes XOR Gateway' aktiv ist.
 
-Es ist notwendig, dass 'Sales Person' 'Prepare sale slip' ausführt, wenn 'Sales Person' 'Determine customer preferences ' ausführt.
+Es ist notwendig, dass 'Procurement' die Aktivität 'Specify and quantify requirements' ausführt, wenn das XOR Gateway 'Unbenanntes XOR Gateway' aktiv ist.
 
-Es ist notwendig, dass 'Sales Person' 'Prepare sale slip' ausführt, wenn 'Sales Person' 'Determine customer preferences ' ausführt.
+Es ist notwendig, dass 'Procurement' 'Place order' ausführt, wenn 'Procurement' 'Specify and quantify requirements' ausführt.
 
-Es ist notwendig, dass 'Cashier' 'Collect payment' ausführt, wenn 'Sales Person' 'Prepare sale slip' ausführt.
+Es ist notwendig, dass 'Procurement' 'Place order by e-mail' ausführt, wenn 'Procurement' 'CatchEvent' ausführt.
 
-Es ist notwendig, dass 'Cashier' 'Collect payment' ausführt, wenn 'Sales Person' 'Prepare sale slip' ausführt.
+Es ist notwendig, dass das Intermediate Catch Event 'Receipt of work equipment' eine Nachricht von 'Supplier' empfängt, bevor fortgeführt wird.
+Es ist notwendig, dass 'Procurement' 'Check stock' ausführt, wenn 'Procurement' 'Start' ausführt.
 
-Es ist notwendig, dass die Aktivität 'Clean Car' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
+Es ist notwendig, dass 'Procurement' 'Retrieve work equipment from the storeroom' ausführt, wenn 'Procurement' 'Check stock' ausführt und 'Work
+equipment
+in stock' gilt.
+Es ist notwendig, dass 'Procurement' 'Specify and quantify requirements' ausführt, wenn 'Procurement' 'Check stock' ausführt und 'Work equipment
+not in stock' gilt.
 
-Es ist notwendig, dass die Aktivität 'Clean Car' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
+Es ist notwendig, dass die Aktivität 'Place order by e-mail' das Datenobjekt 'Order request template' als Eingabe verwendet.
 
-Es ist notwendig, dass 'Detailing Crew
-' der Subprozess 'Dry Car' ausführt, wenn 'Automated Car Wash Lane
-' Clean Car' ausführt.
+Es ist notwendig, dass dass Element 'Place order' mit der TextAnnotation 'ERP-System' zugeordnet ist.
 
-Es ist notwendig, dass 'Cashier' 'Demand other form of payment' ausführt, wenn 'Cashier' 'Collect payment' ausführt und 'no' gilt.
-Es ist notwendig, dass 'Automated Car Wash Lane
-' 'Clean Car' ausführt, wenn 'Cashier' 'Collect payment' ausführt und 'yes' gilt.
+Es ist notwendig, dass das IntermediateCatchEvent Message 'Receipt of work equipment' eine Nachricht von 'Supplier' empfängt, bevor fortgeführt wird.
+Es ist notwendig, dass das Event-Based Gateway 'Unbenannt' abgeschlossen wird, bevor das Timer Event '5 days' eintritt..
+Es ist notwendig, dass 'Procurement' die Aktivität 'Place order by e-mail' ausgeführt, nachdem das Timer Event '5 days' eingetreten ist.
+Es ist notwendig, dass das IntermediateCatchEvent Message 'Receipt of  work equipment' eine Nachricht von 'Supplier' empfängt, bevor fortgeführt wird.
 
-Es ist notwendig, dass die Aktivität 'Demand other form of payment' ausgeführt wird, wenn das XOR Gateway 'XOR-Gateway' ausgeführt wird.
+Es ist notwendig, dass die Aktivität 'Place order by e-mail' eine Nachricht an 'Supplier' sendet, bevor fortgeführt wird.
+Es ist notwendig, dass der Prozess mit dem EndEvent 'Work equipment  removed from the  storeroom' endet, nachdem die Aktivität 'Retrieve work equipment from the storeroom' abgeschlossen wurde.
+Es ist notwendig, dass der Prozess mit dem EndEvent 'Work equipment  procured' endet, wenn das Gateway 'unbenanntes Gateway' mit der Bedingung 'unbekannte Bedingung' ausgewählt wird.
 
 
 
-
-Es ist notwendig, dass die Aufgabe 'Collect payment', einer Ressource mit der Rolle 'Cashier' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Prepare sale slip', einer Ressource mit der Rolle 'Sales Person' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Clean Car' automatisch durch das System 'Automated Car Wash Lane
-' ausgeführt wird.
-Es ist notwendig, dass der Prozess mit dem EndEvent 'Car is washed' endet, nachdem die Aktivität 'Dry Car' abgeschlossen wurde.

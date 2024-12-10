@@ -24,19 +24,48 @@ public class ActivityTransformer implements FlowNodeTransformer {
             // Überprüfen, ob der Vorgänger ein XOR Gateway ist
             if (!task.getIncoming().isEmpty()) {
                 FlowNode incomingNode = task.getIncoming().iterator().next().getSource();
+
+                // Überprüfen, ob das eingehende Element ein XOR-Gateway ist
                 if (incomingNode instanceof ExclusiveGateway xorGateway) {
-                    String gatewayName = getName(xorGateway);
-                    sourceActivityRole = getRoleForNode(incomingNode, lanes);
+                    // XOR Gateway-Logik
+                    String gatewayName = xorGateway.getAttributeValue("name");
+
+                    // Fallback für den Fall, dass der Name des Gateways leer oder null ist
+                    if (gatewayName == null || gatewayName.isEmpty()) {
+                        gatewayName = "Unbenanntes XOR Gateway";  // Fallback-Wert setzen
+                    }
+
+                    // Rolle der eingehenden Aktivität ermitteln
+                    String roleName = getRoleForNode((FlowNode) incomingNode, lanes);
 
                     // Regel für XOR Gateway
-                    sbvrOutput.append("Es ist notwendig, dass die Aktivität '" + activityName + "' ausgeführt wird, wenn das XOR Gateway '" + gatewayName + "' ausgeführt wird.").append("\n");
+                    sbvrOutput.append("Es ist notwendig, dass '")
+                            .append(roleName)
+                            .append("' die Aktivität '")
+                            .append(activityName)  // activityName sollte der Name der aktuellen Aktivität sein
+                            .append("' ausführt, wenn das XOR Gateway '")
+                            .append(gatewayName)
+                            .append("' aktiv ist.\n");
+                } else if (incomingNode instanceof ParallelGateway andGateway) {
+                    // AND Gateway-Logik (Parallel-Gateway)
+                    String gatewayName = andGateway.getAttributeValue("name");
+
+                    if (gatewayName == null || gatewayName.isEmpty()) {
+                        gatewayName = "Unbenanntes AND Gateway";  // Fallback-Wert setzen
+                    }
+
+                    sourceActivityRole = getRoleForNode(incomingNode, lanes);
+
+                    // Regel für AND Gateway (Parallel Gateway)
+                    sbvrOutput.append("Es ist notwendig, dass die Aktivitäten '" + activityName + "' und '" + getName(incomingNode) + "' ausgeführt werden, wenn das AND Gateway '" + gatewayName + "' aktiv ist und alle eingehenden Pfade abgeschlossen sind.").append("\n");
                 } else {
-                    // Wenn der Vorgänger kein XOR Gateway ist, überprüfen wir den normalen Fluss
+                    // Wenn der Vorgänger kein XOR oder AND Gateway ist, überprüfen wir den normalen Fluss
                     sourceActivity = getName(incomingNode);
                     sourceActivityRole = getRoleForNode(incomingNode, lanes);
                     sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' '" + activityName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
                 }
             }
+
         }
 
         // Prüfen, ob es sich um einen Subprozess handelt
@@ -50,10 +79,21 @@ public class ActivityTransformer implements FlowNodeTransformer {
                 FlowNode incomingNode = subProcess.getIncoming().iterator().next().getSource();
                 sourceActivity = getName(incomingNode);
                 sourceActivityRole = getRoleForNode(incomingNode, lanes);
-            }
 
-            if (sourceActivity != null) {
-                sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' der Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
+                // Wenn der Vorgänger ein AND Gateway ist, füge die Bedingung "und alle eingehenden Pfade abgeschlossen sind" hinzu
+                if (incomingNode instanceof ParallelGateway andGateway) {
+                    String gatewayName = andGateway.getAttributeValue("name");
+
+                    if (gatewayName == null || gatewayName.isEmpty()) {
+                        gatewayName = "Unbenanntes AND Gateway";  // Fallback-Wert setzen
+                    }
+
+                    // Regel für Subprozess und AND Gateway (Parallel Gateway)
+                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' der Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' aktiv ist und alle eingehenden Pfade abgeschlossen sind.").append("\n");
+                } else {
+                    // Regel für Subprozess ohne AND Gateway
+                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' der Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
+                }
             }
         }
 
@@ -104,5 +144,4 @@ public class ActivityTransformer implements FlowNodeTransformer {
 
         return sbvrOutput.toString();
     }
-
 }

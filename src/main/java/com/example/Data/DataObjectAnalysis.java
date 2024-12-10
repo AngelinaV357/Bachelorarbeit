@@ -54,22 +54,22 @@ public class DataObjectAnalysis {
                 if (targetElement instanceof DataObjectReference) {
                     DataObjectReference dataObjectRef = (DataObjectReference) targetElement;
                     String dataObjectName = dataObjectRef.getAttributeValue("name");
-                    sbvrOutput.append("Die Aktivität '")
+                    sbvrOutput.append("Es ist notwendig, dass die Aktivität '")
                             .append(activityName)
-                            .append("' erzeugt das Datenobjekt '")
+                            .append("' das Datenobjekt '")
                             .append(dataObjectName)
-                            .append("', welches als Ausgabe dient.\n");
+                            .append("' erzeugt, welches als Ausgabe dient.\n");
                 }
 
                 // Wenn das Ziel ein DataInput ist (eher selten, aber möglich)
                 if (targetElement instanceof DataInput) {
                     DataInput dataInput = (DataInput) targetElement;
                     String dataInputName = dataInput.getAttributeValue("name");
-                    sbvrOutput.append("Das DataInput '")
+                    sbvrOutput.append("Es ist notwendig, dass das DataInput '")
                             .append(dataInputName)
-                            .append("' wird als Ausgabe von der Aktivität '")
+                            .append("' als Ausgabe von der Aktivität '")
                             .append(activityName)
-                            .append("' bereitgestellt.\n");
+                            .append("' bereitgestellt wird.\n");
                 }
             }
         }
