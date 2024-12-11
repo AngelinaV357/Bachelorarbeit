@@ -47,8 +47,6 @@ public class SubProcessTransformer {
                 }
             }
         }
-
-        // Füge die gesammelten Aussagen an sbvrOutput an und stelle sicher, dass der Text korrekt formatiert ist
         sbvrOutput.append(result.toString()); // Kein trim() hier, um die Absätze zu bewahren
     }
 }

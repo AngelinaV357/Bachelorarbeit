@@ -5,9 +5,21 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 import java.util.Collection;
 
+/**
+ * Diese Klasse analysiert DataObjects in einem BPMN-Modell und generiert
+ * eine textuelle Beschreibung im SBVR-Format basierend auf den gefundenen Verbindungen.
+ */
 public class DataObjectAnalysis {
 
-    // Methode zur Analyse der DataObjects im Modell
+    /**
+     * Analysiert die DataObjects und DataAssociations in einem BPMN-Modell.
+     * Die Methode untersucht alle Aktivitäten im Modell und prüft:
+     * 1. Welche DataObjects als Eingaben (DataInputAssociation) verwendet werden.
+     * 2. Welche DataObjects als Ausgaben (DataOutputAssociation) erzeugt werden.
+     *
+     * @param modelInstance Die BPMN-Modelldatei, die analysiert werden soll.
+     * @param sbvrOutput    Der StringBuilder, in den die SBVR-Regeln geschrieben werden.
+     */
     public void analyzeDataObjects(BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {
         // 1. Alle Aktivitäten im Modell finden
         Collection<Activity> activities = modelInstance.getModelElementsByType(Activity.class);

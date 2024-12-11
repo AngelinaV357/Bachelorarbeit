@@ -3,7 +3,6 @@ package com.example.Gateways;
 import org.camunda.bpm.model.bpmn.instance.*;
 import java.util.Collection;
 
-import static com.example.Hilfsmethoden.getEventType;
 import static com.example.Hilfsmethoden.getMessageFlowParticipantName;
 
 public class EventBasedGatewayTransformer {
@@ -20,8 +19,7 @@ public class EventBasedGatewayTransformer {
             FlowNode targetNode = flow.getTarget();
 
             // Wenn das Ziel ein IntermediateCatchEvent ist
-            if (targetNode instanceof IntermediateCatchEvent) {
-                IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) targetNode;
+            if (targetNode instanceof IntermediateCatchEvent catchEvent) {
                 boolean isTimerEvent = false;
 
                 // Überprüfe, ob es sich um ein Timer Event handelt
@@ -29,8 +27,6 @@ public class EventBasedGatewayTransformer {
                     if (eventDefinition instanceof TimerEventDefinition) {
                         isTimerEvent = true;
 
-                        // Gebe die SBVR-Regel für Timer Event aus
-                        String eventType = "Timer Event";
                         for (MessageFlow messageFlow : messageFlows) {
                             BaseElement source = (BaseElement) messageFlow.getSource();
                             BaseElement target = (BaseElement) messageFlow.getTarget();
@@ -49,7 +45,6 @@ public class EventBasedGatewayTransformer {
 
                 // Wenn es kein Timer Event ist, wird der normale Event-Typ behandelt
                 if (!isTimerEvent) {
-                    String eventType = getEventType(catchEvent);
                     for (MessageFlow messageFlow : messageFlows) {
                         BaseElement source = (BaseElement) messageFlow.getSource();
                         BaseElement target = (BaseElement) messageFlow.getTarget();
@@ -67,23 +62,20 @@ public class EventBasedGatewayTransformer {
             }
 
             // Wenn das Ziel ein Event-Based Gateway und das nachfolgende Ziel ein Timer Event ist
-            if (targetNode instanceof EventBasedGateway) {
-                EventBasedGateway eventBasedGatewayTarget = (EventBasedGateway) targetNode;
+            if (targetNode instanceof EventBasedGateway eventBasedGatewayTarget) {
 
                 for (SequenceFlow innerFlow : eventBasedGatewayTarget.getOutgoing()) {
                     FlowNode innerTargetNode = innerFlow.getTarget();
 
                     // Überprüfe, ob das Ziel des EventBasedGateway ein TimerEvent ist
-                    if (innerTargetNode instanceof IntermediateCatchEvent) {
-                        IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) innerTargetNode;
+                    if (innerTargetNode instanceof IntermediateCatchEvent catchEvent) {
                         boolean isTimerEventInFlow = false;
 
                         for (EventDefinition eventDefinition : catchEvent.getEventDefinitions()) {
                             if (eventDefinition instanceof TimerEventDefinition) {
                                 isTimerEventInFlow = true;
 
-                                // Gebe die SBVR-Regel für Timer Event nach EventBasedGateway aus
-                                String eventType = "Timer Event";
+                                // Gibt SBVR-Regel für Timer Event nach EventBasedGateway aus
                                 for (MessageFlow messageFlow : messageFlows) {
                                     BaseElement source = (BaseElement) messageFlow.getSource();
                                     BaseElement target = (BaseElement) messageFlow.getTarget();
@@ -102,7 +94,6 @@ public class EventBasedGatewayTransformer {
 
                         // Falls es kein Timer Event ist, andere Events behandeln
                         if (!isTimerEventInFlow) {
-                            String eventType = getEventType(catchEvent);
                             for (MessageFlow messageFlow : messageFlows) {
                                 BaseElement source = (BaseElement) messageFlow.getSource();
                                 BaseElement target = (BaseElement) messageFlow.getTarget();

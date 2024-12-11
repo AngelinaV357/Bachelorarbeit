@@ -8,38 +8,35 @@ import java.util.Collection;
 
 public class TestAnnotationAnalysis {
 
-    // Methode zur Analyse von TextAnnotations und deren Verbindungen
+    /**
+     * Analysiert alle TextAnnotations in einem BPMN-Modell und deren Verbindungen.
+     * Diese Methode bereinigt den Text der TextAnnotations, entfernt unnötige Teile wie '/glossary/...',
+     * und überprüft die Verbindungen zu anderen BPMN-Elementen über Assoziationen.
+     *
+     * @param modelInstance Das BPMN-Modell, das analysiert werden soll.
+     * @param sbvrOutput    Der StringBuilder, in den die Ergebnisse der Analyse geschrieben werden.
+     */
     public static void analyzeTextAnnotations(BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {
         // Alle TextAnnotations im Modell finden
         Collection<TextAnnotation> textAnnotations = modelInstance.getModelElementsByType(TextAnnotation.class);
 
         // Über alle TextAnnotations iterieren
         for (TextAnnotation annotation : textAnnotations) {
-            String text = annotation.getTextContent();
-
-            // Entfernen des Teils '/glossary/...'
-            String cleanedText = cleanTextAnnotationContent(text);
-
-            // Erweiterungselemente analysieren
-            ExtensionElements extensionElements = annotation.getExtensionElements();
-//            if (extensionElements != null) {
-//                for (ModelElementInstance element : extensionElements.getElements()) {
-//                    sbvrOutput.append("TextAnnotation: '")
-//                            .append(cleanedText)
-//                            .append("\n");
-//                }
-//            } else {
-//                sbvrOutput.append("TextAnnotation: '").append(cleanedText).append("', keine Erweiterungselemente gefunden.\n");
-//            }
 
             // Analyse der Verbindungen der TextAnnotation
             analyzeTextAnnotationConnections(annotation, modelInstance, sbvrOutput);
         }
     }
 
-    // Methode zur Bereinigung des Textes (Entfernen des '/glossary/...' Teils und des ersten Abschnitts)
+    /**
+     * Bereinigt den Text einer TextAnnotation, indem der Teil '/glossary/...' und
+     * unnötige Abschnitte entfernt werden.
+     *
+     * @param text Der ursprüngliche Text der TextAnnotation.
+     * @return Der bereinigte Text ohne '/glossary/...' oder andere unnötige Teile.
+     */
     private static String cleanTextAnnotationContent(String text) {
-        // Überprüfen, ob der Text das Muster '/glossary/... ' enthält
+        // Überprüfen, ob der Text das Muster '/glossary/...' enthält
         if (text != null && text.contains("/glossary/")) {
             // Entfernen des Teils vor und einschließlich '/glossary/...' (alles bis zum ersten Leerzeichen nach der ID)
             int glossaryIndex = text.indexOf("/glossary/");
@@ -54,8 +51,15 @@ public class TestAnnotationAnalysis {
         return text; // Falls kein '/glossary/' vorhanden ist, gib den Text unverändert zurück
     }
 
-
-    // Methode zur Analyse der Verbindungen von TextAnnotations
+    /**
+     * Analysiert die Verbindungen (Assoziationen) einer TextAnnotation im BPMN-Modell.
+     * Die Methode überprüft, ob die TextAnnotation eine Quelle oder ein Ziel einer Assoziation ist,
+     * und erzeugt entsprechende SBVR-Ausgaben.
+     *
+     * @param textAnnotation Die zu analysierende TextAnnotation.
+     * @param modelInstance  Das BPMN-Modell, das die TextAnnotation enthält.
+     * @param sbvrOutput     Der StringBuilder, in den die Ergebnisse der Analyse geschrieben werden.
+     */
     private static void analyzeTextAnnotationConnections(TextAnnotation textAnnotation, BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {
         String textAnnotationContent = textAnnotation.getTextContent();
         String cleanedText = cleanTextAnnotationContent(textAnnotationContent);  // Bereinigen des Textes
@@ -76,7 +80,7 @@ public class TestAnnotationAnalysis {
                         .append("' zugeordnet ist.\n");
             } else if (targetElement.equals(textAnnotation)) {
                 String sourceName = getElementName(sourceElement);
-                sbvrOutput.append("Es ist notwendig, dass dass Element '")
+                sbvrOutput.append("Es ist notwendig, dass die Aktivität '")
                         .append(sourceName)
                         .append("' mit der TextAnnotation '")
                         .append(cleanedText)
@@ -86,7 +90,14 @@ public class TestAnnotationAnalysis {
         sbvrOutput.append("\n");
     }
 
-    // Hilfsmethode, um den Namen eines Elements zu bekommen
+    /**
+     * Gibt den Namen eines BPMN-Elementes zurück.
+     * Diese Methode unterstützt FlowNodes, DataObjectReferences und TextAnnotations.
+     * Für andere Typen wird der Typname des Elements zurückgegeben.
+     *
+     * @param element Das BPMN-Element, dessen Name abgerufen werden soll.
+     * @return Der Name des Elements, oder der Typname, falls kein Name verfügbar ist.
+     */
     private static String getElementName(BaseElement element) {
         if (element instanceof FlowNode) {
             return ((FlowNode) element).getName();

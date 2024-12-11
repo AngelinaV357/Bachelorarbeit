@@ -60,11 +60,9 @@ public class analyzeBusinessTaskTransformer {
      * Holt den Namen der vorherigen Aktivität aus dem SequenceFlow.
      */
     private static String getPreviousActivityName(BusinessRuleTask task) {
-        // Iteriere durch alle eingehenden Sequenzflüsse
         for (SequenceFlow incomingFlow : task.getIncoming()) {
             FlowNode sourceNode = incomingFlow.getSource();
 
-            // Rückgabe des Namens der vorherigen Aktivität
             if (sourceNode != null && sourceNode.getName() != null) {
                 return sanitizeName(sourceNode.getName());
             }
@@ -76,11 +74,9 @@ public class analyzeBusinessTaskTransformer {
      * Holt die Rolle der vorherigen Aktivität.
      */
     private static String getPreviousActivityRole(BusinessRuleTask task, Collection<Lane> lanes) {
-        // Iteriere durch alle eingehenden Sequenzflüsse
         for (SequenceFlow incomingFlow : task.getIncoming()) {
             FlowNode sourceNode = incomingFlow.getSource();
 
-            // Bestimme die Rolle der vorherigen Aktivität
             if (sourceNode != null) {
                 return getRoleForNode(sourceNode, lanes);
             }

@@ -2,7 +2,7 @@ package com.example;
 
 import com.example.Data.DataObjectAnalysis;
 import com.example.Data.TestAnnotationAnalysis;
-import com.example.Data.analyzeMessageFlowsForActivities;
+//import com.example.Data.analyzeMessageFlowsForActivities;
 import com.example.Data.analyzeUserTaskTransformer;
 import com.example.Event.IntermediateCatchEventAnalyzer;
 import com.example.Event.IntermediateThrowEventAnalyzer;
@@ -99,7 +99,7 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
 
             processedNodes.add(source);
         }
-
+        // Außerhalb der Schleife, da diese nicht direkt an Sequence Flows gebunden sein müssen
         // Zusätzliche Datenanalysen
         DataObjectAnalysis dataObjectAnalysis = new DataObjectAnalysis();
         dataObjectAnalysis.analyzeDataObjects(modelInstance, sbvrOutput);
@@ -117,7 +117,7 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
         analyzeServiceTasks(modelInstance, sbvrOutput);
         analyzeBusinessTasks(modelInstance, sbvrOutput);
 
-        analyzeMessageFlowsForActivities.analyzeActivities(modelInstance, sbvrOutput);
+//        analyzeMessageFlowsForActivities.analyzeActivities(modelInstance, sbvrOutput);
 
         SubProcessTransformer.processSubProcessesAndMessageFlows(modelInstance, sbvrOutput);
 

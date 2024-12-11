@@ -5,6 +5,8 @@ import org.camunda.bpm.model.bpmn.instance.*;
 
 import java.util.Collection;
 
+import static com.example.Hilfsmethoden.sanitizeName;
+
 public class StartEventTransformer {
 
     public String processStartEvent(FlowNode startEvent, String sourceRole, String targetRole, Collection<Participant> participants) {
@@ -23,11 +25,6 @@ public class StartEventTransformer {
             // Schleife durch Event-Definitionen
             for (EventDefinition eventDefinition : start.getEventDefinitions()) {
                 if (eventDefinition instanceof MessageEventDefinition) {
-                    // Extrahiere die Nachrichtendetails
-                    MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
-                    Message message = messageEventDefinition.getMessage();
-                    String messageName = (message != null && message.getName() != null) ? message.getName() : "Unbekannte Nachricht";
-
                     // Verknüpfte MessageFlows analysieren
                     Collection<MessageFlow> messageFlows = start.getModelInstance().getModelElementsByType(MessageFlow.class);
 
@@ -37,13 +34,17 @@ public class StartEventTransformer {
 
                         // Wenn das Ziel des MessageFlows das aktuelle StartEvent ist
                         if (target.equals(start)) {
+                            // Extrahiere die Nachricht, die mit dem MessageFlow verbunden ist
+                            Message message = messageFlow.getMessage();
+                            String messageName = (message != null && message.getName() != null) ? message.getName() : "Unbekannte Nachricht";
+
                             // Hier verwenden wir 'participants' anstelle von 'lanes'
                             String sourceName = getMessageFlowParticipantName(source, participants);
 
                             // Generiere die SBVR-Ausgabe
                             return "Es ist erforderlich, dass der Prozess mit '"
-                                    + startEventName
-                                    + "' startet, wenn die Nachricht '"
+                                    + sanitizeName(start.getName()) + "' startet, "
+                                    + "wenn die Nachricht '"
                                     + messageName
                                     + "' von '"
                                     + sourceName
@@ -53,6 +54,8 @@ public class StartEventTransformer {
                 }
             }
         }
+
+
 
         // Standardausgabe, wenn keine MessageEventDefinition gefunden wird
         return "Es ist notwendig, dass der Prozess mit dem StartEvent '" + startEventName + "' startet.";

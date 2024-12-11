@@ -34,17 +34,25 @@ public class IntermediateThrowEventAnalyzer {
                 // Wenn das Quell-Element des MessageFlows das aktuelle IntermediateThrowEvent ist
                 if (source.equals(throwEvent)) {
                     String targetName = getMessageFlowParticipantName(target, participants);
+
+                    // Überprüfen, ob eine Nachricht im MessageFlow enthalten ist und den Namen extrahieren
+                    Message message = messageFlow.getMessage();
+                    String messageName = message != null ? message.getName() : "Unbekannte Nachricht";
+
                     sbvrOutput.append(" Es ist notwendig, dass das IntermediateThrowEvent ")
                             .append(sanitizeName(eventType))
                             .append(" ")
                             .append(throwEventName)
-                            .append(" eine Nachricht an ")
+                            .append(" eine Nachricht '")
+                            .append(messageName)  // Nachricht hinzufügen
+                            .append("' an ")
                             .append(targetName)
                             .append(" sendet.\n");
                 }
             }
         }
     }
+
 
     /**
      * Bereinigt den Namen, entfernt unerwünschte Zeilenumbrüche oder Sonderzeichen.

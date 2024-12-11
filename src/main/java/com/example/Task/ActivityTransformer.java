@@ -80,22 +80,42 @@ public class ActivityTransformer implements FlowNodeTransformer {
                 sourceActivity = getName(incomingNode);
                 sourceActivityRole = getRoleForNode(incomingNode, lanes);
 
-                // Wenn der Vorgänger ein AND Gateway ist, füge die Bedingung "und alle eingehenden Pfade abgeschlossen sind" hinzu
+                // Prüfen, ob der Vorgänger ein Gateway ist
                 if (incomingNode instanceof ParallelGateway andGateway) {
+                    // AND Gateway (Parallel Gateway) - Alle eingehenden Pfade müssen abgeschlossen sein
                     String gatewayName = andGateway.getAttributeValue("name");
-
                     if (gatewayName == null || gatewayName.isEmpty()) {
                         gatewayName = "Unbenanntes AND Gateway";  // Fallback-Wert setzen
                     }
 
                     // Regel für Subprozess und AND Gateway (Parallel Gateway)
-                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' der Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' aktiv ist und alle eingehenden Pfade abgeschlossen sind.").append("\n");
+                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' den Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' aktiv ist und alle eingehenden Pfade abgeschlossen sind.").append("\n");
+                } else if (incomingNode instanceof InclusiveGateway inclusiveGateway) {
+                    // Inclusive Gateway - Mindestens ein eingehender Pfad muss abgeschlossen sein
+                    String gatewayName = inclusiveGateway.getAttributeValue("name");
+                    if (gatewayName == null || gatewayName.isEmpty()) {
+                        gatewayName = "Unbenanntes Inklusives Gateway";  // Fallback-Wert setzen
+                    }
+
+                    // Regel für Subprozess und Inclusive Gateway
+                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' den Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' aktiv ist und mindestens ein eingehender Pfad abgeschlossen ist.").append("\n");
+                } else if (incomingNode instanceof ExclusiveGateway exclusiveGateway) {
+                    // Exklusives Gateway (OR Gateway) - Nur einer der eingehenden Pfade wird aktiviert
+                    String gatewayName = exclusiveGateway.getAttributeValue("name");
+                    if (gatewayName == null || gatewayName.isEmpty()) {
+                        gatewayName = "Unbenanntes OR Gateway";  // Fallback-Wert setzen
+                    }
+
+                    // Regel für Subprozess und Exklusives Gateway
+                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' den Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' aktiv ist und der Pfad durch das OR Gateway '" + gatewayName + "' abgeschlossen ist.").append("\n");
                 } else {
-                    // Regel für Subprozess ohne AND Gateway
-                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' der Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
+                    // Regel für Subprozess ohne Gateway oder andere Gateways
+                    sbvrOutput.append("Es ist notwendig, dass '" + targetActivityRole + "' den Subprozess '" + subProcessName + "' ausführt, wenn '" + sourceActivityRole + "' '" + sourceActivity + "' ausführt.").append("\n");
                 }
             }
         }
+
+
 
         // Überprüfen auf IntermediateCatchEvent
         if (node instanceof IntermediateCatchEvent catchEvent) {

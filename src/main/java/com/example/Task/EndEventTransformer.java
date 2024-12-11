@@ -18,7 +18,7 @@ public class EndEventTransformer implements FlowNodeTransformer {
     @Override
     public String transformFlowNode(FlowNode endEvent, String sourceRole, String targetRole, Collection<Lane> lanes) {
         // Den Namen des EndEvents aus dem BPMN-Modell extrahieren
-        String endEventName = endEvent.getAttributeValue("name"); // Holt den Attributwert "name" des EndEvents
+        String endEventName = endEvent.getAttributeValue("name");
 
         // Wenn der EndEventName leer ist, einen Standardnamen setzen
         if (endEventName == null || endEventName.trim().isEmpty()) {
@@ -40,7 +40,6 @@ public class EndEventTransformer implements FlowNodeTransformer {
 
             // Fall 1: Vorgänger ist ein Gateway (z. B. ExclusiveGateway)
             if (sourceNode instanceof ExclusiveGateway gateway) {
-                // Setze den Namen des Gateways
                 precedingNodeName = gateway.getAttributeValue("name") != null ? gateway.getAttributeValue("name") : "unbenanntes Gateway";
 
                 // Gehe durch die ausgehenden Flüsse des Gateways
@@ -52,8 +51,6 @@ public class EndEventTransformer implements FlowNodeTransformer {
                         break;
                     }
                 }
-
-                // Generiere das SBVR-Statement für ein Gateway
                 result = "Es ist notwendig, dass der Prozess mit dem EndEvent '" + endEventName
                         + "' endet, wenn das Gateway '" + precedingNodeName
                         + "' mit der Bedingung '" + precedingCondition + "' ausgewählt wird.";
@@ -62,8 +59,6 @@ public class EndEventTransformer implements FlowNodeTransformer {
             else {
                 // Extrahiere den Namen der Aktivität
                 precedingNodeName = sourceNode.getAttributeValue("name") != null ? sourceNode.getAttributeValue("name") : "unbenannte Aktivität";
-
-                // Generiere das SBVR-Statement für eine Aktivität
                 result = "Es ist notwendig, dass der Prozess mit dem EndEvent '" + endEventName + "' endet, nachdem die Aktivität '" + precedingNodeName + "' abgeschlossen wurde.\n";
             }
         } else {

@@ -43,6 +43,8 @@ public class Hilfsmethoden {
             return "XOR-Gateway";
         } else if (node instanceof ParallelGateway) {
             return "UND-Gateway";
+        } else if (node instanceof InclusiveGateway) {
+            return "OR-Gateway";
         }else if (node instanceof EventBasedGateway) {
             return "Event";
         }else if (node instanceof IntermediateCatchEventImpl) {
@@ -79,6 +81,22 @@ public class Hilfsmethoden {
         }
 
         return "Unbekannte Quelle/Ziel";
+    }
+
+
+
+    /**
+     * Hilfsmethode, um den Teilnehmernamen aus dem MessageFlow zu extrahieren
+     */
+    public static String getMessageFlowParticipantNameFromSendTask(SendTask sendTask, Collection<MessageFlow> messageFlows, Collection<Participant> participants) {
+        for (MessageFlow messageFlow : messageFlows) {
+            BaseElement source = (BaseElement) messageFlow.getSource();
+            BaseElement target = (BaseElement) messageFlow.getTarget();
+            if (source.equals(sendTask)) {
+                return getMessageFlowParticipantName(target, participants);
+            }
+        }
+        return "Unbekannter Teilnehmer";
     }
 
     public static String getRoleForNode(FlowNode node, Collection<Lane> lanes) {
@@ -123,4 +141,15 @@ public class Hilfsmethoden {
             System.out.println("Fehler beim Schreiben der Datei: " + e.getMessage());
         }
     }
+
+    /**
+     * Bereinigt den Namen, entfernt unerwünschte Zeilenumbrüche oder Sonderzeichen.
+     */
+    public static String sanitizeName(String name) {
+        if (name == null) {
+            return "Unbenannt";
+        }
+        return name.replaceAll("[\\r\\n]+", " ").trim();
+    }
+
 }

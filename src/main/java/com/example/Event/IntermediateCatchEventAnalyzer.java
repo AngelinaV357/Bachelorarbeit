@@ -1,5 +1,6 @@
 package com.example.Event;
 
+import com.example.Hilfsmethoden;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.*;
 
@@ -23,7 +24,7 @@ public class IntermediateCatchEventAnalyzer {
         // Durch alle IntermediateCatchEvents iterieren
         for (IntermediateCatchEvent catchEvent : catchEvents) {
             // Namen des IntermediateCatchEvents abrufen
-            String catchEventName = sanitizeName(catchEvent.getName());
+            String catchEventName = Hilfsmethoden.sanitizeName(catchEvent.getName());
 
             // Ereignistyp ermitteln (z. B. Timer, Message, Signal etc.)
             String eventType = getEventType(catchEvent);
@@ -48,9 +49,9 @@ public class IntermediateCatchEventAnalyzer {
                     if (previousFlowElement instanceof Gateway) {
                         String roleName = getRoleForNode((FlowNode) previousFlowElement, lanes);
                         sbvrOutput.append("Es ist notwendig, dass das Event-Based Gateway '")
-                                .append(sanitizeName(previousFlowElement.getName()))
+                                .append(Hilfsmethoden.sanitizeName(previousFlowElement.getName()))
                                 .append("' abgeschlossen wird, bevor das Timer Event '")
-                                .append(sanitizeName(catchEventName))
+                                .append(Hilfsmethoden.sanitizeName(catchEventName))
                                 .append("' eintritt.")
                                 .append(".\n");
                     } else if (previousFlowElement instanceof Activity) {
@@ -60,7 +61,7 @@ public class IntermediateCatchEventAnalyzer {
                                 .append("' die Aktivität '")
                                 .append(previousFlowElement != null ? previousFlowElement.getName() : "unbekannte Aktivität")
                                 .append("' ausführt, bevor das Timer Event '")
-                                .append(sanitizeName(catchEventName))
+                                .append(Hilfsmethoden.sanitizeName(catchEventName))
                                 .append("' eintritt.")
                                 .append("'.\n");
                     }
@@ -71,7 +72,7 @@ public class IntermediateCatchEventAnalyzer {
                             .append("' die Aktivität '")
                             .append(nextActivity != null ? nextActivity.getName() : "unbekannte Aktivität")
                             .append("' ausgeführt, nachdem das Timer Event '")
-                            .append(sanitizeName(catchEventName))
+                            .append(Hilfsmethoden.sanitizeName(catchEventName))
                             .append("' eingetreten ist.\n");
 
                     break;
@@ -83,46 +84,50 @@ public class IntermediateCatchEventAnalyzer {
                 for (EventDefinition eventDefinition : catchEvent.getEventDefinitions()) {
                     if (eventDefinition instanceof MessageEventDefinition) {
                         eventType = "Message"; // Ereignistyp auf "Message" setzen
-                        break;
+
+                        // Nachricht aus der MessageEventDefinition extrahieren
+                        MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+                        Message message = messageEventDefinition.getMessage(); // Die Message-Instanz holen
+
+                        // Überprüfen, ob eine Nachricht vorhanden ist und den Namen extrahieren
+                        String messageName = message != null ? message.getName() : "Unbekannte Nachricht";
+
+                        // Verknüpfte MessageFlows analysieren
+                        for (MessageFlow messageFlow : messageFlows) {
+                            BaseElement source = (BaseElement) messageFlow.getSource();
+                            BaseElement target = (BaseElement) messageFlow.getTarget();
+
+                            // Wenn das Ziel des MessageFlows das aktuelle IntermediateCatchEvent ist
+                            if (target.equals(catchEvent)) {
+                                String sourceName = getMessageFlowParticipantName(source, participants);
+
+                                // Überprüfen, ob die Nachricht im MessageFlow enthalten ist
+                                if (messageFlow.getMessage() != null) {
+                                    messageName = messageFlow.getMessage().getName(); // Die Nachricht aus dem MessageFlow holen
+                                }
+
+                                sbvrOutput.append("Es ist notwendig, dass das IntermediateCatchEvent ")
+                                        .append(Hilfsmethoden.sanitizeName(eventType))
+                                        .append(" '")
+                                        .append(catchEventName)
+                                        .append("' die Nachricht '")
+                                        .append(messageName)  // Nachricht hinzufügen
+                                        .append("' von '")
+                                        .append(sourceName)
+                                        .append("' empfängt, bevor fortgeführt wird.\n");
+                            }
+                        }
+                        break; // Es reicht aus, die Nachricht einmal zu finden
                     }
                 }
             }
-
-            // Verknüpfte MessageFlows analysieren
-            for (MessageFlow messageFlow : messageFlows) {
-                BaseElement source = (BaseElement) messageFlow.getSource();
-                BaseElement target = (BaseElement) messageFlow.getTarget();
-
-                // Wenn das Ziel des MessageFlows das aktuelle IntermediateCatchEvent ist
-                if (target.equals(catchEvent)) {
-                    String sourceName = getMessageFlowParticipantName(source, participants);
-                    sbvrOutput.append("Es ist notwendig, dass das IntermediateCatchEvent ")
-                            .append(sanitizeName(eventType))
-                            .append(" '")
-                            .append(catchEventName)
-                            .append("' eine Nachricht von '")
-                            .append(sourceName)
-                            .append("' empfängt, bevor fortgeführt wird.\n");
-                }
-            }
         }
-        sbvrOutput.append("\n");
     }
 
-    /**
-     * Bereinigt den Namen, entfernt unerwünschte Zeilenumbrüche oder Sonderzeichen.
-     */
-    private static String sanitizeName(String name) {
-        if (name == null) {
-            return "Unbenannt";
-        }
-        // Entfernt Zeilenumbrüche und überflüssige Leerzeichen
-        return name.replaceAll("[\\r\\n]+", " ").trim();
-    }
 
-    /**
-     * Findet das vorherige Element (Aktivität oder Gateway), das zum IntermediateCatchEvent führt.
-     */
+            /**
+             * Findet das vorherige Element (Aktivität oder Gateway), das zum IntermediateCatchEvent führt.
+             */
     private static FlowElement getPreviousFlowElement(IntermediateCatchEvent catchEvent, BpmnModelInstance modelInstance) {
         // Alle Sequenzflüsse durchsuchen, um das vorherige Element zu finden
         Collection<SequenceFlow> sequenceFlows = modelInstance.getModelElementsByType(SequenceFlow.class);

@@ -24,6 +24,12 @@ public class SBVRTransformerNEU {
         return "Es ist notwendig, dass '" + targetRole + "' '" + targetName + "' ausführt, wenn '" + sourceRole + "' '" + sourceName + "' ausführt und '" + condition + "' gilt.\n";
     }
 
+    /**
+     * Erstellt die Aussage für einen SendTask
+     */
+    public static String createSendTaskStatement(String taskName, String senderRole, String receiverRole) {
+        return "Es ist notwendig, dass die Ressource mit der Rolle '" + senderRole + "' die Nachricht '" + taskName + "' an die Ressource mit der Rolle '" + receiverRole + "' sendet, bevor fortgeführt wird.\n";
+    }
 
     /**
      * Generiert eine SBVR-Aussage für das AND-Gateway, das mehrere Bedingungen berücksichtigt.
@@ -31,14 +37,6 @@ public class SBVRTransformerNEU {
     public static String createANDGatewayStatement(String targetRole1, String targetName1, String targetRole2, String targetName2, String gatewayName, String condition1, String condition2) {
         // Generiere eine SBVR-Aussage, die beschreibt, dass beide Aktivitäten unter einer AND-Bedingung ausgeführt werden
         return "Es ist notwendig, dass '" + targetRole1 + "' '" + targetName1 + "' ausführt und '" + targetRole2 + "' '" + targetName2 + "' ausführt, wenn '" + gatewayName + "' mit der Bedingung '" + condition1 + "' und '" + condition2 + "' erfüllt ist.";
-    }
-
-    /**
-     * Ein oder basiertes Gateway bedeutet, dass nur ein Ergebnis eintreffen muss, um den Prozess fortzusetzen
-     */
-    public static String createODEREventGatewayStatement(String activityName, String eventType) {
-        // Formuliert die SBVR-Aussage basierend auf der Aktivität und dem Ereignis
-        return "Es ist notwendig, dass die Aufgabe '" + activityName + "' startet, wenn das Datenereignis '" + eventType + "' eintritt.";
     }
 
 
@@ -60,17 +58,6 @@ public class SBVRTransformerNEU {
     public static String createServiceTaskStatement(String taskName, String sourceRole) {
         return "Es ist notwendig, dass die Aufgabe '" + taskName + "' automatisch durch das System '" + sourceRole + "' ausgeführt wird.\n";
     }
-
-//    /**
-//     * Erzeugt die SBVR-Regel für einen Send Task, wobei die sendende und empfangende Ressource berücksichtigt werden.
-//     * @param taskName Name der Aufgabe
-//     * @param senderRole Die Rolle, die die Nachricht sendet
-//     * @param receiverRole Die Rolle, die die Nachricht empfängt
-//     * @return SBVR-Regel für den Send Task
-//     */
-//    public static String createSendTaskStatement(String taskName, String senderRole, String receiverRole) {
-//        return "Es ist notwendig, dass die Ressource mit der Rolle " + senderRole + " die Nachricht " + taskName + " an die Ressource mit der Rolle " + receiverRole + " sendet.\n";
-//    }
 
 
     public static String createEndEventStatement(String sourceRole, String targetRole, String targetName, String endEventName) {
