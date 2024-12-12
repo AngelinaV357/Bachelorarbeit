@@ -9,7 +9,7 @@ import org.camunda.bpm.model.bpmn.instance.MessageFlow;
 import java.util.Collection;
 
 import static com.example.Hilfsmethoden.*;
-import static com.example.SBVRTransformerNEU.createSendTaskStatement;
+import static com.example.main.SBVRTransformerNEU.createSendTaskStatement;
 
 public class analyzeSendTaskTransformer {
     public static void analyzeSendTasks(BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {

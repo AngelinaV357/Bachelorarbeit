@@ -5,7 +5,7 @@ import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Lane;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import com.example.SBVRTransformerNEU;
+import com.example.main.SBVRTransformerNEU;
 
 import java.util.*;
 

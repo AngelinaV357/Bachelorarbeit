@@ -1,116 +1,16 @@
 Fehler: StartEvent hat keinen Namen.
-Es ist erforderlich, dass der Prozess mit 'Anfrage empfangen' startet, wenn die Nachricht 'Anfrage' von 'Kunde' empfangen wird.
-Es ist notwendig, dass 'Unbekannte Rolle' 'Anfrage prüfen' ausführt, wenn 'Unbekannte Rolle' 'Start' ausführt.
+Es ist notwendig, dass 'Unbekannte Rolle' 'Add dry ingredients to the mixer bowl' ausführt, wenn 'Unbekannte Rolle' 'Start' ausführt.
 
-Es ist notwendig, dass 'Unbekannte Rolle' 'Anfrage prüfen' ausführt, wenn 'Unbekannte Rolle' 'Start' ausführt.
+Es ist notwendig, dass 'Unbekannte Rolle' 'Beat until all ingredients are combined' ausführt, wenn 'Unbekannte Rolle' 'Add dry ingredients to the mixer bowl' ausführt.
 
-Es ist notwendig, dass 'Unbekannte Rolle' 'Produktmodifikationsvorschlag erarbeiten' ausführt, wenn 'Unbekannte Rolle' 'Anfrage prüfen' ausführt und 'nein' gilt.
-Es ist notwendig, dass 'Unbekannte Rolle' 'XOR-Gateway' ausführt, wenn 'Unbekannte Rolle' 'Anfrage prüfen' ausführt und 'ja' gilt.
+Es ist notwendig, dass 'Unbekannte Rolle' 'stir chocolate chips and nuts into the cookie dough ' ausführt, wenn 'Unbekannte Rolle' 'Beat until all ingredients are combined' ausführt und 'No' gilt.
+Es ist notwendig, dass 'Unbekannte Rolle' 'stir chocolate chips into the cookie dough ' ausführt, wenn 'Unbekannte Rolle' 'Beat until all ingredients are combined' ausführt und 'Yes' gilt.
 
+Es ist notwendig, dass 'Unbekannte Rolle' die Aktivität 'stir chocolate chips and nuts into the cookie dough ' ausführt, wenn das XOR Gateway 'Serve people with nut allergies?' aktiv ist.
 
-Es ist notwendig, dass 'Unbekannte Rolle' den Subprozess 'Produktmodifikationsvorschlag erarbeiten' ausführt, wenn 'Unbekannte Rolle' 'XOR-Gateway' aktiv ist und der Pfad durch das OR Gateway 'geeignetes Produkt
-vorhanden?' abgeschlossen ist.
-
-Es ist notwendig, dass 'Unbekannte Rolle' 'Ende' ausführt, wenn 'Unbekannte Rolle' 'Produktmodifikationsvorschlag erarbeiten' ausführt und 'nein' gilt.
-Es ist notwendig, dass 'Unbekannte Rolle' 'XOR-Gateway' ausführt, wenn 'Unbekannte Rolle' 'Produktmodifikationsvorschlag erarbeiten' ausführt und 'ja' gilt.
-
-Es ist notwendig, dass 'Vertrieb' den Subprozess 'Usecase analysieren' ausführt, wenn 'Vertrieb' 'UND-Gateway' aktiv ist und alle eingehenden Pfade abgeschlossen sind.
-
-Es ist notwendig, dass 'Produktmanagement' 'Usecase auf Produktanforderungen prüfen' ausführt, wenn 'Produktmanagement' 'Usecase aufnehmen und dokumentieren' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Usecase auf Produktanforderungen prüfen' ausführt, wenn 'Produktmanagement' 'Usecase aufnehmen und dokumentieren' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Produktanforderungen dokumentieren' ausführt, wenn 'Produktmanagement' 'Usecase auf Produktanforderungen prüfen' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Produktanforderungen dokumentieren' ausführt, wenn 'Produktmanagement' 'Usecase auf Produktanforderungen prüfen' ausführt.
-
-Es ist notwendig, dass 'Vertrieb' 'Produkt anbeiten' ausführt und 'Vertrieb' 'Usecase analysieren' ausführt, wenn 'UND-Gateway' mit der Bedingung 'unbekannte Bedingung' und 'unbekannte Bedingung' erfüllt ist.
-Es ist notwendig, dass 'Vertrieb' den Subprozess 'Anfrage bearbeiten' ausführt, wenn 'Vertrieb' 'Start' ausführt.
-
-Es ist notwendig, dass die Aktivitäten 'Produkt anbeiten' und 'UND-Gateway' ausgeführt werden, wenn das AND Gateway 'Unbenanntes AND Gateway' aktiv ist und alle eingehenden Pfade abgeschlossen sind.
-
-Es ist notwendig, dass das Intermediate Catch Event 'Bestätigung erhalten' eine Nachricht von 'Kunde' empfängt, bevor fortgeführt wird.
-Es ist notwendig, dass das Intermediate Catch Event 'Ablehnung erhalten' eine Nachricht von 'Kunde' empfängt, bevor fortgeführt wird.
-
-Es ist notwendig, dass 'Vertrieb' 'Usecase dokumentieren' ausführt, wenn 'Vertrieb' 'Usecase analysieren' ausführt.
-
-Es ist notwendig, dass 'Vertrieb' 'Usecase dokumentieren' ausführt, wenn 'Vertrieb' 'Usecase analysieren' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Lastenheft erstellen' ausführt, wenn 'Produktmanagement' 'Produktanforderungen dokumentieren' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Lastenheft erstellen' ausführt, wenn 'Produktmanagement' 'Produktanforderungen dokumentieren' ausführt.
-
-Es ist notwendig, dass 'Systems Engineering' 'UND-Gateway' ausführt, wenn 'Produktmanagement' 'XOR-Gateway' ausführt und 'Produktspezifikation' gilt.
-Es ist notwendig, dass 'Produktmanagement' 'Ergebnis dokumentieren' ausführt, wenn 'Produktmanagement' 'XOR-Gateway' ausführt und 'keine Modifikation/
-Spezifikation möglich/sinnvoll' gilt.
-Es ist notwendig, dass mindestens 'UND-Gateway' oder 'Ergebnis dokumentieren' wahr sind, wenn 'Produktspezifikation' oder 'keine Modifikation/
-Spezifikation möglich/sinnvoll' gilt.
-Es ist notwendig, dass 'Systems Engineering' 'Modifikation modellieren' ausführt, wenn 'Produktmanagement' 'XOR-Gateway' ausführt und 'Produktmodifikation' gilt.
-Es ist notwendig, dass mindestens 'UND-Gateway' oder 'Modifikation modellieren' wahr sind, wenn 'Produktspezifikation' oder 'Produktmodifikation' gilt.
-Es ist notwendig, dass mindestens 'Ergebnis dokumentieren' oder 'Modifikation modellieren' wahr sind, wenn 'keine Modifikation/
-Spezifikation möglich/sinnvoll' oder 'Produktmodifikation' gilt.
-
-Es ist notwendig, dass 'Systems Engineering' 'Implizite Anforderungen erarbeiten' ausführt und 'CE Consulting' 'Gesetzliche Anforderungen erarbeiten' ausführt, wenn 'UND-Gateway' mit der Bedingung 'unbekannte Bedingung' und 'unbekannte Bedingung' erfüllt ist.
-Es ist notwendig, dass 'Produktmanagement' 'Ergebnis dokumentieren' ausführt, wenn 'Produktmanagement' 'OR-Gateway' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Ergebnis dokumentieren' ausführt, wenn 'Produktmanagement' 'OR-Gateway' ausführt.
-
-Es ist notwendig, dass 'CE Consulting' den Subprozess 'Gesetzliche Anforderungen erarbeiten' ausführt, wenn 'Systems Engineering' 'UND-Gateway' aktiv ist und alle eingehenden Pfade abgeschlossen sind.
-
-Es ist notwendig, dass 'Systems Engineering' den Subprozess 'Implizite Anforderungen erarbeiten' ausführt, wenn 'Systems Engineering' 'UND-Gateway' aktiv ist und alle eingehenden Pfade abgeschlossen sind.
+Es ist notwendig, dass 'Unbekannte Rolle' die Aktivität 'stir chocolate chips into the cookie dough ' ausführt, wenn das XOR Gateway 'Serve people with nut allergies?' aktiv ist.
 
 
-Es ist notwendig, dass 'Systems Engineering' den Subprozess 'Modifikation modellieren' ausführt, wenn 'Produktmanagement' 'OR-Gateway' aktiv ist und mindestens ein eingehender Pfad abgeschlossen ist.
 
 
-Es ist notwendig, dass das Intermediate Catch Event 'Zustimmung erhalten' eine Nachricht von 'Entwicklung' empfängt, bevor fortgeführt wird.
-Es ist notwendig, dass das Intermediate Catch Event 'Anpassungen erhalten' eine Nachricht von 'Entwicklung' empfängt, bevor fortgeführt wird.
-
-Es ist notwendig, dass 'Produktmanagement' 'Lastenheft überarbeiten' ausführt, wenn 'CE Consulting' 'CatchEvent' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Lastenheft überarbeiten' ausführt, wenn 'CE Consulting' 'CatchEvent' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Lastenheft dokumentieren' ausführt, wenn 'Systems Engineering' 'CatchEvent' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Lastenheft dokumentieren' ausführt, wenn 'Systems Engineering' 'CatchEvent' ausführt.
-
-Es ist notwendig, dass 'Produktmanagement' 'Usecase aufnehmen und dokumentieren' ausführt, wenn 'Vertrieb' 'Anfrage bearbeiten' ausführt und 'nein' gilt.
-Es ist notwendig, dass 'Vertrieb' 'UND-Gateway' ausführt, wenn 'Vertrieb' 'Anfrage bearbeiten' ausführt und 'ja' gilt.
-
-Es ist notwendig, dass 'Vertrieb' die Aktivität 'Usecase aufnehmen und dokumentieren' ausführt, wenn das XOR Gateway 'Produkt verfügbar' aktiv ist.
-
-Es ist notwendig, dass 'Vertrieb' die Aktivität 'Usecase aufnehmen und dokumentieren' ausführt, wenn das XOR Gateway 'Produkt verfügbar' aktiv ist.
-
-Es ist notwendig, dass 'Systems Engineering' die Aktivität 'Produktspezifikationsmodell vorstellen' ausführt, wenn das XOR Gateway 'Unbenanntes XOR Gateway' aktiv ist.
-
-Es ist notwendig, dass 'Vertrieb' den Subprozess 'Auftrag abarbeiten' ausführt, wenn 'Vertrieb' 'CatchEvent' ausführt.
-
-Es ist notwendig, dass 'Vertrieb' 'Abschluss-analyse durchführen und dokumentieren' ausführt, wenn 'Vertrieb' 'CatchEvent' ausführt.
-
-Es ist notwendig, dass 'Vertrieb' 'Abschluss-analyse durchführen und dokumentieren' ausführt, wenn 'Vertrieb' 'CatchEvent' ausführt.
-
-
-Es ist notwendig, dass das IntermediateCatchEvent Message 'Ablehnung erhalten' die Nachricht 'Ablehnung' von 'Kunde' empfängt, bevor fortgeführt wird.
-Es ist notwendig, dass das IntermediateCatchEvent Message 'Bestätigung erhalten' die Nachricht 'Bestätigung' von 'Kunde' empfängt, bevor fortgeführt wird.
-Es ist notwendig, dass das IntermediateCatchEvent Message 'Zustimmung erhalten' die Nachricht 'Zustimmung' von 'Entwicklung' empfängt, bevor fortgeführt wird.
-Es ist notwendig, dass das IntermediateCatchEvent Message 'Anpassungen erhalten' die Nachricht 'Anpassung' von 'Entwicklung' empfängt, bevor fortgeführt wird.
-Es ist notwendig, dass die Ressource mit der Rolle 'Vertrieb' die Nachricht 'Produkt anbeiten' an die Ressource mit der Rolle 'Kunde' sendet, bevor fortgeführt wird.
-Es ist notwendig, dass die Ressource mit der Rolle 'Systems Engineering' die Nachricht 'Produktspezifikationsmodell vorstellen' an die Ressource mit der Rolle 'Entwicklung' sendet, bevor fortgeführt wird.
-
-Es ist notwendig, dass die Aufgabe 'Usecase dokumentieren', einer Ressource mit der Rolle 'Vertrieb' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Anfrage prüfen', einer Ressource mit der Rolle 'Unbekannte Rolle' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Abschluss-analyse durchführen und dokumentieren', einer Ressource mit der Rolle 'Vertrieb' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Usecase auf Produktanforderungen prüfen', einer Ressource mit der Rolle 'Produktmanagement' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Produktanforderungen dokumentieren', einer Ressource mit der Rolle 'Produktmanagement' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Lastenheft erstellen', einer Ressource mit der Rolle 'Produktmanagement' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Ergebnis dokumentieren', einer Ressource mit der Rolle 'Produktmanagement' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Lastenheft dokumentieren', einer Ressource mit der Rolle 'Produktmanagement' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Lastenheft überarbeiten', einer Ressource mit der Rolle 'Produktmanagement' zugewiesen wird.
-Es ist notwendig, dass die Aufgabe 'Usecase aufnehmen und dokumentieren', einer Ressource mit der Rolle 'Produktmanagement' zugewiesen wird.
-
-Es ist notwendig, dass der Prozess mit dem EndEvent 'Produkt verfügbar' endet, wenn das Gateway 'unbenanntes Gateway' mit der Bedingung 'unbekannte Bedingung' ausgewählt wird.
-Es ist notwendig, dass der Prozess mit dem EndEvent 'kein Standard- produkt verfügbar' endet, wenn das Gateway 'Modifikation möglich?' mit der Bedingung 'nein' ausgewählt wird.
-Es ist notwendig, dass der Prozess mit dem EndEvent 'Anfrage abgeschlossen' endet, nachdem die Aktivität 'Auftrag abarbeiten' abgeschlossen wurde.
-Es ist notwendig, dass der Prozess mit dem EndEvent 'Verhandlungsabruch durch Kunde' endet, nachdem die Aktivität 'Abschluss-analyse durchführen und dokumentieren' abgeschlossen wurde.
-Es ist notwendig, dass der Prozess mit dem EndEvent 'Auftrag ablehnen' endet, nachdem die Aktivität 'Ergebnis dokumentieren' abgeschlossen wurde.
-Es ist notwendig, dass der Prozess mit dem EndEvent 'neues Lastenheft vorstellen' endet, nachdem die Aktivität 'Lastenheft dokumentieren' abgeschlossen wurde.
+Es ist notwendig, dass der Prozess mit dem EndEvent 'unbenanntes Endevent' endet, wenn das Gateway 'unbenanntes Gateway' mit der Bedingung 'unbekannte Bedingung' ausgewählt wird.

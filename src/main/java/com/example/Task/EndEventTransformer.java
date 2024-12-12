@@ -1,6 +1,5 @@
 package com.example.Task;
 
-import com.example.Hilfsmethoden;
 import com.example.Interfaces.FlowNodeTransformer;
 import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
@@ -10,8 +9,6 @@ import org.camunda.bpm.model.bpmn.instance.Lane;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static com.example.SBVRTransformerNEU.createEndEventStatement;
 
 public class EndEventTransformer implements FlowNodeTransformer {
 

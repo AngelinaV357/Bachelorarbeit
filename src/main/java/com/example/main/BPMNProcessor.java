@@ -1,4 +1,4 @@
-package com.example;
+package com.example.main;
 
 import com.example.Data.DataObjectAnalysis;
 import com.example.Data.TestAnnotationAnalysis;
@@ -11,6 +11,7 @@ import com.example.Gateways.ANDGatewayTransformer;
 import com.example.Gateways.EventBasedGatewayTransformer;
 import com.example.Gateways.ORGatewayTransformer;
 import com.example.Gateways.XORGatewayTransformer;
+import com.example.Hilfsmethoden;
 import com.example.Task.ActivityTransformer;
 import com.example.Task.EndEventTransformer;
 import com.example.Task.StartEventTransformer;
@@ -38,7 +39,7 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
         // Holt alle Sequenzflüsse (SequenceFlow) aus dem Modell
         Collection<SequenceFlow> sequenceFlows = modelInstance.getModelElementsByType(SequenceFlow.class);
         // Holt alle Lane-Elemente, die für die Zuweisung von Rollen verwendet werden
-        Collection<Lane> lanes = modelInstance.getModelElementsByType(Lane.class);
+        List<Lane> lanes = new ArrayList<>(modelInstance.getModelElementsByType(Lane.class)); // Umwandlung in eine Liste für den Indexzugriff
 
         // Verwende Sets, um Duplikate zu vermeiden
         Set<FlowNode> processedNodes = new HashSet<>();
@@ -57,7 +58,6 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
                 processedNodes.add(source);
             }
         }
-
 
         // Danach alle anderen Sequenzflüsse und Knoten verarbeiten
         for (SequenceFlow flow : sequenceFlows) {
@@ -99,6 +99,7 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
 
             processedNodes.add(source);
         }
+
         // Außerhalb der Schleife, da diese nicht direkt an Sequence Flows gebunden sein müssen
         // Zusätzliche Datenanalysen
         DataObjectAnalysis dataObjectAnalysis = new DataObjectAnalysis();
@@ -130,5 +131,3 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
         }
     }
 }
-
-

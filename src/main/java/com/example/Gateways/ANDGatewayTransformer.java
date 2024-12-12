@@ -5,13 +5,12 @@ import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Lane;
 import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import com.example.SBVRTransformerNEU;
 
 import java.util.*;
 
 import static com.example.Hilfsmethoden.getName;
 import static com.example.Hilfsmethoden.getRoleForNode;
-import static com.example.SBVRTransformerNEU.createANDGatewayStatement;
+import static com.example.main.SBVRTransformerNEU.createANDGatewayStatement;
 
 public class ANDGatewayTransformer implements FlowNodeTransformer {
     /**

@@ -1,8 +1,7 @@
 package com.example;
 
+import com.example.main.BPMNProcessor;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.builder.SequenceFlowBuilder;
-import org.camunda.bpm.model.bpmn.impl.instance.SequenceFlowImpl;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

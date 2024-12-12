@@ -1,4 +1,4 @@
-package com.example;
+package com.example.main;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import java.io.File;
@@ -8,7 +8,7 @@ import static com.example.Hilfsmethoden.writeToFile;
 public class SBVRGenerator {
 
     public static void main(String[] args) {
-        File file = new File("src/main/resources/Seminararbeit.bpmn");
+        File file = new File("src/main/resources/May_combine_ingredients.bpmn");
         File sbvrOutputFile = new File("src/main/resources/sbvr_output.txt");
 
         try {

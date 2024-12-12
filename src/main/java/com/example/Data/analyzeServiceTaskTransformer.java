@@ -1,11 +1,9 @@
 package com.example.Data;
 
-import com.example.SBVRTransformerNEU;
+import com.example.main.SBVRTransformerNEU;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Lane;
-import org.camunda.bpm.model.bpmn.instance.Participant;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
-import org.camunda.bpm.model.bpmn.instance.MessageFlow;
 
 import java.util.Collection;
 

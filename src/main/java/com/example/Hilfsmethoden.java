@@ -133,7 +133,7 @@ public class Hilfsmethoden {
     /**
      * Schreibt Text in die Datei
      */
-    static void writeToFile(String content, File file) {
+    public static void writeToFile(String content, File file) {
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(content);
             System.out.println("In die Datei geschrieben: " + file.getPath());
