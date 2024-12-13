@@ -1,0 +1,18 @@
+strict digraph G {
+  "Serve people with nut allergies?" [ label="Serve people with nut allergies?" ];
+  "sid-8993A030-B3DB-4B51-97C9-19A39D8A3A39" [ label="sid-8993A030-B3DB-4B51-97C9-19A39D8A3A39" ];
+  "Add dry ingredients to the mixer bowl" [ label="Add dry ingredients to the mixer bowl" ];
+  "Beat until all ingredients are combined" [ label="Beat until all ingredients are combined" ];
+  "stir chocolate chips and nuts into the cookie dough " [ label="stir chocolate chips and nuts into the cookie dough " ];
+  "stir chocolate chips into the cookie dough " [ label="stir chocolate chips into the cookie dough " ];
+  "sid-E3D7FD92-8D68-4B39-89A6-BF8B14216076" [ label="sid-E3D7FD92-8D68-4B39-89A6-BF8B14216076" ];
+  "sid-BB7AF9E4-A845-407A-B3F1-1352393CF42E" [ label="sid-BB7AF9E4-A845-407A-B3F1-1352393CF42E" ];
+  "Add dry ingredients to the mixer bowl" -> "Beat until all ingredients are combined";
+  "Beat until all ingredients are combined" -> "Serve people with nut allergies?";
+  "Serve people with nut allergies?" -> "stir chocolate chips and nuts into the cookie dough ";
+  "Serve people with nut allergies?" -> "stir chocolate chips into the cookie dough ";
+  "stir chocolate chips and nuts into the cookie dough " -> "sid-8993A030-B3DB-4B51-97C9-19A39D8A3A39";
+  "stir chocolate chips into the cookie dough " -> "sid-8993A030-B3DB-4B51-97C9-19A39D8A3A39";
+  "sid-8993A030-B3DB-4B51-97C9-19A39D8A3A39" -> "sid-E3D7FD92-8D68-4B39-89A6-BF8B14216076";
+  "sid-BB7AF9E4-A845-407A-B3F1-1352393CF42E" -> "Add dry ingredients to the mixer bowl";
+}
