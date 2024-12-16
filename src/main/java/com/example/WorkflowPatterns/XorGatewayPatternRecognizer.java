@@ -52,11 +52,21 @@ public class XorGatewayPatternRecognizer {
     }
 
     // Methode: SBVR-Regel für XOR-Gateways erstellen
-    public String generateSbvrRuleForXor(List<String> pattern, Map<String, String> nodeNames, Map<String, String> conditions) {
-        String xorGateway = nodeNames.get(pattern.get(0));  // XOR-Gateway
+    public String generateSBVRRule(List<String> pattern, Map<String, String> nodeNames, Map<String, String> conditions) {
         StringBuilder sbvrRule = new StringBuilder();
-        sbvrRule.append("* SBVR-Regel für XOR-Gateway: ").append(xorGateway).append(" *\n");
 
+        // Zuerst alle Aktivitäten und deren Kanten ausgeben
+        sbvrRule.append("Aktivitäten und Kanten:\n");
+        for (String nodeName : nodeNames.keySet()) {
+            sbvrRule.append(nodeNames.get(nodeName)).append("\n");
+        }
+
+        sbvrRule.append("Kanten:\n");
+        for (Map.Entry<String, String> entry : conditions.entrySet()) {
+            sbvrRule.append(entry.getKey()).append(" -> ").append(entry.getValue()).append("\n");
+        }
+
+        // Überprüfen, ob das XOR Gateway ein diverging oder converging ist
         if (pattern.size() > 3) { // Diverging XOR-Gateway
             String incomingNode = nodeNames.get(pattern.get(1));
             List<String> outgoingNodes = pattern.subList(2, pattern.size());
@@ -100,11 +110,10 @@ public class XorGatewayPatternRecognizer {
         return sbvrRule.toString();
     }
 
-    // Prüft, ob ein Sequenzfluss zwischen zwei Knoten eine Bedingung hat
-    private boolean hasConditionForFlow(String sourceNode, String targetNode, Map<String, String> conditions) {
-        String flowId = sourceNode + "->" + targetNode;
-        return conditions.containsKey(flowId);  // Überprüft, ob eine Bedingung existiert
+    private boolean hasConditionForFlow(String incomingNode, String outgoingNode, Map<String, String> conditions) {
+        return conditions.containsKey(incomingNode + "->" + outgoingNode);
     }
+
 
     // Hilfsfunktion: Finde eingehende Kanten für einen Knoten
     private List<String> findIncomingEdges(Graph<String, DefaultEdge> graph, String targetNode) {

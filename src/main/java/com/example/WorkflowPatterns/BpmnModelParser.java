@@ -10,11 +10,14 @@ import org.jgrapht.nio.Attribute;
 import org.jgrapht.nio.DefaultAttribute;
 import org.jgrapht.nio.dot.DOTExporter;
 
-import java.io.File;
-import java.io.FileWriter;
+import org.jgrapht.nio.dot.DOTImporter;
+import org.jgrapht.util.SupplierUtil;
+
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.*;
+
+import java.io.*;
 
 public class BpmnModelParser {
 
@@ -149,7 +152,7 @@ public class BpmnModelParser {
     public static void main(String[] args) {
         try {
             // Load BPMN file
-            File bpmnFile = new File("src/main/resources/Receipt of Good.bpmn");
+            File bpmnFile = new File("src/main/resources/May_combine_ingredients.bpmn");
 
             // Convert to graph
             Graph<String, LabeledEdge> bpmnGraph = convertBpmnToGraph(bpmnFile);
@@ -164,6 +167,7 @@ public class BpmnModelParser {
 
             // Optional: Save DOT representation to a file
             try (FileWriter fileWriter = new FileWriter("bpmnGraph.dot")) {
+                fileWriter.write(dotRepresentation);
                 fileWriter.write(dotRepresentation);
                 System.out.println("DOT file saved: bpmnGraph.dot");
             } catch (IOException e) {
