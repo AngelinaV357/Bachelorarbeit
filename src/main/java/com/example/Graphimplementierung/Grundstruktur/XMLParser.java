@@ -2,12 +2,9 @@ package com.example.Graphimplementierung.Grundstruktur;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.*;
 import org.w3c.dom.*;
-import org.w3c.dom.Node;
-
 import javax.xml.parsers.*;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import org.w3c.dom.Node;
 
 public class XMLParser {
     public static void main(String[] args) {
@@ -22,10 +19,7 @@ public class XMLParser {
             // 2. BPMN-Graph initialisieren
             BPMNGraph graph = new BPMNGraph();
 
-            // 3. Lanes auslesen und eine Lane-Map erstellen
-            Map<String, Lane> laneMap = createLaneMap(doc);
-
-            // 4. "task"-Elemente auslesen und ActivityNodes erstellen
+            // 3. "task"-Elemente auslesen und ActivityNodes erstellen
             NodeList taskNodes = doc.getElementsByTagName("ns0:task");
             for (int i = 0; i < taskNodes.getLength(); i++) {
                 Node node = taskNodes.item(i);
@@ -33,10 +27,10 @@ public class XMLParser {
                     Element element = (Element) node;
                     String id = element.getAttribute("id");
                     String name = element.getAttribute("name");
-                    String activityType = element.getTagName();
+                    String activityType = "Task";  // Zum Beispiel für Task-Elemente
 
-                    // Lane zuordnen
-                    Lane lane = laneMap.getOrDefault(id, new Lane("defaultLane", "Default Lane"));
+                    // Lane extrahieren
+                    Lane lane = extractLane(element);
 
                     // ActivityNode erstellen
                     ActivityNode activityNode = new ActivityNode(id, name, lane, activityType);
@@ -44,7 +38,26 @@ public class XMLParser {
                 }
             }
 
-            // 5. Gateway-Elemente auslesen und GatewayNodes erstellen
+            // 4. "subProcess"-Elemente auslesen und ActivityNodes erstellen
+            NodeList subProcessNodes = doc.getElementsByTagName("ns0:subProcess");
+            for (int i = 0; i < subProcessNodes.getLength(); i++) {
+                Node node = subProcessNodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+                    String id = element.getAttribute("id");
+                    String name = element.getAttribute("name");
+                    String activityType = "SubProcess";  // Subprozess-Typ
+
+                    // Lane extrahieren
+                    Lane lane = extractLane(element);
+
+                    // ActivityNode erstellen (mit SubProcess-Typ)
+                    ActivityNode subProcessNode = new ActivityNode(id, name, lane, activityType);
+                    graph.addNode(subProcessNode);
+                }
+            }
+
+            // 5. "exclusiveGateway" und andere Gateway-Elemente auslesen und ActivityNodes erstellen
             NodeList gatewayNodes = doc.getElementsByTagName("*");
             for (int i = 0; i < gatewayNodes.getLength(); i++) {
                 Node node = gatewayNodes.item(i);
@@ -56,19 +69,13 @@ public class XMLParser {
                     if (tagName.equals("ns0:exclusiveGateway") || tagName.equals("ns0:parallelGateway") || tagName.equals("ns0:eventBasedGateway")) {
                         String id = element.getAttribute("id");
                         String name = element.getAttribute("name");
-                        String gatewayType;
+                        String gatewayType = "Gateway";  // Standard für Gateway
 
                         // Gateway-Typ anhand des Tags bestimmen
-                        switch (tagName) {
-                            case "ns0:parallelGateway":
-                                gatewayType = "AND";
-                                break;
-                            case "ns0:eventBasedGateway":
-                                gatewayType = "Event";
-                                break;
-                            case "ns0:exclusiveGateway":
-                            default:
-                                gatewayType = "XOR"; // Standard für XOR
+                        if (tagName.equals("ns0:parallelGateway")) {
+                            gatewayType = "AND";
+                        } else if (tagName.equals("ns0:eventBasedGateway")) {
+                            gatewayType = "Event";
                         }
 
                         // Standardname setzen, wenn kein Name vorhanden ist
@@ -76,40 +83,17 @@ public class XMLParser {
                             name = gatewayType + " Gateway";
                         }
 
-                        // Lane zuordnen
-                        Lane lane = laneMap.getOrDefault(id, new Lane("defaultLane", "Default Lane"));
+                        // Lane extrahieren
+                        Lane lane = extractLane(element);
 
-                        // GatewayNode erstellen
-                        GatewayNode gatewayNode = new GatewayNode(id, name, lane, gatewayType);
+                        // ActivityNode erstellen (mit Gateway-Typ)
+                        ActivityNode gatewayNode = new ActivityNode(id, name, lane, gatewayType);
                         graph.addNode(gatewayNode);
                     }
                 }
             }
 
-            // 6. SubProcess-Elemente auslesen und SubProcessNodes erstellen
-            NodeList subProcessNodes = doc.getElementsByTagName("ns0:subProcess");
-            for (int i = 0; i < subProcessNodes.getLength(); i++) {
-                Node node = subProcessNodes.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) node;
-                    String id = element.getAttribute("id");
-                    String name = element.getAttribute("name");
-
-                    // Standardname setzen, falls Name leer ist
-                    if (name == null || name.isEmpty()) {
-                        name = "SubProcess";
-                    }
-
-                    // Lane zuordnen
-                    Lane lane = laneMap.getOrDefault(id, new Lane("defaultLane", "Default Lane"));
-
-                    // SubProcessNode erstellen und dem Graph hinzufügen
-                    SubProcessNode subProcessNode = new SubProcessNode(id, name, lane);
-                    graph.addNode(subProcessNode);
-                }
-            }
-
-            // 7. StartEvent-Elemente auslesen und StartEventNodes erstellen
+            // 6. "startEvent"-Elemente auslesen und ActivityNodes erstellen
             NodeList startEventNodes = doc.getElementsByTagName("ns0:startEvent");
             for (int i = 0; i < startEventNodes.getLength(); i++) {
                 Node node = startEventNodes.item(i);
@@ -121,15 +105,16 @@ public class XMLParser {
                         name = "Start";
                     }
 
-                    // Lane zuordnen
-                    Lane lane = laneMap.getOrDefault(id, new Lane("defaultLane", "Default Lane"));
+                    // Lane extrahieren
+                    Lane lane = extractLane(element);
 
-                    StartEventNode startEventNode = new StartEventNode(id, name, lane);
+                    // ActivityNode erstellen (mit StartEvent-Typ)
+                    ActivityNode startEventNode = new ActivityNode(id, name, lane, "StartEvent");
                     graph.addNode(startEventNode);
                 }
             }
 
-            // 8. EndEvent-Elemente auslesen und EndEventNodes erstellen
+            // 7. "endEvent"-Elemente auslesen und ActivityNodes erstellen
             NodeList endEventNodes = doc.getElementsByTagName("ns0:endEvent");
             for (int i = 0; i < endEventNodes.getLength(); i++) {
                 Node node = endEventNodes.item(i);
@@ -141,15 +126,16 @@ public class XMLParser {
                         name = "End";
                     }
 
-                    // Lane zuordnen
-                    Lane lane = laneMap.getOrDefault(id, new Lane("defaultLane", "Default Lane"));
+                    // Lane extrahieren
+                    Lane lane = extractLane(element);
 
-                    EndEventNode endEventNode = new EndEventNode(id, name, lane);
+                    // ActivityNode erstellen (mit EndEvent-Typ)
+                    ActivityNode endEventNode = new ActivityNode(id, name, lane, "EndEvent");
                     graph.addNode(endEventNode);
                 }
             }
 
-            // 9. SequenceFlow-Elemente auslesen und Kanten erstellen
+            // 8. "sequenceFlow"-Elemente auslesen und Kanten erstellen
             NodeList sequenceFlowNodes = doc.getElementsByTagName("ns0:sequenceFlow");
             for (int i = 0; i < sequenceFlowNodes.getLength(); i++) {
                 Node node = sequenceFlowNodes.item(i);
@@ -183,7 +169,7 @@ public class XMLParser {
                 }
             }
 
-            // Optional: Ausgabe des gesamten Graphen
+            // Optional: Ausgabe des gesamten Graphen, fokussiert auf Knoten und Kanten
             System.out.println("\nAlle Knoten im Graph:");
             graph.getNodes().forEach(node -> System.out.println(node));
 
@@ -195,25 +181,39 @@ public class XMLParser {
         }
     }
 
-    // Methode zum Erstellen der Lane-Map
-    private static Map<String, Lane> createLaneMap(Document doc) {
-        Map<String, Lane> laneMap = new HashMap<>();
-        NodeList laneNodes = doc.getElementsByTagName("ns0:lane");
-        for (int i = 0; i < laneNodes.getLength(); i++) {
-            Node node = laneNodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element laneElement = (Element) node;
+    // Methode zum Extrahieren der Lane aus einem Element (angepasst für LaneSet)
+    // Methode zum Extrahieren der Lane aus einem Element
+    private static Lane extractLane(Element element) {
+        Lane lane = null;
+
+        // Durchsuche alle LaneSet-Elemente im gesamten Dokument
+        NodeList laneSetNodes = element.getOwnerDocument().getElementsByTagName("ns0:laneSet");
+
+        // Überprüfen, ob es LaneSets gibt
+        for (int i = 0; i < laneSetNodes.getLength(); i++) {
+            Element laneSetElement = (Element) laneSetNodes.item(i);
+
+            // Durchsuche alle Lanes innerhalb des LaneSets
+            NodeList laneNodes = laneSetElement.getElementsByTagName("ns0:lane");
+            if (laneNodes.getLength() > 0) {
+                // Wähle die erste Lane (oder je nach Bedarf eine andere)
+                Element laneElement = (Element) laneNodes.item(0);
                 String laneId = laneElement.getAttribute("id");
                 String laneName = laneElement.getAttribute("name");
 
-                Lane lane = new Lane(laneId, laneName);
-                NodeList flowNodeRefs = laneElement.getElementsByTagName("ns0:flowNodeRef");
-                for (int j = 0; j < flowNodeRefs.getLength(); j++) {
-                    String flowNodeId = flowNodeRefs.item(j).getTextContent();
-                    laneMap.put(flowNodeId, lane);
-                }
+                // Setze die Lane
+                lane = new Lane(laneId, laneName);
+                break;  // Wir nehmen nur die erste Lane aus dem ersten LaneSet, brechen die Schleife ab
             }
         }
-        return laneMap;
+
+        // Falls keine Lane gefunden wurde, setze eine Standard-Lane
+        if (lane == null) {
+            lane = new Lane("defaultLane", "Default Lane");
+        }
+
+        return lane;
     }
+
+
 }
