@@ -27,6 +27,10 @@ public class Edge {
         return target;
     }
 
+    public String getCondition() {
+        return condition;
+    }
+
     public boolean hasCondition() {
         return condition != null && !condition.isEmpty();
     }
