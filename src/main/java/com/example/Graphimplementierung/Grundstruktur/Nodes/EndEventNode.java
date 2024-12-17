@@ -1,8 +1,10 @@
-package com.example.Graphimplementierung.Grundstruktur;
+package com.example.Graphimplementierung.Grundstruktur.Nodes;
+
+import com.example.Graphimplementierung.Grundstruktur.Lane;
 
 public class EndEventNode extends Node {
     public EndEventNode(String id, String name, Lane lane) {
-        super(id, "EndEvent", name, lane); // Typ ist "EndEvent" und wird über die Basisklasse gesetzt
+        super(id, "EndEvent", name != null && !name.isEmpty() ? name : "End", lane); // Standardname "End" verwenden
     }
 
     @Override

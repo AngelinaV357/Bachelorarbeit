@@ -1,5 +1,7 @@
 package com.example.Graphimplementierung.Grundstruktur;
 
+import com.example.Graphimplementierung.Grundstruktur.Nodes.Node;
+
 import java.util.*;
 import java.util.stream.Collectors;
 

@@ -1,5 +1,7 @@
 package com.example.Graphimplementierung.Grundstruktur;
 
+import com.example.Graphimplementierung.Grundstruktur.Nodes.Node;
+
 public class Edge {
     private String id;
     private Node source;
@@ -28,6 +30,7 @@ public class Edge {
     public boolean hasCondition() {
         return condition != null && !condition.isEmpty();
     }
+
 
     @Override
     public String toString() {

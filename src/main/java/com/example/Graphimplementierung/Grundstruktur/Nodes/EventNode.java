@@ -1,4 +1,6 @@
-package com.example.Graphimplementierung.Grundstruktur;
+package com.example.Graphimplementierung.Grundstruktur.Nodes;
+
+import com.example.Graphimplementierung.Grundstruktur.Lane;
 
 public class EventNode extends Node {
     private final String eventType;

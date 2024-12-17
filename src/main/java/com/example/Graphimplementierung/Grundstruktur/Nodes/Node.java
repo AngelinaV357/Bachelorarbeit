@@ -1,8 +1,10 @@
-package com.example.Graphimplementierung.Grundstruktur;
+package com.example.Graphimplementierung.Grundstruktur.Nodes;
+
+import com.example.Graphimplementierung.Grundstruktur.Lane;
 
 public abstract class Node {
     private final String id;  // final, da ID sich nicht ändern sollte
-    private final String type;
+    private final String type; // Typ der Node (z.B. Task, DataObject)
     private String name;
     private Lane lane;
 
@@ -19,7 +21,7 @@ public abstract class Node {
     }
 
     public String getType() {
-        return type;
+        return type;  // Rückgabe des Typs
     }
 
     public String getName() {
@@ -30,7 +32,7 @@ public abstract class Node {
         return lane;
     }
 
-    // Setter für Lane (optional, falls Lane später geändert werden soll)
+    // Setter für Lane (optional)
     public void setLane(Lane lane) {
         this.lane = lane;
     }
@@ -41,3 +43,4 @@ public abstract class Node {
                 id, type, name, lane != null ? lane.getName() : "None");
     }
 }
+
