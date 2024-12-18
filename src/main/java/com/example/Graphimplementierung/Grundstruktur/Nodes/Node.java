@@ -1,7 +1,5 @@
 package com.example.Graphimplementierung.Grundstruktur.Nodes;
 
-import com.example.Graphimplementierung.Grundstruktur.Lane;
-
 public abstract class Node {
     private final String id;  // final, da ID sich nicht ändern sollte
     private final String type; // Typ der Node (z.B. Task, DataObject)

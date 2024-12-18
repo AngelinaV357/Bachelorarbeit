@@ -1,7 +1,5 @@
 package com.example.Graphimplementierung.Grundstruktur.Nodes;
 
-import com.example.Graphimplementierung.Grundstruktur.Lane;
-
 public class ActivityNode extends Node {
     private String activityType;  // Der Typ des Knotens (z.B. "Task", "SubProcess", etc.)
 

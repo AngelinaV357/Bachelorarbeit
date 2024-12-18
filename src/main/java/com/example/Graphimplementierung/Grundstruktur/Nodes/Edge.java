@@ -1,6 +1,4 @@
-package com.example.Graphimplementierung.Grundstruktur;
-
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Node;
+package com.example.Graphimplementierung.Grundstruktur.Nodes;
 
 public class Edge {
     private String id;

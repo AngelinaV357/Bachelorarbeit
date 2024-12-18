@@ -1,7 +1,7 @@
 package com.example.Graphimplementierung.Workflowpatterns;
 
-import com.example.Graphimplementierung.Grundstruktur.BPMNGraph;
-import com.example.Graphimplementierung.Grundstruktur.Edge;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.ActivityNode;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Node;
 

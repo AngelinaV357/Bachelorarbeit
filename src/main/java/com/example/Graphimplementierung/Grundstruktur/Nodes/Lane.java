@@ -1,6 +1,4 @@
-package com.example.Graphimplementierung.Grundstruktur;
-
-import com.example.Graphimplementierung.Grundstruktur.Nodes.ActivityNode;
+package com.example.Graphimplementierung.Grundstruktur.Nodes;
 
 import java.util.HashSet;
 import java.util.Set;
