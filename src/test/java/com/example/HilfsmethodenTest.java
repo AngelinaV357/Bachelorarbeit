@@ -1,6 +1,7 @@
 package com.example;
 
-import com.example.main.BPMNProcessor;
+import com.example.XMLIteration.Task.Hilfsmethoden;
+import com.example.XMLIteration.Task.main.BPMNProcessor;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.junit.jupiter.api.Assertions;
