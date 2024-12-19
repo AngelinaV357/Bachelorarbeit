@@ -75,11 +75,11 @@ public class TaskPatternFinder {
                     // Falls eine Bedingung für die Kante existiert
                     if (condition != null && !condition.isEmpty()) {
                         System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " nach " + cleanText(eventNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
+                                " ausgeführt wird, nachdem " + cleanText(eventNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
                                 cleanText(condition) + "' erfüllt ist.");
                     } else {
                         System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " nach " + cleanText(eventNode.getName()) + " ausgeführt wird.");
+                                " ausgeführt wird, nachdem " + cleanText(eventNode.getName()) + " ausgeführt wird.");
                     }
                     outputEdges.add(edge);
                 }
@@ -106,11 +106,11 @@ public class TaskPatternFinder {
                     String condition = edge.getCondition();
                     if (condition != null && !condition.isEmpty()) {
                         System.out.println("Es ist erlaubt, dass " + sourceLane + " " + cleanText(sourceNode.getName()) +
-                                " nach " + targetLane + " " + cleanText(targetNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
+                                " ausgeführt wird, nachdem " + targetLane + " " + cleanText(targetNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
                                 cleanText(condition) + "' erfüllt ist.");
                     } else {
                         System.out.println("Es ist erlaubt, dass " + sourceLane + " " + cleanText(sourceNode.getName()) +
-                                " nach " + targetLane + " " + cleanText(targetNode.getName()) + " ausgeführt wird.");
+                                " ausgeführt wird, nachdem " + targetLane + " " + cleanText(targetNode.getName()) + " ausgeführt wird.");
                     }
 
                     outputEdges.add(edge);
