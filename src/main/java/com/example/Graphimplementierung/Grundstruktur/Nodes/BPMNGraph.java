@@ -15,11 +15,14 @@ public class BPMNGraph {
 
     // Knoten hinzufügen
     public void addNode(Node node) {
+        // Überprüfen, ob der Knoten mit der gleichen ID bereits existiert
         if (nodes.containsKey(node.getId())) {
-            throw new IllegalArgumentException("Node with ID " + node.getId() + " already exists.");
+            System.out.println("Warnung: Knoten mit ID " + node.getId() + " existiert bereits und wird übersprungen.");
+            return; // Überspringe das Hinzufügen des Knotens
         }
-        nodes.put(node.getId(), node);
+        nodes.put(node.getId(), node); // Füge den Knoten hinzu, wenn er noch nicht existiert
     }
+
 
     // Kante hinzufügen
     public void addEdge(Edge edge) {

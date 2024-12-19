@@ -142,26 +142,35 @@ public class TaskParser {
     }
 
     static void processParticipants(Document doc, BPMNGraph graph) {
-        NodeList participantNodes = doc.getElementsByTagName("ns0:participant");  // Tagname für Teilnehmer
+        // Suche nach den Participant-Knoten im XML-Dokument
+        NodeList participantNodes = doc.getElementsByTagName("ns0:participant");
+
+
         for (int i = 0; i < participantNodes.getLength(); i++) {
             Node node = participantNodes.item(i);
+
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
+
+                // Extrahiere die ID und den Namen des Participants
                 String id = element.getAttribute("id");
                 String name = element.getAttribute("name");
 
-                // Optional: Weitere Attribute wie "processRef" extrahieren, falls benötigt
-                String processRef = element.getAttribute("processRef");
+                // Falls kein Name vorhanden ist, setzen wir einen Standardnamen
+                if (name == null || name.isEmpty()) {
+                    name = "Participant";
+                }
 
-                // Lane extrahieren (wenn notwendig)
+                // Extrahiere optionale Attribute, z. B. Lane, falls vorhanden
                 Lane lane = extractLane(element, graph);
 
-                // ParticipantNode erstellen
-                ParticipantNode participantNode = new ParticipantNode(id, name, lane);
-                graph.addNode(participantNode);  // Participant zum Graphen hinzufügen
+                // Erstelle den ParticipantNode und füge ihn dem Graphen hinzu
+                ActivityNode participantNode = new ActivityNode(id, name, lane, "Participant");
+                graph.addNode(participantNode);
             }
         }
     }
+
 
 
     static void processUserTasks(Document doc, BPMNGraph graph) {
