@@ -1,9 +1,6 @@
 package com.example.Graphimplementierung.Grundstruktur.Parser;
 
-import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Lane;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.ActivityNode;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -143,6 +140,29 @@ public class TaskParser {
             }
         }
     }
+
+    static void processParticipants(Document doc, BPMNGraph graph) {
+        NodeList participantNodes = doc.getElementsByTagName("ns0:participant");  // Tagname für Teilnehmer
+        for (int i = 0; i < participantNodes.getLength(); i++) {
+            Node node = participantNodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+                String id = element.getAttribute("id");
+                String name = element.getAttribute("name");
+
+                // Optional: Weitere Attribute wie "processRef" extrahieren, falls benötigt
+                String processRef = element.getAttribute("processRef");
+
+                // Lane extrahieren (wenn notwendig)
+                Lane lane = extractLane(element, graph);
+
+                // ParticipantNode erstellen
+                ParticipantNode participantNode = new ParticipantNode(id, name, lane);
+                graph.addNode(participantNode);  // Participant zum Graphen hinzufügen
+            }
+        }
+    }
+
 
     static void processUserTasks(Document doc, BPMNGraph graph) {
         NodeList userTaskNodes = doc.getElementsByTagName("ns0:userTask");

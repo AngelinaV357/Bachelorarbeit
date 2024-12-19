@@ -24,6 +24,10 @@ public class XMLParser {
             DataParser.processDataInputs(doc, graph);
 
             FlowParser.processSequenceFlows(doc, graph);
+            TaskParser.processParticipants(doc, graph);
+
+            FlowParser.processMessageFlows(doc, graph);
+            TaskParser.processParticipants(doc, graph);
 
         } catch (Exception e) {
             e.printStackTrace();

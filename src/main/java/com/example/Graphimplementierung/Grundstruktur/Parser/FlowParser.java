@@ -36,27 +36,36 @@ public class FlowParser {
     }
 
     public static void processMessageFlows(Document doc, BPMNGraph graph) {
-        NodeList messageFlowNodes = doc.getElementsByTagName("ns0:messageFlow");
+        // Suche nach allen MessageFlow-Elementen unter Berücksichtigung des Namensraums
+        NodeList messageFlowNodes = doc.getElementsByTagNameNS("*", "messageFlow");
         for (int i = 0; i < messageFlowNodes.getLength(); i++) {
             org.w3c.dom.Node node = messageFlowNodes.item(i);
             if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
                 Element element = (Element) node;
 
+                // Extrahiere die Attribute id, sourceRef und targetRef
                 String id = element.getAttribute("id");
                 String sourceRef = element.getAttribute("sourceRef");
                 String targetRef = element.getAttribute("targetRef");
-                String condition = ""; // Message Flows haben normalerweise keine Bedingungen
+
+                // Überprüfe, ob alle erforderlichen Attribute vorhanden sind
+                if (id == null || id.isEmpty() || sourceRef == null || sourceRef.isEmpty() || targetRef == null || targetRef.isEmpty()) {
+                    continue; // Überspringe diese Nachricht, falls eine der notwendigen Informationen fehlt
+                }
 
                 // Knoten aus dem Graphen holen
                 com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
                 com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
 
-                // Überprüfen, ob die Knoten existieren
+                // Überprüfe, ob die Knoten existieren
                 if (sourceNode == null || targetNode == null) {
-                    continue;
+                    continue; // Wenn einer der Knoten nicht existiert, überspringe diesen MessageFlow
                 }
 
-                // Kante erstellen
+                // Bei MessageFlows gibt es normalerweise keine Bedingungen, daher wird hier ein leerer String verwendet
+                String condition = "";
+
+                // Kante für den MessageFlow erstellen
                 Edge edge = new Edge(id, sourceNode, targetNode, condition);
                 graph.addEdge(edge);
             }
