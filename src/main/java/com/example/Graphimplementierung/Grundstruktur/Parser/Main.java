@@ -1,6 +1,9 @@
 package com.example.Graphimplementierung.Grundstruktur.Parser;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
+import com.example.Graphimplementierung.Workflowpatterns.GatewayPatternFinder;
+import com.example.Graphimplementierung.Workflowpatterns.SubProcessPatternFinder;
+import com.example.Graphimplementierung.Workflowpatterns.TaskPatternFinder;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -30,19 +33,19 @@ public class Main {
             System.out.println("\nAlle Kanten im Graph:");
             graph.getEdges().forEach(edge -> System.out.println(cleanText(edge.toString())));
 
-//            // 3. Gateway Pattern Finder initialisieren
-//            GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
-//            gatewayPatternFinder.findExclusiveGatewayPatterns(graph);  // Nur einmal aufrufen
-//            gatewayPatternFinder.findParallelGatewayPatterns(graph);   // Nur einmal aufrufen
-//            gatewayPatternFinder.findEventBasedGatewayPatterns(graph);  // EventBased Gateway
-//
-//            // 4. Task Pattern Finder initialisieren (Für alle Tasks)
-//            TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
-//            taskPatternFinder.findAllTaskPatterns(graph);  // Alle Task-Typen auf einmal finden
-//
-//            // 5. SubProcess Pattern Finder initialisieren
-//            SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();
-//            subProcessPatternFinder.findSubProcessPatterns(graph);  // SubProzess-Muster finden
+            // 3. Gateway Pattern Finder initialisieren
+            GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
+            gatewayPatternFinder.findExclusiveGatewayPatterns(graph);  // Nur einmal aufrufen
+            gatewayPatternFinder.findParallelGatewayPatterns(graph);   // Nur einmal aufrufen
+            gatewayPatternFinder.findEventBasedGatewayPatterns(graph);  // EventBased Gateway
+
+            // 4. Task Pattern Finder initialisieren (Für alle Tasks)
+            TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
+            taskPatternFinder.findAllTaskPatterns(graph);  // Alle Task-Typen auf einmal finden
+
+            // 5. SubProcess Pattern Finder initialisieren
+            SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();
+            subProcessPatternFinder.findSubProcessPatterns(graph);  // SubProzess-Muster finden
 
         } catch (Exception e) {
             e.printStackTrace();

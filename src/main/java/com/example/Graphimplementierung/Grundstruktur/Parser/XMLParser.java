@@ -2,7 +2,6 @@ package com.example.Graphimplementierung.Grundstruktur.Parser;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Lane;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.*;
 import org.w3c.dom.*;
 
 public class XMLParser {
@@ -21,10 +20,11 @@ public class XMLParser {
 
             GatewayParser.processGateways(doc, graph);
 
-            DataFinder.processDataObjects(doc, graph);
-            DataFinder.processDataInputs(doc, graph);
+            DataParser.processDataObjects(doc, graph);
+            DataParser.processDataInputs(doc, graph);
 
             FlowParser.processSequenceFlows(doc, graph);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

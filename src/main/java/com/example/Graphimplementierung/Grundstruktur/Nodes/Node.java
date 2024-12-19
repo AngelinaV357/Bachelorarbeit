@@ -1,6 +1,6 @@
 package com.example.Graphimplementierung.Grundstruktur.Nodes;
 
-public abstract class Node {
+public class Node {
     private final String id;  // final, da ID sich nicht ändern sollte
     private final String type; // Typ der Node (z.B. Task, DataObject)
     private String name;

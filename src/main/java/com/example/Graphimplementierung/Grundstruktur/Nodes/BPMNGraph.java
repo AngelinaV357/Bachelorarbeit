@@ -12,6 +12,7 @@ public class BPMNGraph {
         this.edges = new ArrayList<>();
     }
 
+
     // Knoten hinzufügen
     public void addNode(Node node) {
         if (nodes.containsKey(node.getId())) {

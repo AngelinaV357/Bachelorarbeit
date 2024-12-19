@@ -1,6 +1,7 @@
 package com.example.Graphimplementierung.Grundstruktur.Parser;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Lane;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.ActivityNode;
 import org.w3c.dom.Document;
@@ -32,7 +33,6 @@ public class TaskParser {
     }
 
     static void processIntermediateEvents(Document doc, BPMNGraph graph) {
-        // Suche nach den IntermediateCatchEvent-Knoten im XML-Dokument
         NodeList intermediateEventNodes = doc.getElementsByTagName("ns0:intermediateCatchEvent");
         for (int i = 0; i < intermediateEventNodes.getLength(); i++) {
             Node node = intermediateEventNodes.item(i);
@@ -49,12 +49,10 @@ public class TaskParser {
                 }
 
                 // Überprüfen, ob es sich um ein IntermediateCatchEvent oder ein IntermediateThrowEvent handelt
-                String eventType = "IntermediateCatchEvent";  // Standardmäßig als Catch Event
-
-                // Falls der eventDefinitionRef auf ein "Throw" Event hinweist, setzen wir den Typ auf "IntermediateThrowEvent"
+                String eventType = "IntermediateCatchEvent"; // Standardmäßig als Catch Event
                 String eventDefinitionRef = element.getAttribute("eventDefinitionRef");
                 if (eventDefinitionRef != null && eventDefinitionRef.contains("Throw")) {
-                    eventType = "IntermediateThrowEvent";  // Setzen auf Throw Event, wenn "Throw" erkannt wird
+                    eventType = "IntermediateThrowEvent"; // Setzen auf Throw Event, wenn "Throw" erkannt wird
                 }
 
                 // Lane extrahieren und zuweisen (falls notwendig)
@@ -63,12 +61,34 @@ public class TaskParser {
                 // Erstelle den IntermediateEventNode und füge ihn dem Graphen hinzu
                 ActivityNode intermediateEventNode = new ActivityNode(id, name, lane, eventType);
                 graph.addNode(intermediateEventNode);
+            }
+        }
 
-                // Für das Throw Event könnte es auch spezifische Logik für die Behandlung von ausgehenden Kanten geben
-                // Hier könnte man zusätzliche Schritte hinzufügen, wenn nötig
+        // Zusätzliche Verarbeitung: Message Flows für Intermediate Events
+        NodeList messageFlowNodes = doc.getElementsByTagName("ns0:messageFlow");
+        for (int i = 0; i < messageFlowNodes.getLength(); i++) {
+            Node node = messageFlowNodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+
+                // Extrahiere die ID, sourceRef und targetRef der Message Flow
+                String id = element.getAttribute("id");
+                String sourceRef = element.getAttribute("sourceRef");
+                String targetRef = element.getAttribute("targetRef");
+
+                // Hole die entsprechenden Knoten aus dem Graphen
+                com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
+                com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
+
+                if (sourceNode != null && targetNode != null) {
+                    // Erstelle eine Kante, die den Message Flow darstellt
+                    Edge messageFlowEdge = new Edge(id, sourceNode, targetNode, "MessageFlow");
+                    graph.addEdge(messageFlowEdge);
+                }
             }
         }
     }
+
 
     static void processStartEndEvents(Document doc, String tagName, String eventType, BPMNGraph graph) {
         NodeList eventNodes = doc.getElementsByTagName(tagName);

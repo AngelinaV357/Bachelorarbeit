@@ -72,13 +72,18 @@ public class GatewayPatternFinder {
                 if (!outputEdges.contains(edge)) {
                     Node targetNode = edge.getTarget();
                     String condition = edge.getCondition();
+
+                    // Hole die Lane des Quell- und Zielknotens
+                    String sourceLane = gatewayNode.getLane() != null ? gatewayNode.getLane().getName() : "Unbekannte Lane";
+                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+
                     if (condition != null && !condition.isEmpty()) {
-                        System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
+                        System.out.println("Es ist erlaubt, dass " + targetLane + " " + cleanText(targetNode.getName()) +
+                                " nach " + sourceLane + " " + cleanText(gatewayNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
                                 cleanText(condition) + "' erfüllt ist.");
                     } else {
-                        System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird.");
+                        System.out.println("Es ist erlaubt, dass " + targetLane + " " + cleanText(targetNode.getName()) +
+                                " nach " + sourceLane + " " + cleanText(gatewayNode.getName()) + " ausgeführt wird.");
                     }
                     outputEdges.add(edge);
                 }
@@ -93,8 +98,13 @@ public class GatewayPatternFinder {
             if (edge.getTarget().equals(gatewayNode)) {
                 if (!outputEdges.contains(edge)) {
                     Node sourceNode = edge.getSource();
-                    System.out.println("Es ist erlaubt, dass " + cleanText(gatewayNode.getName()) +
-                            " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.");
+
+                    // Hole die Lane des Quell- und Zielknotens
+                    String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
+                    String targetLane = gatewayNode.getLane() != null ? gatewayNode.getLane().getName() : "Unbekannte Lane";
+
+                    System.out.println("Es ist erlaubt, dass " + targetLane + " " + cleanText(gatewayNode.getName()) +
+                            " nach " + sourceLane + " " + cleanText(sourceNode.getName()) + " ausgeführt wird.");
                     outputEdges.add(edge);
                 }
             }

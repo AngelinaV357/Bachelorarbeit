@@ -10,7 +10,7 @@ import org.w3c.dom.NodeList;
 
 import static com.example.Graphimplementierung.Grundstruktur.Parser.XMLParser.extractLane;
 
-public class DataFinder {
+public class DataParser {
 
     static void processDataObjects(Document doc, BPMNGraph graph) {
         NodeList dataObjectNodes = doc.getElementsByTagName("ns0:dataObject");
