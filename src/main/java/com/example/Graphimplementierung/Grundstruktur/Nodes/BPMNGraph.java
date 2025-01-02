@@ -17,11 +17,17 @@ public class BPMNGraph {
     public void addNode(Node node) {
         // Überprüfen, ob der Knoten mit der gleichen ID bereits existiert
         if (nodes.containsKey(node.getId())) {
-            System.out.println("Warnung: Knoten mit ID " + node.getId() + " existiert bereits und wird übersprungen.");
-            return; // Überspringe das Hinzufügen des Knotens
+            // Hier können wir entscheiden, was mit bestehenden Knoten zu tun ist:
+            // Möglichkeit 1: Knoten ignorieren und keine Warnung anzeigen.
+            // System.out.println("Knoten mit ID " + node.getId() + " existiert bereits und wird ignoriert.");
+
+            // Möglichkeit 2: Den Knoten aktualisieren, wenn er bereits existiert.
+            nodes.put(node.getId(), node); // Knoten aktualisieren
+        } else {
+            nodes.put(node.getId(), node); // Füge den neuen Knoten hinzu
         }
-        nodes.put(node.getId(), node); // Füge den Knoten hinzu, wenn er noch nicht existiert
     }
+
 
 
     // Kante hinzufügen

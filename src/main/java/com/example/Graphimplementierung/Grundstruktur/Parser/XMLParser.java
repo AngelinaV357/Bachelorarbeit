@@ -24,6 +24,7 @@ public class XMLParser {
             DataParser.processDataInputs(doc, graph);
 
             FlowParser.processSequenceFlows(doc, graph);
+            FlowParser.addEdgesToDataInputAssociation(doc, graph);
             TaskParser.processParticipants(doc, graph);
 
             FlowParser.processMessageFlows(doc, graph);
