@@ -74,114 +74,60 @@ public class FlowParser {
     }
 
     static void addEdgesToDataInputAssociation(Document doc, BPMNGraph graph) {
-        // Verarbeitung der Kanten (edges) für dataInputAssociations
-        NodeList dataInputAssociations = doc.getElementsByTagName("ns0:dataInputAssociation");
-        for (int i = 0; i < dataInputAssociations.getLength(); i++) {
-            org.w3c.dom.Node node = dataInputAssociations.item(i);
-            if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-                Element element = (Element) node;
+        // Verarbeitung für dataInputAssociation und dataOutputAssociation
+        processAssociations(doc, graph, "dataInputAssociation");
+        processAssociations(doc, graph, "dataOutputAssociation");
+    }
 
-                // Extrahiere sourceRef und targetRef aus der XML
-                String sourceRef = null;
-                String targetRef = null;
+    private static void processAssociations(Document doc, BPMNGraph graph, String tagName) {
+        // Holen der Assoziationen für den gegebenen tagName (dataInputAssociation oder dataOutputAssociation)
+        NodeList associations = doc.getElementsByTagNameNS("*", tagName);
+        for (int i = 0; i < associations.getLength(); i++) {
+            Element element = (Element) associations.item(i);
 
-                NodeList sourceRefs = element.getElementsByTagName("ns0:sourceRef");
-                if (sourceRefs.getLength() > 0) {
-                    sourceRef = sourceRefs.item(0).getTextContent();
-                }
+            // Holen der sourceRef und targetRef aus der Assoziation
+            NodeList sourceRefs = element.getElementsByTagName("ns0:sourceRef");
+            NodeList targetRefs = element.getElementsByTagName("ns0:targetRef");
 
-                NodeList targetRefs = element.getElementsByTagName("ns0:targetRef");
-                if (targetRefs.getLength() > 0) {
-                    targetRef = targetRefs.item(0).getTextContent();
-                }
+            for (int j = 0; j < sourceRefs.getLength(); j++) {
+                String sourceRef = sourceRefs.item(j).getTextContent();
+                for (int k = 0; k < targetRefs.getLength(); k++) {
+                    String targetRef = targetRefs.item(k).getTextContent();
 
-                // Sicherstellen, dass sourceRef und targetRef nicht leer sind
-                if (sourceRef == null || sourceRef.isEmpty() || targetRef == null || targetRef.isEmpty()) {
-                    System.out.println("Warnung: Ungültige sourceRef oder targetRef bei dataInputAssociation");
-                    continue;
-                }
+                    // Sicherstellen, dass sourceRef und targetRef nicht leer sind
+                    if (sourceRef == null || sourceRef.isEmpty() || targetRef == null || targetRef.isEmpty()) {
+                        System.out.println("Warnung: Ungültige sourceRef oder targetRef bei " + tagName);
+                        continue;
+                    }
 
-                // Hole die Knoten vom Graph (Datenobjekte und Aktivitäten)
-                com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
-                com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
+                    // Hole die Knoten vom Graphen anhand der sourceRef und targetRef
+                    com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
+                    com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
 
-                // Prüfe, ob die Knoten existieren
-                if (sourceNode == null) {
-                    System.out.println("Warnung: Quellknoten mit ID " + sourceRef + " nicht gefunden.");
-                    continue;
-                }
-                if (targetNode == null) {
-                    System.out.println("Warnung: Zielknoten mit ID " + targetRef + " nicht gefunden.");
-                    continue;
-                }
+                    // Prüfe, ob die Knoten existieren, wenn nicht, überspringe diese Assoziation
+                    if (sourceNode == null) {
+                        System.out.println("Warnung: Quellknoten mit ID " + sourceRef + " nicht gefunden.");
+                        continue;
+                    }
+                    if (targetNode == null) {
+                        System.out.println("Warnung: Zielknoten mit ID " + targetRef + " nicht gefunden.");
+                        continue;
+                    }
 
-                // Wenn es sich um eine Verbindung zwischen Datenobjekten handelt
-                if (sourceNode instanceof DataNode && targetNode instanceof DataNode) {
-                    DataEdge dataObjectEdge = new DataEdge(sourceRef, sourceNode, targetNode);
-                    graph.addEdge(dataObjectEdge);
-                    System.out.println("DataObjectEdge{source='" + sourceNode.getName() + "', target='" + targetNode.getName() + "'}");
-                } else {
-                    // Normaler Edge Fall (Dateninput zu Aktivität)
-                    Edge dataEdge = new Edge(sourceRef, sourceNode, targetNode, null);
-                    graph.addEdge(dataEdge);
-                    System.out.println("Edge{source='" + sourceNode.getName() + "', target='" + targetNode.getName() + "'}");
-                }
-            }
-        }
-
-        // Verarbeitung der Kanten (edges) für dataOutputAssociations
-        NodeList dataOutputAssociations = doc.getElementsByTagName("ns0:dataOutputAssociation");
-        for (int i = 0; i < dataOutputAssociations.getLength(); i++) {
-            org.w3c.dom.Node node = dataOutputAssociations.item(i);
-            if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-                Element element = (Element) node;
-
-                // Extrahiere sourceRef und targetRef aus der XML
-                String sourceRef = null;
-                String targetRef = null;
-
-                NodeList sourceRefs = element.getElementsByTagName("ns0:sourceRef");
-                if (sourceRefs.getLength() > 0) {
-                    sourceRef = sourceRefs.item(0).getTextContent();
-                }
-
-                NodeList targetRefs = element.getElementsByTagName("ns0:targetRef");
-                if (targetRefs.getLength() > 0) {
-                    targetRef = targetRefs.item(0).getTextContent();
-                }
-
-                // Sicherstellen, dass sourceRef und targetRef nicht leer sind
-                if (sourceRef == null || sourceRef.isEmpty() || targetRef == null || targetRef.isEmpty()) {
-                    System.out.println("Warnung: Ungültige sourceRef oder targetRef bei dataOutputAssociation");
-                    continue;
-                }
-
-                // Hole die Knoten vom Graph (Aktivitäten und Datenobjekte)
-                com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
-                com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
-
-                // Prüfe, ob die Knoten existieren
-                if (sourceNode == null) {
-                    System.out.println("Warnung: Quellknoten mit ID " + sourceRef + " nicht gefunden.");
-                    continue;
-                }
-                if (targetNode == null) {
-                    System.out.println("Warnung: Zielknoten mit ID " + targetRef + " nicht gefunden.");
-                    continue;
-                }
-
-                // Wenn es sich um eine Verbindung zwischen Datenobjekten handelt
-                if (sourceNode instanceof DataNode && targetNode instanceof DataNode) {
-                    DataEdge dataObjectEdge = new DataEdge(sourceRef, sourceNode, targetNode);
-                    graph.addEdge(dataObjectEdge);
-                    System.out.println("DataObjectEdge{source='" + sourceNode.getName() + "', target='" + targetNode.getName() + "'}");
-                } else {
-                    // Normaler Edge Fall (Aktivität zu Datenobjekt)
-                    Edge dataEdge = new Edge(sourceRef, sourceNode, targetNode, null);
-                    graph.addEdge(dataEdge);
-                    System.out.println("Edge{source='" + sourceNode.getName() + "', target='" + targetNode.getName() + "'}");
+                    // Wenn beide Knoten vom Typ DataNode sind, erstelle eine DataEdge
+                    if (sourceNode instanceof DataNode && targetNode instanceof DataNode) {
+                        DataEdge dataObjectEdge = new DataEdge(sourceRef, sourceNode, targetNode);
+                        graph.addEdge(dataObjectEdge);
+                        System.out.println(dataObjectEdge);  // Ausgabe der DataEdge für Debugging
+                    } else {
+                        // Andernfalls normale Edge erstellen
+                        Edge edge = new Edge(sourceRef, sourceNode, targetNode, null);
+                        graph.addEdge(edge);
+                        System.out.println(edge);  // Ausgabe der normalen Edge für Debugging
+                    }
                 }
             }
         }
     }
+
 }

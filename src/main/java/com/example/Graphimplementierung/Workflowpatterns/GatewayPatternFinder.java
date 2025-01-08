@@ -13,38 +13,34 @@ public class GatewayPatternFinder {
     // Set, um bereits ausgegebene Gateways nachzuverfolgen
     private Set<String> processedGateways = new HashSet<>();
 
-    public void findExclusiveGatewayPatterns(BPMNGraph graph) {
+    public void findExclusiveGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
             if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
                 GatewayNode gatewayNode = (GatewayNode) node;
 
-                // Verhindern der doppelten Ausgabe desselben Gateways
                 if (!processedGateways.contains(gatewayNode.getId())) {
-                    System.out.println("\nExclusive Gateway gefunden: " + cleanText(gatewayNode.getName()));
+                    String message = "\nExclusive Gateway gefunden: " + cleanText(gatewayNode.getName());
+                    System.out.println(message);
+                    sbvrData.append(message).append("\n");
 
-                    // SBVR-Regeln ausgeben
-                    generateSBVRRules(graph, gatewayNode);
-
-                    // Gateway als verarbeitet markieren
+                    generateSBVRRules(graph, gatewayNode, sbvrData);
                     processedGateways.add(gatewayNode.getId());
                 }
             }
         }
     }
 
-    public void findParallelGatewayPatterns(BPMNGraph graph) {
+    public void findParallelGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
             if (node instanceof GatewayNode && "Parallel".equals(((GatewayNode) node).getGatewayType())) {
                 GatewayNode gatewayNode = (GatewayNode) node;
 
-                // Verhindern der doppelten Ausgabe desselben Gateways
                 if (!processedGateways.contains(gatewayNode.getId())) {
-                    System.out.println("\nParallel Gateway gefunden: " + cleanText(gatewayNode.getName()));
+                    String message = "\nParallel Gateway gefunden: " + cleanText(gatewayNode.getName());
+                    System.out.println(message);
+                    sbvrData.append(message).append("\n");
 
-                    // SBVR-Regeln ausgeben
-                    generateSBVRRules(graph, gatewayNode);
-
-                    // Gateway als verarbeitet markieren
+                    generateSBVRRules(graph, gatewayNode, sbvrData);
                     processedGateways.add(gatewayNode.getId());
                 }
             }
@@ -53,54 +49,59 @@ public class GatewayPatternFinder {
 
 
 
-    public void findEventBasedGatewayPatterns(BPMNGraph graph) {
+    public void findEventBasedGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
             if (node instanceof GatewayNode && "EventBased".equals(((GatewayNode) node).getGatewayType())) {
                 GatewayNode gatewayNode = (GatewayNode) node;
 
-                // Verhindern der doppelten Ausgabe desselben Gateways
                 if (!processedGateways.contains(gatewayNode.getId())) {
-                    System.out.println("\nEvent-Based Gateway gefunden: " + cleanText(gatewayNode.getName()));
+                    String message = "\nEvent-Based Gateway gefunden: " + cleanText(gatewayNode.getName());
+                    System.out.println(message);
+                    sbvrData.append(message).append("\n");
 
-                    // SBVR-Regeln ausgeben
-                    generateSBVRRules(graph, gatewayNode);
-
-                    // Gateway als verarbeitet markieren
+                    generateSBVRRules(graph, gatewayNode, sbvrData);
                     processedGateways.add(gatewayNode.getId());
                 }
             }
         }
     }
 
+    private void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
+        String message = "SBVR-Regeln für " + cleanText(gatewayNode.getName()) + ":";
+        System.out.println(message);
+        sbvrData.append(message).append("\n");
 
-    private void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode) {
-        System.out.println("SBVR-Regeln für " + gatewayNode.getName() + ":");
-
-        // Ausgehende Kanten verarbeiten
+        // Ausgehende Kanten
         System.out.print("Ausgehende Kanten:\n");
+        sbvrData.append("Ausgehende Kanten:\n");
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(gatewayNode)) {
                 String condition = edge.getCondition();
                 Node targetNode = edge.getTarget();
 
                 if (condition != null && !condition.isEmpty()) {
-                    System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                    message = "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
                             " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
-                            cleanText(condition) + "' erfüllt ist.");
+                            cleanText(condition) + "' erfüllt ist.";
                 } else {
-                    System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                            " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird.");
+                    message = "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                            " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird.";
                 }
+                System.out.println(message);
+                sbvrData.append(message).append("\n");
             }
         }
 
-        // Eingehende Kanten verarbeiten
+        // Eingehende Kanten
         System.out.print("Eingehende Kanten:\n");
+        sbvrData.append("Eingehende Kanten:\n");
         for (Edge edge : graph.getEdges()) {
             if (edge.getTarget().equals(gatewayNode)) {
                 Node sourceNode = edge.getSource();
-                System.out.println("Es ist erlaubt, dass " + cleanText(gatewayNode.getName()) +
-                        " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.");
+                message = "Es ist erlaubt, dass " + cleanText(gatewayNode.getName()) +
+                        " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.";
+                System.out.println(message);
+                sbvrData.append(message).append("\n");
             }
         }
     }

@@ -13,158 +13,173 @@ public class TaskPatternFinder {
     private Set<Edge> outputEdges = new HashSet<>();
 
     // Hauptmethode zum Finden aller Task-Typen
-    public void findAllTaskPatterns(BPMNGraph graph) {
+    public void findAllTaskPatterns(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         for (Node node : graph.getNodes()) {
             if (node instanceof TaskNode) {
                 TaskNode taskNode = (TaskNode) node;
 
-                // UserTask erkennen und weiter verarbeiten
+                // UserTask erkennen und verarbeiten
                 if ("UserTask".equals(taskNode.getActivityType())) {
-                    System.out.println("\nUser Task gefunden: " + cleanText(taskNode.getName()));
-                    processOutgoingEdgesForUserTask(graph, taskNode);
-                    processIncomingEdges(graph, taskNode);
+                    String message = "\nUser Task gefunden: " + cleanText(taskNode.getName());
+                    System.out.println(message);
+                    sbvrDataBuilder.append(message).append("\n");
+                    processOutgoingEdgesForUserTask(graph, taskNode, sbvrDataBuilder);
+                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
                 }
 
-                // ServiceTask erkennen und weiter verarbeiten
+                // ServiceTask erkennen und verarbeiten
                 if ("ServiceTask".equals(taskNode.getActivityType())) {
-                    System.out.println("\nService Task gefunden: " + cleanText(taskNode.getName()));
-                    processOutgoingEdgesForServiceTask(graph, taskNode);
-                    processIncomingEdges(graph, taskNode);
+                    String message = "\nService Task gefunden: " + cleanText(taskNode.getName());
+                    System.out.println(message);
+                    sbvrDataBuilder.append(message).append("\n");
+                    processOutgoingEdgesForServiceTask(graph, taskNode, sbvrDataBuilder);
+                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
                 }
 
-
-                // BusinessRuleTask erkennen und weiter verarbeiten
+                // BusinessRuleTask erkennen und verarbeiten
                 if ("BusinessRuleTask".equals(taskNode.getActivityType())) {
-                    System.out.println("\nBusiness Rule Task gefunden: " + cleanText(taskNode.getName()));
-                    processOutgoingEdgesForBusinessRuleTask(graph, taskNode);
-                    processIncomingEdges(graph, taskNode);
+                    String message = "\nBusiness Rule Task gefunden: " + cleanText(taskNode.getName());
+                    System.out.println(message);
+                    sbvrDataBuilder.append(message).append("\n");
+                    processOutgoingEdgesForBusinessRuleTask(graph, taskNode, sbvrDataBuilder);
+                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
                 }
 
-                // IntermediateCatchEvent erkennen und weiter verarbeiten
+                // IntermediateCatchEvent erkennen und verarbeiten
                 if ("IntermediateCatchEvent".equals(taskNode.getActivityType())) {
-                    System.out.println("\nIntermediate Catch Event gefunden: " + cleanText(taskNode.getName()));
-                    processOutgoingEdgesForIntermediateEvent(graph, taskNode, "Catch");
-                    processIncomingEdges(graph, taskNode);
+                    String message = "\nIntermediate Catch Event gefunden: " + cleanText(taskNode.getName());
+                    System.out.println(message);
+                    sbvrDataBuilder.append(message).append("\n");
+                    processOutgoingEdgesForIntermediateEvent(graph, taskNode, "Catch", sbvrDataBuilder);
+                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
                 }
 
-                // IntermediateThrowEvent erkennen und weiter verarbeiten
+                // IntermediateThrowEvent erkennen und verarbeiten
                 if ("IntermediateThrowEvent".equals(taskNode.getActivityType())) {
-                    System.out.println("\nIntermediate Throw Event gefunden: " + cleanText(taskNode.getName()));
-                    processOutgoingEdgesForIntermediateEvent(graph, taskNode, "Throw");
-                    processIncomingEdges(graph, taskNode);
+                    String message = "\nIntermediate Throw Event gefunden: " + cleanText(taskNode.getName());
+                    System.out.println(message);
+                    sbvrDataBuilder.append(message).append("\n");
+                    processOutgoingEdgesForIntermediateEvent(graph, taskNode, "Throw", sbvrDataBuilder);
+                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
                 }
 
-                // Task erkennen und weiter verarbeiten
+                // Task erkennen und verarbeiten
                 if ("Task".equals(taskNode.getActivityType())) {
-                    System.out.println("\nTask gefunden: " + cleanText(taskNode.getName()));
-                    processOutgoingEdgesForTask(graph, taskNode);
-                    processIncomingEdges(graph, taskNode);
+                    String message = "\nTask gefunden: " + cleanText(taskNode.getName());
+                    System.out.println(message);
+                    sbvrDataBuilder.append(message).append("\n");
+                    processOutgoingEdgesForTask(graph, taskNode, sbvrDataBuilder);
+                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
                 }
             }
         }
     }
 
-    private void processOutgoingEdgesForIntermediateEvent(BPMNGraph graph, TaskNode eventNode, String eventType) {
-        System.out.println("SBVR-Regeln für ausgehende Kanten (" + eventType + " Event):");
+    private void processOutgoingEdgesForIntermediateEvent(BPMNGraph graph, TaskNode eventNode, String eventType, StringBuilder sbvrDataBuilder) {
+        String header = "SBVR-Regeln für ausgehende Kanten (" + eventType + " Event):";
+        System.out.println(header);
+        sbvrDataBuilder.append(header).append("\n");
+
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(eventNode)) {
                 if (!outputEdges.contains(edge)) {
                     Node targetNode = edge.getTarget();
                     String condition = edge.getCondition();
 
-                    // Falls eine Bedingung für die Kante existiert
-                    if (condition != null && !condition.isEmpty()) {
-                        System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " ausgeführt wird, nachdem " + cleanText(eventNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
-                                cleanText(condition) + "' erfüllt ist.");
-                    } else {
-                        System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " ausgeführt wird, nachdem " + cleanText(eventNode.getName()) + " ausgeführt wird.");
-                    }
+                    String rule = (condition != null && !condition.isEmpty())
+                            ? "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                            " ausgeführt wird, nachdem " + cleanText(eventNode.getName()) +
+                            " ausgeführt wird, wenn die Bedingung '" + cleanText(condition) + "' erfüllt ist."
+                            : "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                            " ausgeführt wird, nachdem " + cleanText(eventNode.getName()) + " ausgeführt wird.";
+
+                    System.out.println(rule);
+                    sbvrDataBuilder.append(rule).append("\n");
                     outputEdges.add(edge);
                 }
             }
         }
     }
 
-
-    // Methode zur Verarbeitung der ausgehenden Kanten
-    private void processOutgoingEdgesForTask(BPMNGraph graph, TaskNode taskNode) {
-        System.out.println("SBVR-Regeln für ausgehende Kanten:");
+    private void processOutgoingEdgesForTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        String header = "SBVR-Regeln für ausgehende Kanten:";
+        System.out.println(header);
+        sbvrDataBuilder.append(header).append("\n");
 
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(taskNode)) {
                 if (!outputEdges.contains(edge)) {
                     Node targetNode = edge.getTarget();
+                    String condition = edge.getCondition();
+
+                    String rule = (condition != null && !condition.isEmpty())
+                            ? "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                            " ausgeführt wird, nachdem " + cleanText(taskNode.getName()) +
+                            " ausgeführt wird, wenn die Bedingung '" + cleanText(condition) + "' erfüllt ist."
+                            : "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                            " ausgeführt wird, nachdem " + cleanText(taskNode.getName()) + " ausgeführt wird.";
+
+                    System.out.println(rule);
+                    sbvrDataBuilder.append(rule).append("\n");
+                    outputEdges.add(edge);
+                }
+            }
+        }
+    }
+
+    private void processOutgoingEdgesForServiceTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        String header = "SBVR-Regeln für ausgehende Kanten (ServiceTask):";
+        System.out.println(header);
+        sbvrDataBuilder.append(header).append("\n");
+
+        for (Edge edge : graph.getEdges()) {
+            if (edge.getSource().equals(taskNode)) {
+                if (!outputEdges.contains(edge)) {
+                    Node targetNode = edge.getTarget();
+                    String rule = "Es ist erforderlich, dass " + cleanText(targetNode.getName()) +
+                            " ausgeführt wird, wenn der Service erfolgreich abgeschlossen wurde.";
+                    System.out.println(rule);
+                    sbvrDataBuilder.append(rule).append("\n");
+                    outputEdges.add(edge);
+                }
+            }
+        }
+    }
+
+    private void processOutgoingEdgesForUserTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        String header = "SBVR-Regeln für ausgehende Kanten (UserTask):";
+        System.out.println(header);
+        sbvrDataBuilder.append(header).append("\n");
+
+        for (Edge edge : graph.getEdges()) {
+            if (edge.getSource().equals(taskNode)) {
+                if (!outputEdges.contains(edge)) {
+                    Node targetNode = edge.getTarget();
+
+                    String rule = "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                            " nach " + cleanText(taskNode.getName()) + " ausgeführt wird.";
+                    System.out.println(rule);
+                    sbvrDataBuilder.append(rule).append("\n");
+                    outputEdges.add(edge);
+                }
+            }
+        }
+    }
+
+    private void processIncomingEdges(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        String header = "SBVR-Regeln für eingehende Kanten:";
+        System.out.println(header);
+        sbvrDataBuilder.append(header).append("\n");
+
+        for (Edge edge : graph.getEdges()) {
+            if (edge.getTarget().equals(taskNode)) {
+                if (!outputEdges.contains(edge)) {
                     Node sourceNode = edge.getSource();
 
-                    // Hole die Lane des Quell- und Zielknotens
-                    String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
-                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
-
-                    // Falls eine Bedingung existiert
-                    String condition = edge.getCondition();
-                    if (condition != null && !condition.isEmpty()) {
-                        System.out.println("Es ist erlaubt, dass " + sourceLane + " " + cleanText(sourceNode.getName()) +
-                                " ausgeführt wird, nachdem " + targetLane + " " + cleanText(targetNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
-                                cleanText(condition) + "' erfüllt ist.");
-                    } else {
-                        System.out.println("Es ist erlaubt, dass " + sourceLane + " " + cleanText(sourceNode.getName()) +
-                                " ausgeführt wird, nachdem " + targetLane + " " + cleanText(targetNode.getName()) + " ausgeführt wird.");
-                    }
-
-                    outputEdges.add(edge);
-                }
-            }
-        }
-    }
-
-
-
-    // Methode zur Verarbeitung der ausgehenden Kanten für ServiceTask
-    private void processOutgoingEdgesForServiceTask(BPMNGraph graph, TaskNode taskNode) {
-        System.out.println("SBVR-Regeln für ausgehende Kanten (ServiceTask):");
-
-        for (Edge edge : graph.getEdges()) {
-            if (edge.getSource().equals(taskNode)) {
-                if (!outputEdges.contains(edge)) {
-                    Node targetNode = edge.getTarget();
-
-                    // Hole die Lane des Quell- und Zielknotens
-                    String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
-                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
-
-                    // SBVR-Regel für ServiceTask
-                    System.out.println("Es ist erforderlich, dass " + targetLane + " " + cleanText(targetNode.getName()) +
-                            " ausgeführt wird, wenn der Service erfolgreich abgeschlossen wurde.");
-                    outputEdges.add(edge);
-                }
-            }
-        }
-    }
-
-    // Methode zur Verarbeitung der ausgehenden Kanten für UserTask
-    private void processOutgoingEdgesForUserTask(BPMNGraph graph, TaskNode taskNode) {
-        System.out.println("SBVR-Regeln für ausgehende Kanten (UserTask):");
-
-        for (Edge edge : graph.getEdges()) {
-            if (edge.getSource().equals(taskNode)) {
-                if (!outputEdges.contains(edge)) {
-                    Node targetNode = edge.getTarget();
-
-                    // Hole die Lane des Quell- und Zielknotens
-                    String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
-                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
-
-                    // Überprüfe, ob der Zielknoten auch ein UserTask ist
-                    if (targetNode instanceof TaskNode && "UserTask".equals(((TaskNode) targetNode).getActivityType())) {
-                        System.out.println("Es ist erforderlich, dass " + targetLane + " " + cleanText(targetNode.getName()) +
-                                " ausgeführt wird, wenn der Benutzer seine Aufgabe abgeschlossen hat.");
-                    } else {
-                        // Standardverhalten für andere Knoten
-                        System.out.println("Es ist erlaubt, dass " + targetLane + " " + cleanText(targetNode.getName()) +
-                                " nach " + sourceLane + " " + cleanText(taskNode.getName()) + " ausgeführt wird.");
-                    }
+                    String rule = "Es ist erlaubt, dass " + cleanText(taskNode.getName()) +
+                            " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.";
+                    System.out.println(rule);
+                    sbvrDataBuilder.append(rule).append("\n");
                     outputEdges.add(edge);
                 }
             }
@@ -172,7 +187,7 @@ public class TaskPatternFinder {
     }
 
     // Methode zur Verarbeitung der ausgehenden Kanten für BusinessRuleTask
-    private void processOutgoingEdgesForBusinessRuleTask(BPMNGraph graph, TaskNode taskNode) {
+    private void processOutgoingEdgesForBusinessRuleTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         System.out.println("SBVR-Regeln für ausgehende Kanten (BusinessRuleTask):");
 
         for (Edge edge : graph.getEdges()) {
@@ -185,39 +200,15 @@ public class TaskPatternFinder {
                     String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
 
                     // SBVR-Regel für BusinessRuleTask
-                    System.out.println("Es ist notwendig, " + targetLane + " " + cleanText(targetNode.getName()) +
-                            " ausgeführt wird, wenn alle Anforderungen überprüft worden sind.");
+                    String rule = "Es ist notwendig, " + targetLane + " " + cleanText(targetNode.getName()) +
+                            " ausgeführt wird, wenn alle Anforderungen überprüft worden sind.";
+                    System.out.print(rule);
+                    sbvrDataBuilder.append(rule).append("\n");
                     outputEdges.add(edge);
                 }
             }
         }
     }
-
-
-    // Methode zur Verarbeitung der eingehenden Kanten
-    private void processIncomingEdges(BPMNGraph graph, TaskNode taskNode) {
-        System.out.println("SBVR-Regeln für eingehende Kanten:");
-
-        for (Edge edge : graph.getEdges()) {
-            if (edge.getTarget().equals(taskNode)) {
-                if (!outputEdges.contains(edge)) {
-                    Node sourceNode = edge.getSource();
-
-                    // Hole die Lane des Quell- und Zielknotens
-                    String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
-                    String targetLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
-
-                    // Ausgabe der SBVR-Regeln, um die Reihenfolge zu korrigieren
-                    System.out.println("Es ist erlaubt, dass " + targetLane + " " + cleanText(taskNode.getName()) +
-                            " nach " + sourceLane + " " + cleanText(sourceNode.getName()) + " ausgeführt wird.");
-
-                    outputEdges.add(edge);
-                }
-            }
-        }
-    }
-
-
 
     // Methode zum Entfernen von Zeilenumbrüchen, Tabulatoren und überflüssigen Leerzeichen
     private static String cleanText(String text) {

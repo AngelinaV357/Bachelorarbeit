@@ -1,5 +1,6 @@
 package com.example.Graphimplementierung.Grundstruktur.Parser;
-
+//https://github.com/stackmystack/SBVR-Parsing-Engine?search=1
+//
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
 import com.example.Graphimplementierung.Workflowpatterns.GatewayPatternFinder;
 import com.example.Graphimplementierung.Workflowpatterns.SubProcessPatternFinder;
@@ -14,11 +15,12 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/Receipt of Good.bpmn");
+            File xmlFile = new File("src/main/resources/Employee Onboarding.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
+            StringBuilder sbvrDataBuilder = new StringBuilder();
 
             // 2. BPMN-Graph initialisieren
             BPMNGraph graph = new BPMNGraph();
@@ -35,18 +37,19 @@ public class Main {
 
             // 3. Gateway Pattern Finder initialisieren
             GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
-            gatewayPatternFinder.findParallelGatewayPatterns(graph);
-            gatewayPatternFinder.findExclusiveGatewayPatterns(graph);
-            gatewayPatternFinder.findEventBasedGatewayPatterns(graph);
+            gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
+            gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
+            gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
 
             // 4. Task Pattern Finder initialisieren (Für alle Tasks)
             TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
-            taskPatternFinder.findAllTaskPatterns(graph);
+            taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
 
             // 5. SubProcess Pattern Finder initialisieren
             SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();
-            subProcessPatternFinder.findSubProcessPatterns(graph);
+            subProcessPatternFinder.findSubProcessPatterns(graph, sbvrDataBuilder);
 
+            SBVRFileSaver.saveSBVRToFile(sbvrDataBuilder.toString(), "generated_rules.sbvr");
         } catch (Exception e) {
             e.printStackTrace();
         }
