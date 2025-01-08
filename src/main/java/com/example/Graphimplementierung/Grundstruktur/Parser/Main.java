@@ -35,17 +35,17 @@ public class Main {
 
             // 3. Gateway Pattern Finder initialisieren
             GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
-            gatewayPatternFinder.findExclusiveGatewayPatterns(graph);  // Nur einmal aufrufen
-            gatewayPatternFinder.findParallelGatewayPatterns(graph);   // Nur einmal aufrufen
-            gatewayPatternFinder.findEventBasedGatewayPatterns(graph);  // EventBased Gateway
+            gatewayPatternFinder.findParallelGatewayPatterns(graph);
+            gatewayPatternFinder.findExclusiveGatewayPatterns(graph);
+            gatewayPatternFinder.findEventBasedGatewayPatterns(graph);
 
             // 4. Task Pattern Finder initialisieren (Für alle Tasks)
             TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
-            taskPatternFinder.findAllTaskPatterns(graph);  // Alle Task-Typen auf einmal finden
+            taskPatternFinder.findAllTaskPatterns(graph);
 
             // 5. SubProcess Pattern Finder initialisieren
             SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();
-            subProcessPatternFinder.findSubProcessPatterns(graph);  // SubProzess-Muster finden
+            subProcessPatternFinder.findSubProcessPatterns(graph);
 
         } catch (Exception e) {
             e.printStackTrace();

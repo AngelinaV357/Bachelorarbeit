@@ -10,23 +10,23 @@ import java.util.Set;
 
 public class GatewayPatternFinder {
 
-    // Set, um bereits ausgegebene Kanten nachzuverfolgen
-    private Set<Edge> outputEdges = new HashSet<>();
-
     // Set, um bereits ausgegebene Gateways nachzuverfolgen
     private Set<String> processedGateways = new HashSet<>();
 
     public void findExclusiveGatewayPatterns(BPMNGraph graph) {
         for (Node node : graph.getNodes()) {
-            if (node instanceof TaskNode && "ExclusiveGateway".equals(((TaskNode) node).getActivityType())) {
-                TaskNode gatewayNode = (TaskNode) node;
+            if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
+                GatewayNode gatewayNode = (GatewayNode) node;
 
                 // Verhindern der doppelten Ausgabe desselben Gateways
-                if (!processedGateways.contains(gatewayNode.getName())) {
+                if (!processedGateways.contains(gatewayNode.getId())) {
                     System.out.println("\nExclusive Gateway gefunden: " + cleanText(gatewayNode.getName()));
-                    processOutgoingEdges(graph, gatewayNode);
-                    processIncomingEdges(graph, gatewayNode);
-                    processedGateways.add(gatewayNode.getName());  // Gateway als verarbeitet markieren
+
+                    // SBVR-Regeln ausgeben
+                    generateSBVRRules(graph, gatewayNode);
+
+                    // Gateway als verarbeitet markieren
+                    processedGateways.add(gatewayNode.getId());
                 }
             }
         }
@@ -34,69 +34,73 @@ public class GatewayPatternFinder {
 
     public void findParallelGatewayPatterns(BPMNGraph graph) {
         for (Node node : graph.getNodes()) {
-            if (node instanceof TaskNode && "ParallelGateway".equals(((TaskNode) node).getActivityType())) {
-                TaskNode gatewayNode = (TaskNode) node;
+            if (node instanceof GatewayNode && "Parallel".equals(((GatewayNode) node).getGatewayType())) {
+                GatewayNode gatewayNode = (GatewayNode) node;
 
                 // Verhindern der doppelten Ausgabe desselben Gateways
-                if (!processedGateways.contains(gatewayNode.getName())) {
+                if (!processedGateways.contains(gatewayNode.getId())) {
                     System.out.println("\nParallel Gateway gefunden: " + cleanText(gatewayNode.getName()));
-                    processOutgoingEdges(graph, gatewayNode);
-                    processIncomingEdges(graph, gatewayNode);
-                    processedGateways.add(gatewayNode.getName());  // Gateway als verarbeitet markieren
+
+                    // SBVR-Regeln ausgeben
+                    generateSBVRRules(graph, gatewayNode);
+
+                    // Gateway als verarbeitet markieren
+                    processedGateways.add(gatewayNode.getId());
                 }
             }
         }
     }
+
+
 
     public void findEventBasedGatewayPatterns(BPMNGraph graph) {
         for (Node node : graph.getNodes()) {
-            if (node instanceof TaskNode && "EventBasedGateway".equals(((TaskNode) node).getActivityType())) {
-                TaskNode gatewayNode = (TaskNode) node;
+            if (node instanceof GatewayNode && "EventBased".equals(((GatewayNode) node).getGatewayType())) {
+                GatewayNode gatewayNode = (GatewayNode) node;
 
                 // Verhindern der doppelten Ausgabe desselben Gateways
-                if (!processedGateways.contains(gatewayNode.getName())) {
-                    System.out.println("\nEventBased Gateway gefunden: " + cleanText(gatewayNode.getName()));
-                    processOutgoingEdges(graph, gatewayNode);
-                    processIncomingEdges(graph, gatewayNode);
-                    processedGateways.add(gatewayNode.getName());  // Gateway als verarbeitet markieren
+                if (!processedGateways.contains(gatewayNode.getId())) {
+                    System.out.println("\nEvent-Based Gateway gefunden: " + cleanText(gatewayNode.getName()));
+
+                    // SBVR-Regeln ausgeben
+                    generateSBVRRules(graph, gatewayNode);
+
+                    // Gateway als verarbeitet markieren
+                    processedGateways.add(gatewayNode.getId());
                 }
             }
         }
     }
 
-    // Hilfsmethode zur Verarbeitung ausgehender Kanten eines Gateways
-    private void processOutgoingEdges(BPMNGraph graph, TaskNode gatewayNode) {
-        System.out.println("Regeln für ausgehende Kanten:");
+
+    private void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode) {
+        System.out.println("SBVR-Regeln für " + gatewayNode.getName() + ":");
+
+        // Ausgehende Kanten verarbeiten
+        System.out.print("Ausgehende Kanten:\n");
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(gatewayNode)) {
-                if (!outputEdges.contains(edge)) {
-                    Node targetNode = edge.getTarget();
-                    String condition = edge.getCondition();
-                    if (condition != null && !condition.isEmpty()) {
-                        System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
-                                cleanText(condition) + "' erfüllt ist.");
-                    } else {
-                        System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird.");
-                    }
-                    outputEdges.add(edge);
+                String condition = edge.getCondition();
+                Node targetNode = edge.getTarget();
+
+                if (condition != null && !condition.isEmpty()) {
+                    System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                            " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
+                            cleanText(condition) + "' erfüllt ist.");
+                } else {
+                    System.out.println("Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
+                            " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird.");
                 }
             }
         }
-    }
 
-    // Hilfsmethode zur Verarbeitung eingehender Kanten eines Gateways
-    private void processIncomingEdges(BPMNGraph graph, TaskNode gatewayNode) {
-        System.out.println("Regeln für eingehende Kanten:");
+        // Eingehende Kanten verarbeiten
+        System.out.print("Eingehende Kanten:\n");
         for (Edge edge : graph.getEdges()) {
             if (edge.getTarget().equals(gatewayNode)) {
-                if (!outputEdges.contains(edge)) {
-                    Node sourceNode = edge.getSource();
-                    System.out.println("Es ist erlaubt, dass " + cleanText(gatewayNode.getName()) +
-                            " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.");
-                    outputEdges.add(edge);
-                }
+                Node sourceNode = edge.getSource();
+                System.out.println("Es ist erlaubt, dass " + cleanText(gatewayNode.getName()) +
+                        " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.");
             }
         }
     }
