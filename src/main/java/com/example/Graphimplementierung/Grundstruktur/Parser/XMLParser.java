@@ -23,11 +23,8 @@ public class XMLParser {
             DataParser.parseData(doc, graph);
 
             FlowParser.processSequenceFlows(doc, graph);
-            FlowParser.processDataAssociations(doc, graph);
             FlowParser.processGatewayEdges(doc, graph);
-            TaskParser.processParticipants(doc, graph);
-
-            FlowParser.processMessageFlows(doc, graph);
+            FlowParser.addEdgesToDataInputAssociation(doc, graph);
             TaskParser.processParticipants(doc, graph);
 
         } catch (Exception e) {

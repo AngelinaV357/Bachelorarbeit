@@ -30,6 +30,7 @@ public class TaskParser {
     }
 
     static void processIntermediateEvents(Document doc, BPMNGraph graph) {
+        // Verarbeite alle Intermediate Catch Events
         NodeList intermediateEventNodes = doc.getElementsByTagName("ns0:intermediateCatchEvent");
         for (int i = 0; i < intermediateEventNodes.getLength(); i++) {
             Node node = intermediateEventNodes.item(i);
@@ -45,19 +46,22 @@ public class TaskParser {
                     name = "Intermediate Catch Event";
                 }
 
-                // Überprüfen, ob es sich um ein IntermediateCatchEvent oder ein IntermediateThrowEvent handelt
-                String eventType = "IntermediateCatchEvent"; // Standardmäßig als Catch Event
+                // Bestimme den Event-Typ (Catch oder Throw Event)
+                String eventType = "IntermediateCatchEvent"; // Standardmäßig Catch Event
                 String eventDefinitionRef = element.getAttribute("eventDefinitionRef");
                 if (eventDefinitionRef != null && eventDefinitionRef.contains("Throw")) {
-                    eventType = "IntermediateThrowEvent"; // Setzen auf Throw Event, wenn "Throw" erkannt wird
+                    eventType = "IntermediateThrowEvent"; // Setze auf Throw Event, wenn "Throw" erkannt wird
                 }
 
-                // Lane extrahieren und zuweisen (falls notwendig)
+                // Extrahiere Lane (falls notwendig)
                 Lane lane = extractLane(element, graph);
 
-                // Erstelle den IntermediateEventNode und füge ihn dem Graphen hinzu
-                TaskNode intermediateEventNode = new TaskNode(id, name, lane, eventType);
-                graph.addNode(intermediateEventNode);
+                // Erstelle den IntermediateNode und füge ihn dem Graphen hinzu
+                IntermediateNode intermediateNode = new IntermediateNode(id, name, lane, eventType);
+                graph.addNode(intermediateNode);
+
+                // Ausgabe des Intermediate Node
+                System.out.println("IntermediateNode{id='" + id + "', name='" + name + "', eventType='" + eventType + "'}");
             }
         }
 
@@ -85,6 +89,7 @@ public class TaskParser {
             }
         }
     }
+
 
 
     static void processStartEndEvents(Document doc, String tagName, String eventType, BPMNGraph graph) {
