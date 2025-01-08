@@ -7,7 +7,7 @@ public class Lane {
 
     private String id;
     private String name;
-    private Set<ActivityNode> flowNodeRefs;  // Sammlung von FlowNode-Referenzen (Knoten, die dieser Lane zugeordnet sind)
+    private Set<TaskNode> flowNodeRefs;  // Sammlung von FlowNode-Referenzen (Knoten, die dieser Lane zugeordnet sind)
 
     // Konstruktor
     public Lane(String id, String name) {
@@ -34,12 +34,12 @@ public class Lane {
     }
 
     // Methode, um einen Knoten zu dieser Lane hinzuzufügen
-    public void addFlowNodeRef(ActivityNode node) {
+    public void addFlowNodeRef(TaskNode node) {
         this.flowNodeRefs.add(node);
     }
 
     // Methode, um alle FlowNode-Referenzen dieser Lane zu erhalten
-    public Set<ActivityNode> getFlowNodeRefs() {
+    public Set<TaskNode> getFlowNodeRefs() {
         return flowNodeRefs;
     }
 

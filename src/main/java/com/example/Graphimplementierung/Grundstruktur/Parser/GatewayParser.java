@@ -1,8 +1,8 @@
 package com.example.Graphimplementierung.Grundstruktur.Parser;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.GatewayNode;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Lane;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.ActivityNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,11 +23,11 @@ public class GatewayParser {
 
                 // Bestimme den Typ des Gateways basierend auf dem Tag-Namen
                 if (tagName.equals("ns0:exclusiveGateway")) {
-                    gatewayType = "ExclusiveGateway";
+                    gatewayType = "Exclusive";
                 } else if (tagName.equals("ns0:parallelGateway")) {
-                    gatewayType = "ParallelGateway";
+                    gatewayType = "Parallel";
                 } else if (tagName.equals("ns0:eventBasedGateway")) {
-                    gatewayType = "EventBasedGateway";
+                    gatewayType = "EventBased";
                 }
 
                 // Wenn es ein Gateway ist, erstellen wir einen neuen Knoten
@@ -40,16 +40,11 @@ public class GatewayParser {
                         name = gatewayType + " Gateway";
                     }
 
-                    // Entferne "Gateway" am Ende des Namens, falls es bereits vorhanden ist
-                    if (name.endsWith("Gateway")) {
-                        name = name.substring(0, name.length() - "Gateway".length()).trim();
-                    }
-
                     // Lane extrahieren und zuweisen
                     Lane lane = extractLane(element, graph);
 
                     // GatewayNode erstellen
-                    ActivityNode gatewayNode = new ActivityNode(id, name, lane, gatewayType);
+                    GatewayNode gatewayNode = new GatewayNode(id, name, lane, gatewayType);
                     graph.addNode(gatewayNode);
                 }
             }

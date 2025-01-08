@@ -2,7 +2,7 @@ package com.example.Graphimplementierung.Workflowpatterns;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.ActivityNode;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.TaskNode;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Node;
 
 import java.util.HashSet;
@@ -14,8 +14,8 @@ public class SubProcessPatternFinder {
 
     public void findSubProcessPatterns(BPMNGraph graph) {
         for (Node node : graph.getNodes()) {
-            if (node instanceof ActivityNode && "SubProcess".equals(((ActivityNode) node).getActivityType())) {
-                ActivityNode subProcessNode = (ActivityNode) node;
+            if (node instanceof TaskNode && "SubProcess".equals(((TaskNode) node).getActivityType())) {
+                TaskNode subProcessNode = (TaskNode) node;
                 System.out.println("\nSubprozess gefunden: " + subProcessNode.getName());
                 processOutgoingEdges(graph, subProcessNode);
                 processIncomingEdges(graph, subProcessNode);
@@ -23,7 +23,7 @@ public class SubProcessPatternFinder {
         }
     }
 
-    private void processOutgoingEdges(BPMNGraph graph, ActivityNode subProcessNode) {
+    private void processOutgoingEdges(BPMNGraph graph, TaskNode subProcessNode) {
         System.out.println("Regeln für ausgehende Kanten:");
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(subProcessNode)) {
@@ -44,7 +44,7 @@ public class SubProcessPatternFinder {
         }
     }
 
-    private void processIncomingEdges(BPMNGraph graph, ActivityNode subProcessNode) {
+    private void processIncomingEdges(BPMNGraph graph, TaskNode subProcessNode) {
         System.out.println("Regeln für eingehende Kanten:");
         for (Edge edge : graph.getEdges()) {
             if (edge.getTarget().equals(subProcessNode)) {

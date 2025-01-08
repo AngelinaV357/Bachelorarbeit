@@ -23,8 +23,8 @@ public class TaskParser {
                 Lane lane = extractLane(element, graph);
 
                 // ActivityNode erstellen
-                ActivityNode activityNode = new ActivityNode(id, name, lane, activityType);
-                graph.addNode(activityNode);
+                TaskNode taskNode = new TaskNode(id, name, lane, activityType);
+                graph.addNode(taskNode);
             }
         }
     }
@@ -56,7 +56,7 @@ public class TaskParser {
                 Lane lane = extractLane(element, graph);
 
                 // Erstelle den IntermediateEventNode und füge ihn dem Graphen hinzu
-                ActivityNode intermediateEventNode = new ActivityNode(id, name, lane, eventType);
+                TaskNode intermediateEventNode = new TaskNode(id, name, lane, eventType);
                 graph.addNode(intermediateEventNode);
             }
         }
@@ -104,11 +104,17 @@ public class TaskParser {
                 Lane lane = extractLane(element, graph);
 
                 // EventNode erstellen
-                ActivityNode eventNode = new ActivityNode(id, name, lane, eventType);
-                graph.addNode(eventNode);
+                if (eventType.equals("StartEvent")) {
+                    StartEventNode startEventNode = new StartEventNode(id, name, lane);
+                    graph.addNode(startEventNode);
+                } else if (eventType.equals("EndEvent")) {
+                    EndEventNode endEventNode = new EndEventNode(id, name, lane);
+                    graph.addNode(endEventNode);
+                }
             }
         }
     }
+
 
     static void processBusinessRuleTasks(Document doc, BPMNGraph graph) {
         // Suche nach den BusinessRuleTask-Knoten im XML-Dokument
@@ -135,7 +141,7 @@ public class TaskParser {
                 Lane lane = extractLane(element, graph);
 
                 // Erstelle den BusinessRuleTaskNode und füge ihn dem Graphen hinzu
-                ActivityNode businessRuleTaskNode = new ActivityNode(id, name, lane, "BusinessRuleTask");
+                TaskNode businessRuleTaskNode = new TaskNode(id, name, lane, "BusinessRuleTask");
                 graph.addNode(businessRuleTaskNode);
             }
         }
@@ -144,7 +150,6 @@ public class TaskParser {
     static void processParticipants(Document doc, BPMNGraph graph) {
         // Suche nach den Participant-Knoten im XML-Dokument
         NodeList participantNodes = doc.getElementsByTagName("ns0:participant");
-
 
         for (int i = 0; i < participantNodes.getLength(); i++) {
             Node node = participantNodes.item(i);
@@ -165,12 +170,11 @@ public class TaskParser {
                 Lane lane = extractLane(element, graph);
 
                 // Erstelle den ParticipantNode und füge ihn dem Graphen hinzu
-                ActivityNode participantNode = new ActivityNode(id, name, lane, "Participant");
+                ParticipantNode participantNode = new ParticipantNode(id, name, lane);
                 graph.addNode(participantNode);
             }
         }
     }
-
 
 
     static void processUserTasks(Document doc, BPMNGraph graph) {
@@ -187,7 +191,7 @@ public class TaskParser {
                 Lane lane = extractLane(element, graph);
 
                 // UserTaskNode erstellen
-                ActivityNode userTaskNode = new ActivityNode(id, name, lane, activityType);
+                TaskNode userTaskNode = new TaskNode(id, name, lane, activityType);
                 graph.addNode(userTaskNode);
             }
         }
@@ -207,7 +211,7 @@ public class TaskParser {
                 Lane lane = extractLane(element, graph);
 
                 // ServiceTaskNode erstellen
-                ActivityNode serviceTaskNode = new ActivityNode(id, name, lane, activityType);
+                TaskNode serviceTaskNode = new TaskNode(id, name, lane, activityType);
                 graph.addNode(serviceTaskNode);
             }
         }

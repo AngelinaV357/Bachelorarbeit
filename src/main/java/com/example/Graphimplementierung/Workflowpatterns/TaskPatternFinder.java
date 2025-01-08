@@ -2,7 +2,7 @@ package com.example.Graphimplementierung.Workflowpatterns;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.ActivityNode;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.TaskNode;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Node;
 
 import java.util.HashSet;
@@ -15,56 +15,56 @@ public class TaskPatternFinder {
     // Hauptmethode zum Finden aller Task-Typen
     public void findAllTaskPatterns(BPMNGraph graph) {
         for (Node node : graph.getNodes()) {
-            if (node instanceof ActivityNode) {
-                ActivityNode activityNode = (ActivityNode) node;
+            if (node instanceof TaskNode) {
+                TaskNode taskNode = (TaskNode) node;
 
                 // UserTask erkennen und weiter verarbeiten
-                if ("UserTask".equals(activityNode.getActivityType())) {
-                    System.out.println("\nUser Task gefunden: " + cleanText(activityNode.getName()));
-                    processOutgoingEdgesForUserTask(graph, activityNode);
-                    processIncomingEdges(graph, activityNode);
+                if ("UserTask".equals(taskNode.getActivityType())) {
+                    System.out.println("\nUser Task gefunden: " + cleanText(taskNode.getName()));
+                    processOutgoingEdgesForUserTask(graph, taskNode);
+                    processIncomingEdges(graph, taskNode);
                 }
 
                 // ServiceTask erkennen und weiter verarbeiten
-                if ("ServiceTask".equals(activityNode.getActivityType())) {
-                    System.out.println("\nService Task gefunden: " + cleanText(activityNode.getName()));
-                    processOutgoingEdgesForServiceTask(graph, activityNode);
-                    processIncomingEdges(graph, activityNode);
+                if ("ServiceTask".equals(taskNode.getActivityType())) {
+                    System.out.println("\nService Task gefunden: " + cleanText(taskNode.getName()));
+                    processOutgoingEdgesForServiceTask(graph, taskNode);
+                    processIncomingEdges(graph, taskNode);
                 }
 
 
                 // BusinessRuleTask erkennen und weiter verarbeiten
-                if ("BusinessRuleTask".equals(activityNode.getActivityType())) {
-                    System.out.println("\nBusiness Rule Task gefunden: " + cleanText(activityNode.getName()));
-                    processOutgoingEdgesForBusinessRuleTask(graph, activityNode);
-                    processIncomingEdges(graph, activityNode);
+                if ("BusinessRuleTask".equals(taskNode.getActivityType())) {
+                    System.out.println("\nBusiness Rule Task gefunden: " + cleanText(taskNode.getName()));
+                    processOutgoingEdgesForBusinessRuleTask(graph, taskNode);
+                    processIncomingEdges(graph, taskNode);
                 }
 
                 // IntermediateCatchEvent erkennen und weiter verarbeiten
-                if ("IntermediateCatchEvent".equals(activityNode.getActivityType())) {
-                    System.out.println("\nIntermediate Catch Event gefunden: " + cleanText(activityNode.getName()));
-                    processOutgoingEdgesForIntermediateEvent(graph, activityNode, "Catch");
-                    processIncomingEdges(graph, activityNode);
+                if ("IntermediateCatchEvent".equals(taskNode.getActivityType())) {
+                    System.out.println("\nIntermediate Catch Event gefunden: " + cleanText(taskNode.getName()));
+                    processOutgoingEdgesForIntermediateEvent(graph, taskNode, "Catch");
+                    processIncomingEdges(graph, taskNode);
                 }
 
                 // IntermediateThrowEvent erkennen und weiter verarbeiten
-                if ("IntermediateThrowEvent".equals(activityNode.getActivityType())) {
-                    System.out.println("\nIntermediate Throw Event gefunden: " + cleanText(activityNode.getName()));
-                    processOutgoingEdgesForIntermediateEvent(graph, activityNode, "Throw");
-                    processIncomingEdges(graph, activityNode);
+                if ("IntermediateThrowEvent".equals(taskNode.getActivityType())) {
+                    System.out.println("\nIntermediate Throw Event gefunden: " + cleanText(taskNode.getName()));
+                    processOutgoingEdgesForIntermediateEvent(graph, taskNode, "Throw");
+                    processIncomingEdges(graph, taskNode);
                 }
 
                 // Task erkennen und weiter verarbeiten
-                if ("Task".equals(activityNode.getActivityType())) {
-                    System.out.println("\nTask gefunden: " + cleanText(activityNode.getName()));
-                    processOutgoingEdgesForTask(graph, activityNode);
-                    processIncomingEdges(graph, activityNode);
+                if ("Task".equals(taskNode.getActivityType())) {
+                    System.out.println("\nTask gefunden: " + cleanText(taskNode.getName()));
+                    processOutgoingEdgesForTask(graph, taskNode);
+                    processIncomingEdges(graph, taskNode);
                 }
             }
         }
     }
 
-    private void processOutgoingEdgesForIntermediateEvent(BPMNGraph graph, ActivityNode eventNode, String eventType) {
+    private void processOutgoingEdgesForIntermediateEvent(BPMNGraph graph, TaskNode eventNode, String eventType) {
         System.out.println("SBVR-Regeln für ausgehende Kanten (" + eventType + " Event):");
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(eventNode)) {
@@ -89,7 +89,7 @@ public class TaskPatternFinder {
 
 
     // Methode zur Verarbeitung der ausgehenden Kanten
-    private void processOutgoingEdgesForTask(BPMNGraph graph, ActivityNode taskNode) {
+    private void processOutgoingEdgesForTask(BPMNGraph graph, TaskNode taskNode) {
         System.out.println("SBVR-Regeln für ausgehende Kanten:");
 
         for (Edge edge : graph.getEdges()) {
@@ -122,7 +122,7 @@ public class TaskPatternFinder {
 
 
     // Methode zur Verarbeitung der ausgehenden Kanten für ServiceTask
-    private void processOutgoingEdgesForServiceTask(BPMNGraph graph, ActivityNode taskNode) {
+    private void processOutgoingEdgesForServiceTask(BPMNGraph graph, TaskNode taskNode) {
         System.out.println("SBVR-Regeln für ausgehende Kanten (ServiceTask):");
 
         for (Edge edge : graph.getEdges()) {
@@ -144,7 +144,7 @@ public class TaskPatternFinder {
     }
 
     // Methode zur Verarbeitung der ausgehenden Kanten für UserTask
-    private void processOutgoingEdgesForUserTask(BPMNGraph graph, ActivityNode taskNode) {
+    private void processOutgoingEdgesForUserTask(BPMNGraph graph, TaskNode taskNode) {
         System.out.println("SBVR-Regeln für ausgehende Kanten (UserTask):");
 
         for (Edge edge : graph.getEdges()) {
@@ -157,7 +157,7 @@ public class TaskPatternFinder {
                     String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
 
                     // Überprüfe, ob der Zielknoten auch ein UserTask ist
-                    if (targetNode instanceof ActivityNode && "UserTask".equals(((ActivityNode) targetNode).getActivityType())) {
+                    if (targetNode instanceof TaskNode && "UserTask".equals(((TaskNode) targetNode).getActivityType())) {
                         System.out.println("Es ist erforderlich, dass " + targetLane + " " + cleanText(targetNode.getName()) +
                                 " ausgeführt wird, wenn der Benutzer seine Aufgabe abgeschlossen hat.");
                     } else {
@@ -172,7 +172,7 @@ public class TaskPatternFinder {
     }
 
     // Methode zur Verarbeitung der ausgehenden Kanten für BusinessRuleTask
-    private void processOutgoingEdgesForBusinessRuleTask(BPMNGraph graph, ActivityNode taskNode) {
+    private void processOutgoingEdgesForBusinessRuleTask(BPMNGraph graph, TaskNode taskNode) {
         System.out.println("SBVR-Regeln für ausgehende Kanten (BusinessRuleTask):");
 
         for (Edge edge : graph.getEdges()) {
@@ -195,7 +195,7 @@ public class TaskPatternFinder {
 
 
     // Methode zur Verarbeitung der eingehenden Kanten
-    private void processIncomingEdges(BPMNGraph graph, ActivityNode taskNode) {
+    private void processIncomingEdges(BPMNGraph graph, TaskNode taskNode) {
         System.out.println("SBVR-Regeln für eingehende Kanten:");
 
         for (Edge edge : graph.getEdges()) {

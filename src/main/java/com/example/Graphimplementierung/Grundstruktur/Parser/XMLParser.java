@@ -20,11 +20,11 @@ public class XMLParser {
 
             GatewayParser.processGateways(doc, graph);
 
-            DataParser.processDataObjects(doc, graph);
-            DataParser.processDataInputs(doc, graph);
+            DataParser.parseData(doc, graph);
 
             FlowParser.processSequenceFlows(doc, graph);
-            FlowParser.addEdgesToDataInputAssociation(doc, graph);
+            FlowParser.processDataAssociations(doc, graph);
+            FlowParser.processGatewayEdges(doc, graph);
             TaskParser.processParticipants(doc, graph);
 
             FlowParser.processMessageFlows(doc, graph);

@@ -7,7 +7,7 @@ public class ParticipantNode extends Node {
 
     @Override
     public String toString() {
-        return String.format("ParticipantNode{id='%s', name='%s', lane='%s', type='%s'}",
-                getId(), getName(), getLane() != null ? getLane().getName() : "None", getType());
+        return String.format("ParticipantNode{id='%s', name='%s'}",
+                getId(), getName());
     }
 }

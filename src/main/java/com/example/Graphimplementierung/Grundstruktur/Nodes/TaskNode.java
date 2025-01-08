@@ -1,9 +1,9 @@
 package com.example.Graphimplementierung.Grundstruktur.Nodes;
 
-public class ActivityNode extends Node {
+public class TaskNode extends Node {
     private String activityType;  // Der Typ des Knotens (z.B. "Task", "SubProcess", etc.)
 
-    public ActivityNode(String id, String name, Lane lane, String activityType) {
+    public TaskNode(String id, String name, Lane lane, String activityType) {
         super(id, "Activity", name, lane);  // Der Typ für ActivityNode bleibt immer "Activity"
         this.activityType = activityType;  // Setze den Typ (z.B. "Task", "SubProcess")
     }
@@ -14,6 +14,6 @@ public class ActivityNode extends Node {
 
     @Override
     public String toString() {
-        return "ActivityNode{id='" + getId() + "', name='" + getName() + "', lane='" + getLane().getName() + "', activityType='" + activityType + "'}";
+        return "TaskNode{id='" + getId() + "', name='" + getName() + "', lane='" + getLane().getName() + "', activityType='" + activityType + "'}";
     }
 }

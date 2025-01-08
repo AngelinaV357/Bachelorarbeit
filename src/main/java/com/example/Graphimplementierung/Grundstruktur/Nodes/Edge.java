@@ -33,11 +33,15 @@ public class Edge {
         return condition != null && !condition.isEmpty();
     }
 
-
     @Override
     public String toString() {
-        return String.format("Edge{source='%s', target='%s', condition='%s'}",
-                source.getName(), target.getName(),  // Hier den Namen anstelle der ID ausgeben
-                condition != null ? condition : "None");
+        // Standard Edge Ausgabe, ohne Bedingung, wenn sie null oder leer ist
+        if (hasCondition()) {
+            return String.format("Edge{source='%s', target='%s', condition='%s'}",
+                    source.getName(), target.getName(), condition);
+        } else {
+            return String.format("Edge{source='%s', target='%s'}",
+                    source.getName(), target.getName());
+        }
     }
 }

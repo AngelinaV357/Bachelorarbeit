@@ -18,8 +18,8 @@ public class GatewayPatternFinder {
 
     public void findExclusiveGatewayPatterns(BPMNGraph graph) {
         for (Node node : graph.getNodes()) {
-            if (node instanceof ActivityNode && "ExclusiveGateway".equals(((ActivityNode) node).getActivityType())) {
-                ActivityNode gatewayNode = (ActivityNode) node;
+            if (node instanceof TaskNode && "ExclusiveGateway".equals(((TaskNode) node).getActivityType())) {
+                TaskNode gatewayNode = (TaskNode) node;
 
                 // Verhindern der doppelten Ausgabe desselben Gateways
                 if (!processedGateways.contains(gatewayNode.getName())) {
@@ -34,8 +34,8 @@ public class GatewayPatternFinder {
 
     public void findParallelGatewayPatterns(BPMNGraph graph) {
         for (Node node : graph.getNodes()) {
-            if (node instanceof ActivityNode && "ParallelGateway".equals(((ActivityNode) node).getActivityType())) {
-                ActivityNode gatewayNode = (ActivityNode) node;
+            if (node instanceof TaskNode && "ParallelGateway".equals(((TaskNode) node).getActivityType())) {
+                TaskNode gatewayNode = (TaskNode) node;
 
                 // Verhindern der doppelten Ausgabe desselben Gateways
                 if (!processedGateways.contains(gatewayNode.getName())) {
@@ -50,8 +50,8 @@ public class GatewayPatternFinder {
 
     public void findEventBasedGatewayPatterns(BPMNGraph graph) {
         for (Node node : graph.getNodes()) {
-            if (node instanceof ActivityNode && "EventBasedGateway".equals(((ActivityNode) node).getActivityType())) {
-                ActivityNode gatewayNode = (ActivityNode) node;
+            if (node instanceof TaskNode && "EventBasedGateway".equals(((TaskNode) node).getActivityType())) {
+                TaskNode gatewayNode = (TaskNode) node;
 
                 // Verhindern der doppelten Ausgabe desselben Gateways
                 if (!processedGateways.contains(gatewayNode.getName())) {
@@ -65,7 +65,7 @@ public class GatewayPatternFinder {
     }
 
     // Hilfsmethode zur Verarbeitung ausgehender Kanten eines Gateways
-    private void processOutgoingEdges(BPMNGraph graph, ActivityNode gatewayNode) {
+    private void processOutgoingEdges(BPMNGraph graph, TaskNode gatewayNode) {
         System.out.println("Regeln für ausgehende Kanten:");
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(gatewayNode)) {
@@ -87,7 +87,7 @@ public class GatewayPatternFinder {
     }
 
     // Hilfsmethode zur Verarbeitung eingehender Kanten eines Gateways
-    private void processIncomingEdges(BPMNGraph graph, ActivityNode gatewayNode) {
+    private void processIncomingEdges(BPMNGraph graph, TaskNode gatewayNode) {
         System.out.println("Regeln für eingehende Kanten:");
         for (Edge edge : graph.getEdges()) {
             if (edge.getTarget().equals(gatewayNode)) {
