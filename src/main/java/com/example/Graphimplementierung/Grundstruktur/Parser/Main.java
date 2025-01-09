@@ -1,6 +1,6 @@
 package com.example.Graphimplementierung.Grundstruktur.Parser;
 //https://github.com/stackmystack/SBVR-Parsing-Engine?search=1
-//
+//https://github.com/paudan/bpmn-sbvr-extraction/tree/master/src
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
 import com.example.Graphimplementierung.Workflowpatterns.GatewayPatternFinder;
 import com.example.Graphimplementierung.Workflowpatterns.SubProcessPatternFinder;
@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/Employee Onboarding.bpmn");
+            File xmlFile = new File("src/main/resources/May_combine_ingredients.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -37,13 +37,13 @@ public class Main {
 
             // 3. Gateway Pattern Finder initialisieren
             GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
-            gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
+//            gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
             gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
-            gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
+//            gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
 
             // 4. Task Pattern Finder initialisieren (Für alle Tasks)
-            TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
-            taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
+//            TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
+//            taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
 
             // 5. SubProcess Pattern Finder initialisieren
             SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();

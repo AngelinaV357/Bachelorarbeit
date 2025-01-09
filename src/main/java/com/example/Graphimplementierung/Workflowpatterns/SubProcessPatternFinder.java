@@ -28,47 +28,43 @@ public class SubProcessPatternFinder {
         }
     }
 
+    // Bearbeitet ausgehende Kanten und erstellt die zugehörigen SBVR-Regeln
     private void processOutgoingEdges(BPMNGraph graph, TaskNode subProcessNode, StringBuilder sbvrData) {
-        String message = "Regeln für ausgehende Kanten:";
-        System.out.println(message);
-        sbvrData.append(message).append("\n");
-
+        // Durchläuft alle Kanten und erstellt Regeln für die ausgehenden Kanten
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(subProcessNode)) {
                 if (!outputEdges.contains(edge)) {
                     Node targetNode = edge.getTarget();
                     String condition = edge.getCondition();
 
+                    // Regel erstellen, wenn eine Bedingung für die Kante existiert
                     if (condition != null && !condition.isEmpty()) {
-                        message = "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " nach " + cleanText(subProcessNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
-                                cleanText(condition) + "' erfüllt ist.";
+                        String message = "It is obligatory " + cleanText(targetNode.getName()) +
+                                " after " + cleanText(subProcessNode.getName()) + " and after '" +
+                                cleanText(condition) + "' .";
+                        sbvrData.append(message).append("\n");
                     } else {
-                        message = "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                                " nach " + cleanText(subProcessNode.getName()) + " ausgeführt wird.";
+                        String message = "It is obligatory " + cleanText(targetNode.getName()) +
+                                " that " + cleanText(subProcessNode.getName()) + " .";
+                        sbvrData.append(message).append("\n");
                     }
 
-                    System.out.println(message);
-                    sbvrData.append(message).append("\n");
                     outputEdges.add(edge);
                 }
             }
         }
     }
-
+    // Bearbeitet eingehende Kanten und erstellt die zugehörigen SBVR-Regeln
     private void processIncomingEdges(BPMNGraph graph, TaskNode subProcessNode, StringBuilder sbvrData) {
-        String message = "Regeln für eingehende Kanten:";
-        System.out.println(message);
-        sbvrData.append(message).append("\n");
-
+        // Durchläuft alle Kanten und erstellt Regeln für die eingehenden Kanten
         for (Edge edge : graph.getEdges()) {
             if (edge.getTarget().equals(subProcessNode)) {
                 if (!outputEdges.contains(edge)) {
                     Node sourceNode = edge.getSource();
 
-                    message = "Es ist erlaubt, dass " + cleanText(subProcessNode.getName()) +
+                    // Regel für eingehende Kante erstellen
+                    String message = "Es ist erlaubt, dass " + cleanText(subProcessNode.getName()) +
                             " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.";
-                    System.out.println(message);
                     sbvrData.append(message).append("\n");
 
                     outputEdges.add(edge);
