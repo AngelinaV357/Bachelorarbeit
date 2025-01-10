@@ -71,40 +71,38 @@ public class GatewayPatternFinder {
         System.out.println(message);
         sbvrData.append(message).append("\n");
 
-        // Ausgehende Kanten
-        System.out.print("Ausgehende Kanten:\n");
-        sbvrData.append("Ausgehende Kanten:\n");
+        // Ausgehende Kanten: Erzeuge Regeln basierend auf ausgehenden Kanten mit Bedingung
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(gatewayNode)) {
                 String condition = edge.getCondition();
                 Node targetNode = edge.getTarget();
 
+                // Finde die Quelle der Kante, um die vorherige Aktivität zu erhalten
+                Node sourceNode = edge.getSource();
+                String sourceActivityName = "";  // Initialisierung
+                // Suche die eingehende Kante, um die Quelle der vorherigen Aktivität zu finden
+                for (Edge incomingEdge : graph.getEdges()) {
+                    if (incomingEdge.getTarget().equals(gatewayNode)) {
+                        sourceNode = incomingEdge.getSource();
+                        sourceActivityName = cleanText(sourceNode.getName());
+                        break;
+                    }
+                }
+
+                // Regel mit Bedingung erstellen
                 if (condition != null && !condition.isEmpty()) {
-                    message = "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                            " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird, wenn die Bedingung '" +
-                            cleanText(condition) + "' erfüllt ist.";
+                    message = "It is obligatory that " + cleanText(targetNode.getName()) +
+                            " after " + sourceActivityName + " and if " + cleanText(condition) + "";
                 } else {
-                    message = "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                            " nach " + cleanText(gatewayNode.getName()) + " ausgeführt wird.";
+                    message = "It is obligatory that " + cleanText(targetNode.getName()) +
+                            " after " + sourceActivityName;
                 }
                 System.out.println(message);
                 sbvrData.append(message).append("\n");
             }
         }
-
-        // Eingehende Kanten
-        System.out.print("Eingehende Kanten:\n");
-        sbvrData.append("Eingehende Kanten:\n");
-        for (Edge edge : graph.getEdges()) {
-            if (edge.getTarget().equals(gatewayNode)) {
-                Node sourceNode = edge.getSource();
-                message = "Es ist erlaubt, dass " + cleanText(gatewayNode.getName()) +
-                        " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.";
-                System.out.println(message);
-                sbvrData.append(message).append("\n");
-            }
-        }
     }
+
 
     // Bereinigt den Text von unerwünschten Umbrüchen und Leerzeichen
     private String cleanText(String text) {

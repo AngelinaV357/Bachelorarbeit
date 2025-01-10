@@ -17,6 +17,8 @@ public class XMLParser {
             TaskParser.processServiceTasks(doc, graph);
             TaskParser.processBusinessRuleTasks(doc, graph);
             TaskParser.processIntermediateEvents(doc, graph);
+            TaskParser.processParticipants(doc, graph);
+            FlowParser.processMessageFlows(doc, graph);
 
             GatewayParser.processGateways(doc, graph);
 
@@ -25,7 +27,6 @@ public class XMLParser {
             FlowParser.processSequenceFlows(doc, graph);
             FlowParser.processGatewayEdges(doc, graph);
             FlowParser.addEdgesToDataInputAssociation(doc, graph);
-            TaskParser.processParticipants(doc, graph);
 
         } catch (Exception e) {
             e.printStackTrace();

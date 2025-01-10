@@ -45,24 +45,6 @@ public class TaskPatternFinder {
                     processIncomingEdges(graph, taskNode, sbvrDataBuilder);
                 }
 
-                // IntermediateCatchEvent erkennen und verarbeiten
-                if ("IntermediateCatchEvent".equals(taskNode.getActivityType())) {
-                    String message = "\nIntermediate Catch Event gefunden: " + cleanText(taskNode.getName());
-                    System.out.println(message);
-                    sbvrDataBuilder.append(message).append("\n");
-                    processOutgoingEdgesForIntermediateEvent(graph, taskNode, "Catch", sbvrDataBuilder);
-                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-                }
-
-                // IntermediateThrowEvent erkennen und verarbeiten
-                if ("IntermediateThrowEvent".equals(taskNode.getActivityType())) {
-                    String message = "\nIntermediate Throw Event gefunden: " + cleanText(taskNode.getName());
-                    System.out.println(message);
-                    sbvrDataBuilder.append(message).append("\n");
-                    processOutgoingEdgesForIntermediateEvent(graph, taskNode, "Throw", sbvrDataBuilder);
-                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-                }
-
                 // Task erkennen und verarbeiten
                 if ("Task".equals(taskNode.getActivityType())) {
                     String message = "\nTask gefunden: " + cleanText(taskNode.getName());
@@ -87,11 +69,11 @@ public class TaskPatternFinder {
                     String condition = edge.getCondition();
 
                     String rule = (condition != null && !condition.isEmpty())
-                            ? "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                            " ausgeführt wird, nachdem " + cleanText(eventNode.getName()) +
-                            " ausgeführt wird, wenn die Bedingung '" + cleanText(condition) + "' erfüllt ist."
-                            : "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                            " ausgeführt wird, nachdem " + cleanText(eventNode.getName()) + " ausgeführt wird.";
+                            ? "It is permitted that " + cleanText(targetNode.getName()) +
+                            " after " + cleanText(eventNode.getName()) +
+                            " and if'" + cleanText(condition) + "."
+                            : "It is obligatory that " + cleanText(targetNode.getName()) +
+                            " after " + cleanText(eventNode.getName()) + ".";
 
                     System.out.println(rule);
                     sbvrDataBuilder.append(rule).append("\n");
@@ -113,11 +95,11 @@ public class TaskPatternFinder {
                     String condition = edge.getCondition();
 
                     String rule = (condition != null && !condition.isEmpty())
-                            ? "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                            " ausgeführt wird, nachdem " + cleanText(taskNode.getName()) +
-                            " ausgeführt wird, wenn die Bedingung '" + cleanText(condition) + "' erfüllt ist."
-                            : "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                            " ausgeführt wird, nachdem " + cleanText(taskNode.getName()) + " ausgeführt wird.";
+                            ? "It is obligatory that " + cleanText(targetNode.getName()) +
+                            " after " + cleanText(taskNode.getName()) +
+                            " and if '" + cleanText(condition) + "."
+                            : "It is obligatory that " + cleanText(targetNode.getName()) +
+                            " after " + cleanText(taskNode.getName()) + ".";
 
                     System.out.println(rule);
                     sbvrDataBuilder.append(rule).append("\n");
@@ -136,8 +118,13 @@ public class TaskPatternFinder {
             if (edge.getSource().equals(taskNode)) {
                 if (!outputEdges.contains(edge)) {
                     Node targetNode = edge.getTarget();
-                    String rule = "Es ist erforderlich, dass " + cleanText(targetNode.getName()) +
-                            " ausgeführt wird, wenn der Service erfolgreich abgeschlossen wurde.";
+                    Node sourceNode = edge.getSource();
+
+                    String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
+                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+
+                    String rule = "It is obligatory that " + targetLane + " " + cleanText(targetNode.getName()) +
+                            " after " + sourceLane + cleanText(taskNode.getName()) + " and if the service is automated completed.";
                     System.out.println(rule);
                     sbvrDataBuilder.append(rule).append("\n");
                     outputEdges.add(edge);
@@ -155,9 +142,14 @@ public class TaskPatternFinder {
             if (edge.getSource().equals(taskNode)) {
                 if (!outputEdges.contains(edge)) {
                     Node targetNode = edge.getTarget();
+                    Node sourceNode = edge.getSource();
 
-                    String rule = "Es ist erlaubt, dass " + cleanText(targetNode.getName()) +
-                            " nach " + cleanText(taskNode.getName()) + " ausgeführt wird.";
+                    String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
+                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+
+                    String rule = "It is obligatory that " + targetLane + cleanText(targetNode.getName()) +
+                            " after " + sourceLane + cleanText(taskNode.getName()) +
+                            " and if the user task is completed.";
                     System.out.println(rule);
                     sbvrDataBuilder.append(rule).append("\n");
                     outputEdges.add(edge);
@@ -175,9 +167,13 @@ public class TaskPatternFinder {
             if (edge.getTarget().equals(taskNode)) {
                 if (!outputEdges.contains(edge)) {
                     Node sourceNode = edge.getSource();
+                    Node targetNode = edge.getTarget();
 
-                    String rule = "Es ist erlaubt, dass " + cleanText(taskNode.getName()) +
-                            " nach " + cleanText(sourceNode.getName()) + " ausgeführt wird.";
+                    String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
+                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+
+                    String rule = "It is obligatory that " + targetLane + cleanText(taskNode.getName()) +
+                            " after " + sourceLane + " " + cleanText(sourceNode.getName()) + ".";
                     System.out.println(rule);
                     sbvrDataBuilder.append(rule).append("\n");
                     outputEdges.add(edge);
@@ -193,6 +189,7 @@ public class TaskPatternFinder {
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(taskNode)) {
                 if (!outputEdges.contains(edge)) {
+                    Node sourceNode = edge.getSource();
                     Node targetNode = edge.getTarget();
 
                     // Hole die Lane des Quell- und Zielknotens
@@ -200,8 +197,8 @@ public class TaskPatternFinder {
                     String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
 
                     // SBVR-Regel für BusinessRuleTask
-                    String rule = "Es ist notwendig, " + targetLane + " " + cleanText(targetNode.getName()) +
-                            " ausgeführt wird, wenn alle Anforderungen überprüft worden sind.";
+                    String rule = "It is obligatory that " + targetLane + " " + cleanText(targetNode.getName()) +
+                            " after " + sourceLane + " " + cleanText(sourceNode.getName()) + " and if the requirements for the activity have been checked.";
                     System.out.print(rule);
                     sbvrDataBuilder.append(rule).append("\n");
                     outputEdges.add(edge);
