@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/Car Wash Process.bpmn");
+            File xmlFile = new File("src/main/resources/May_combine_ingredients.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
