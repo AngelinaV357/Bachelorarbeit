@@ -8,7 +8,7 @@ import static com.example.XMLIteration.Task.Hilfsmethoden.writeToFile;
 public class SBVRGenerator {
 
     public static void main(String[] args) {
-        File file = new File("src/main/resources/May_combine_ingredients.bpmn");
+        File file = new File("src/main/resources/Employee Onboarding.bpmn");
         File sbvrOutputFile = new File("src/main/resources/sbvr_output.txt");
 
         try {

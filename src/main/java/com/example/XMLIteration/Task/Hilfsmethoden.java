@@ -122,7 +122,7 @@ public class Hilfsmethoden {
     /**
      * Hilfsmethode zum Abrufen der Bedingung für einen Sequenzfluss
      */
-    static String getCondition(SequenceFlow flow) {
+    public static String getCondition(SequenceFlow flow) {
         ConditionExpression condition = flow.getConditionExpression();
         if (condition != null) {
             return condition.getTextContent(); // Rückgabe des Textinhalts der Bedingung

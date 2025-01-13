@@ -43,9 +43,9 @@ public class IntermediateThrowEventAnalyzer {
                             .append(sanitizeName(eventType))
                             .append(" ")
                             .append(throwEventName)
-                            .append(" eine Nachricht '")
+                            .append(" eine Nachricht ")
                             .append(messageName)  // Nachricht hinzufügen
-                            .append("' an ")
+                            .append(" an ")
                             .append(targetName)
                             .append(" sendet.\n");
                 }

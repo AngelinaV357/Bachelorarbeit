@@ -29,7 +29,7 @@ import static com.example.XMLIteration.Task.Data.analyzeServiceTaskTransformer.a
 
 public class BPMNProcessor { //BPMN Modell verarbeiten
     // Liest die BPMN-Datei ein und gibt das BpmnModelInstance zurück
-    static BpmnModelInstance readBpmnFile(File file) {
+    public static BpmnModelInstance readBpmnFile(File file) {
         System.out.println("BPMN-Datei wird eingelesen...");
         return Bpmn.readModelFromFile(file);
     }

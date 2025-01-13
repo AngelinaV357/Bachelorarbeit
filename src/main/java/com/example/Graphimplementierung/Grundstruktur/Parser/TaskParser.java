@@ -53,43 +53,33 @@ public class TaskParser {
                     eventType = "IntermediateThrowEvent"; // Setze auf Throw Event, wenn "Throw" erkannt wird
                 }
 
+                // Bestimme den Sub-Typ (Timer, Message, etc.)
+                String eventSubType = "Unknown"; // Standardwert
+                NodeList childNodes = element.getChildNodes(); // Durchsuche den Scope
+                for (int j = 0; j < childNodes.getLength(); j++) {
+                    Node childNode = childNodes.item(j);
+                    if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+                        String localName = childNode.getLocalName();
+                        if ("timerEventDefinition".equals(localName)) {
+                            eventSubType = "Timer";
+                        } else if ("messageEventDefinition".equals(localName)) {
+                            eventSubType = "Message";
+                        }
+                    }
+                }
+
                 // Extrahiere Lane (falls notwendig)
                 Lane lane = extractLane(element, graph);
 
                 // Erstelle den IntermediateNode und füge ihn dem Graphen hinzu
-                IntermediateNode intermediateNode = new IntermediateNode(id, name, lane, eventType);
+                IntermediateNode intermediateNode = new IntermediateNode(id, name, lane, eventType, eventSubType);
                 graph.addNode(intermediateNode);
 
                 // Ausgabe des Intermediate Node
-                System.out.println("IntermediateNode{id='" + id + "', name='" + name + "', eventType='" + eventType + "'}");
-            }
-        }
-
-        // Zusätzliche Verarbeitung: Message Flows für Intermediate Events
-        NodeList messageFlowNodes = doc.getElementsByTagName("ns0:messageFlow");
-        for (int i = 0; i < messageFlowNodes.getLength(); i++) {
-            Node node = messageFlowNodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) node;
-
-                // Extrahiere die ID, sourceRef und targetRef der Message Flow
-                String id = element.getAttribute("id");
-                String sourceRef = element.getAttribute("sourceRef");
-                String targetRef = element.getAttribute("targetRef");
-
-                // Hole die entsprechenden Knoten aus dem Graphen
-                com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
-                com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
-
-                if (sourceNode != null && targetNode != null) {
-                    // Erstelle eine Kante, die den Message Flow darstellt
-                    Edge messageFlowEdge = new Edge(id, sourceNode, targetNode, "MessageFlow");
-                    graph.addEdge(messageFlowEdge);
-                }
+                System.out.println(intermediateNode);
             }
         }
     }
-
 
 
     static void processStartEndEvents(Document doc, String tagName, String eventType, BPMNGraph graph) {
@@ -221,5 +211,4 @@ public class TaskParser {
             }
         }
     }
-
 }

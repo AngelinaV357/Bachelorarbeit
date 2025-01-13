@@ -4,6 +4,14 @@ const SBVRParser = require('./sbvr-parser/sbvr-parser.js').SBVRParser.createInst
 // Der Pfad zur SBVR-Datei
 const sbvrFilePath = 'generated_rules.sbvr';
 
+// Funktion zur Vorverarbeitung der Regeln
+const preprocessRule = (rule) => {
+    // Beispiel für einfache Transformationen
+    return rule
+        .replace('It is permitted that', 'Permission:')
+        .replace('receives a message from', 'receives:');
+};
+
 // Lies die SBVR-Datei ein
 fs.readFile(sbvrFilePath, 'utf8', (err, data) => {
     if (err) {
@@ -18,15 +26,18 @@ fs.readFile(sbvrFilePath, 'utf8', (err, data) => {
     const rules = data.split('\n'); // Annahme: jede Regel ist durch eine neue Zeile getrennt
 
     rules.forEach(rule => {
-        if (rule.trim()) {
+        if (rule.trim() && rule.length < 200) { // Beschränkung auf kürzere Regeln
             try {
-                // Parsen der Regel
-                const LF = SBVRParser.matchAll(rule, 'Process'); // Hier kannst du je nach Bedarf den richtigen Kontext wählen
-                console.log(`Logische Form für Regel: ${rule}`);
+                const preprocessedRule = preprocessRule(rule);
+                const LF = SBVRParser.matchAll(preprocessedRule, 'Process');
+                console.log(`Logische Form für Regel: ${preprocessedRule}`);
                 console.log(LF);
             } catch (error) {
-                console.error(`Fehler beim Parsen der Regel: ${rule}`, error);
+                console.error(`Fehler beim Parsen der Regel: ${rule}`, error.message);
             }
+        } else {
+            console.warn(`Überspringe komplexe Regel: ${rule}`);
         }
     });
 });
+

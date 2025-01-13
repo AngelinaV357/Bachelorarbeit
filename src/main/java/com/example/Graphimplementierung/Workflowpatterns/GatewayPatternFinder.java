@@ -65,7 +65,6 @@ public class GatewayPatternFinder {
             }
         }
     }
-
     private void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         String message = "SBVR-Regeln für " + cleanText(gatewayNode.getName()) + ":";
         System.out.println(message);
@@ -78,30 +77,47 @@ public class GatewayPatternFinder {
                 Node targetNode = edge.getTarget();
 
                 // Finde die Quelle der Kante, um die vorherige Aktivität zu erhalten
+                String sourceActivityName = "";
                 Node sourceNode = edge.getSource();
-                String sourceActivityName = "";  // Initialisierung
-                // Suche die eingehende Kante, um die Quelle der vorherigen Aktivität zu finden
-                for (Edge incomingEdge : graph.getEdges()) {
-                    if (incomingEdge.getTarget().equals(gatewayNode)) {
-                        sourceNode = incomingEdge.getSource();
+
+                String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
+                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+
+                // Wenn das Gateway den Platzhalternamen hat (d.h., es hat keinen benutzerdefinierten Namen)
+                if ("Exclusive Gateway".equals(cleanText(gatewayNode.getName()))) {
+                    // Suche die eingehende Kante, um die Quelle der vorherigen Aktivität zu finden
+                    for (Edge incomingEdge : graph.getEdges()) {
+                        if (incomingEdge.getTarget().equals(gatewayNode)) {
+                            sourceNode = incomingEdge.getSource();
+                            sourceActivityName = cleanText(sourceNode.getName());
+                            break;
+                        }
+                    }
+
+                } else {
+                    // Regel für den Fall, dass das Gateway einen benutzerdefinierten Namen hat
+                    if (condition != null && !condition.isEmpty()) {
                         sourceActivityName = cleanText(sourceNode.getName());
-                        break;
                     }
                 }
 
                 // Regel mit Bedingung erstellen
                 if (condition != null && !condition.isEmpty()) {
-                    message = "It is obligatory that " + cleanText(targetNode.getName()) +
-                            " after " + sourceActivityName + " and if " + cleanText(condition) + "";
+                    message = "It is obligatory that " + targetLane + " " + cleanText(targetNode.getName()) +
+                            " after " + sourceLane + " " + cleanText(gatewayNode.getName()) + " and if " + sourceActivityName + " is " + cleanText(condition) + ".\n";
                 } else {
-                    message = "It is obligatory that " + cleanText(targetNode.getName()) +
-                            " after " + sourceActivityName;
+                    message = "It is obligatory that " + targetLane + " " + cleanText(targetNode.getName()) +
+                            " after " + sourceLane + " " + sourceActivityName + ".\n";
                 }
                 System.out.println(message);
                 sbvrData.append(message).append("\n");
             }
         }
     }
+
+
+
+
 
 
     // Bereinigt den Text von unerwünschten Umbrüchen und Leerzeichen
