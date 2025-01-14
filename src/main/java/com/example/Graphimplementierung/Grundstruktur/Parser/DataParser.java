@@ -1,9 +1,6 @@
 package com.example.Graphimplementierung.Grundstruktur.Parser;
 
-import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.DataNode;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Lane;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -92,12 +89,9 @@ public class DataParser {
 
                 if (sourceNode != null && targetNode != null) {
                     // Verbindung zwischen Source und Target hinzufügen
-                    graph.addEdge(new Edge(id, sourceNode, targetNode, null));
+                    graph.addEdge(new DataEdge(id, sourceNode, targetNode));
                 }
             }
         }
     }
-
-
-
 }

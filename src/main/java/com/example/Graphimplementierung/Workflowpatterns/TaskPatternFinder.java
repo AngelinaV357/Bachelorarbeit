@@ -83,41 +83,35 @@ public class TaskPatternFinder {
     }
 
 
+
     private void processOutgoingEdgesForTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         for (Edge edge : graph.getEdges()) {
-            if (edge.getSource().equals(taskNode)) {
+            // Prüfen, ob die Kante von der aktuellen Aufgabe (taskNode) ausgeht und keine spezielle Edge ist
+            if (edge.getSource().equals(taskNode) && isNormalEdge(edge)) {
                 // Prüfen, ob die Kante eine Gateway-Kante mit einer zyklischen Bedingung ist
                 if (outputEdges.contains(edge)) {
-                    // Falls eine Kante als Loop markiert wird (bei spezifischen Bedingungen)
                     if (edge.getCondition() != null && !edge.getCondition().isEmpty() && edge.getCondition().equals("no")) {
-//                        System.out.println("Loop entdeckt: " + edge);
-                        // Eine spezielle SBVR-Regel für den Loop ausgeben
                         String loopRule = "It is obligatory that the task " + cleanText(taskNode.getName()) +
                                 " can repeat after encountering the condition '" + cleanText(edge.getCondition()) + "'.\n";
-//                        sbvrDataBuilder.append("Loop entdeckt: ").append(edge).append("\n");
-//                        sbvrDataBuilder.append(loopRule).append("\n");  // Regel für Loop hinzufügen
                     }
-                    continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
+                    continue; // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
                 }
 
                 // Kante als besucht markieren
                 outputEdges.add(edge);
 
                 Node targetNode = edge.getTarget();
-                Node sourceNode = edge.getSource();
                 String condition = edge.getCondition();
-                String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
-                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+                String sourceLane = edge.getSource().getLane() != null ? edge.getSource().getLane().getName() : "Unknown Lane";
+                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unknown Lane";
 
-                // Regel erstellen, basierend auf der Bedingung (falls vorhanden)
+                // Regel basierend auf der Bedingung erstellen
                 String rule = (condition != null && !condition.isEmpty())
-                        ? "It is obligatory that" + " \"" + cleanText(targetLane) + "\" "
-                        + cleanText(targetNode.getName()) +
-                        "\" after \"" + cleanText(taskNode.getName()) +
+                        ? "It is obligatory that \"" + cleanText(targetLane) + "\" \"" + cleanText(targetNode.getName()) +
+                        "\" after \"" + cleanText(sourceLane) + "\" \"" + cleanText(taskNode.getName()) +
                         "\" and if \"" + cleanText(condition) + ".\n"
-                        : "It is obligatory that \"" + targetLane + "\" \""
-                        + cleanText(targetNode.getName()) +
-                        "\" after \"" + sourceLane + "\" \"" + cleanText(taskNode.getName()) + "\".\n";
+                        : "It is obligatory that \"" + cleanText(targetLane) + "\" \"" + cleanText(targetNode.getName()) +
+                        "\" after \"" + cleanText(sourceLane) + "\" \"" + cleanText(taskNode.getName()) + "\".\n";
 
                 System.out.println(rule);
                 sbvrDataBuilder.append(rule).append("\n");
@@ -125,14 +119,12 @@ public class TaskPatternFinder {
         }
     }
 
-
     private void processIncomingEdges(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         for (Edge edge : graph.getEdges()) {
-            if (edge.getTarget().equals(taskNode)) {
+            // Prüfen, ob die Kante zum aktuellen TaskNode führt und keine spezielle Edge ist
+            if (edge.getTarget().equals(taskNode) && isNormalEdge(edge)) {
                 // Prüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
                 if (outputEdges.contains(edge)) {
-//                    System.out.println("Loop entdeckt: " + edge);
-//                    sbvrDataBuilder.append("Loop entdeckt: ").append(edge).append("\n");
                     continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
                 }
 
@@ -151,6 +143,11 @@ public class TaskPatternFinder {
                 sbvrDataBuilder.append(rule).append("\n");
             }
         }
+    }
+
+    // Überprüft, ob die Kante eine normale Edge ist (keine DataEdge, MessageEdge oder GatewayEdge)
+    private boolean isNormalEdge(Edge edge) {
+        return !(edge instanceof DataEdge || edge instanceof MessageEdge || edge instanceof GatewayEdge);
     }
 
 
