@@ -206,6 +206,11 @@
         <ns2:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
         <ns2:signavioMetaData metaKey="externaldocuments" metaValue="[]" />
         <ns2:signavioMetaData metaKey="entry" metaValue="/model/840daa33896f410bb86360498d0fe459" />
+        <camunda:executionListener class="" event="start" />
+        <camunda:executionListener class="" event="start" />
+        <camunda:inputOutput>
+          <camunda:outputParameter name="Output_1blhgsg" />
+        </camunda:inputOutput>
       </ns0:extensionElements>
       <ns0:incoming>sid-A5A41212-0EFB-48AD-9E27-D3987F5A3CB6</ns0:incoming>
       <ns0:outgoing>sid-844F526B-6EEB-4546-B6F3-A5EFBC649265</ns0:outgoing>

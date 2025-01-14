@@ -2,6 +2,7 @@ package com.example.Graphimplementierung.Grundstruktur.Parser;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.DataNode;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Lane;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,5 +48,56 @@ public class DataParser {
         // Verarbeitung von DataInputs
         DataParser.processDataNodes(doc, "ns0:dataInput", "DataInput", graph);
     }
+
+    static void processTextAnnotationsAndAssociations(Document doc, BPMNGraph graph) {
+        // Verarbeite die TextAnnotations und erstelle DataNodes
+        NodeList textAnnotations = doc.getElementsByTagName("ns0:textAnnotation");
+        for (int i = 0; i < textAnnotations.getLength(); i++) {
+            Node node = textAnnotations.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+
+                String id = element.getAttribute("id");
+                NodeList textElements = element.getElementsByTagName("ns0:text");
+                String name = textElements.getLength() > 0 ? textElements.item(0).getTextContent() : null;
+
+                // Wenn der Name leer oder null ist, überspringe die Node
+                if (name == null || name.trim().isEmpty()) {
+                    continue;
+                }
+
+                // Lane extrahieren und zuweisen
+                Lane lane = extractLane(element, graph);
+
+                // DataNode erstellen und zum Graph hinzufügen
+                DataNode dataNode = new DataNode(id, name, lane, "TextAnnotation");
+                graph.addNode(dataNode);
+            }
+        }
+
+        // Verarbeite die Association-Elemente, um Source und Target zu finden
+        NodeList associations = doc.getElementsByTagName("ns0:association");
+        for (int i = 0; i < associations.getLength(); i++) {
+            Node node = associations.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+
+                String id = element.getAttribute("id");
+                String sourceRef = element.getAttribute("sourceRef");
+                String targetRef = element.getAttribute("targetRef");
+
+                // Finde die Knoten im Graph basierend auf den IDs
+                com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
+                com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
+
+                if (sourceNode != null && targetNode != null) {
+                    // Verbindung zwischen Source und Target hinzufügen
+                    graph.addEdge(new Edge(id, sourceNode, targetNode, null));
+                }
+            }
+        }
+    }
+
+
 
 }

@@ -6,40 +6,52 @@ const sbvrFilePath = 'generated_rules.sbvr';
 
 // Definition der Termini
 const terms = {
-    HumanResourcesDept: "Human Resources Department", // Akteur
-    SelectWorkEquipment: "Select necessary work equipment", // Aktivität 1
-    AddPersonalData: "Add personal data", // Aktivität 2
-    theProcess: "the Process", // Der Prozess (optional)
-    Start: "Start", // Start-Aktion
-    End: "End" // End-Aktion
+    "Human Resources Department": "Human Resources Department",
+    "IT-Department": "IT-Department",
+    "Set up access rights, hardware and software": "Set up access rights, hardware and software",
+    "Select necessary work equipment": "Select necessary work equipment",
+    "Add personal data": "Add personal data",
+    "Signed employment contract on file": "Signed employment contract on file",
+    "Parallel Gateway": "Parallel Gateway",
+    "Prepared for employee to start": "Prepared for employee to start",
+    "the Process": "the Process",
+    Start: "Start",
+    End: "End"
 };
 
 // Definition der Verben
 const verbs = {
-    performs: "performs", // Standardverb für Handlungen
-    starts: "starts with", // Starten eines Prozesses
-    ends: "ends with", // Beenden eines Prozesses
-    follows: "follows", // Nachfolgeraktion
+    performs: "performs",
+    starts: "starts with",
+    ends: "ends with",
+    follows: "follows"
 };
 
 // Definition der Fact-Typen
 const factTypes = {
-    Obligation: "Obligation", // Die Verpflichtung (z. B. in "It is obligatory that")
-    ProcessBehavior: "ProcessBehavior", // Prozessverhalten für die Prozessregeln
+    Obligation: "Obligation",
+    ProcessBehavior: "ProcessBehavior"
 };
 
 // Funktion zur Vorverarbeitung der Regeln
 const preprocessRule = (rule) => {
     rule = rule
-        .replace('It is obligatory that', factTypes.Obligation) // Obligation für Regeln
-        .replace(/Human Resources Department/g, terms.HumanResourcesDept) // Akteur ersetzen
-        .replace('after', verbs.follows) // "after" durch "follows" ersetzen
-        .replace('starts with', verbs.starts) // "starts with" durch "starts with" ersetzen
-        .replace('ends with', verbs.ends) // "ends with" durch "ends with" ersetzen
-        .replace('Select necessary work equipment', terms.SelectWorkEquipment) // Aktivität 1
-        .replace('Add personal data', terms.AddPersonalData) // Aktivität 2
+        .replace('It is obligatory that', factTypes.Obligation)
+        .replace('after', verbs.follows)
+        .replace('starts with', verbs.starts)
+        .replace('ends with', verbs.ends)
+        .replace('Human Resources Department', terms["Human Resources Department"])
+        .replace('IT-Department', terms["IT-Department"])
+        .replace('Set up access rights, hardware and software', terms["Set up access rights, hardware and software"])
+        .replace('Select necessary work equipment', terms["Select necessary work equipment"])
+        .replace('Add personal data', terms["Add personal data"])
+        .replace('Signed employment contract on file', terms["Signed employment contract on file"])
+        .replace('Parallel Gateway', terms["Parallel Gateway"])
+        .replace('Prepared for employee to start', terms["Prepared for employee to start"])
         .trim();
 
+    // Optional: Entferne überflüssige Anführungszeichen
+    rule = rule.replace(/"([^"]*)"/g, '$1');
     return rule;
 };
 
@@ -63,7 +75,7 @@ fs.readFile(sbvrFilePath, 'utf8', (err, data) => {
                 console.log(`Vorverarbeitete Regel: ${preprocessedRule}`);
 
                 // Versuche, die vorverarbeitete Regel zu parsen
-                const LF = SBVRParser.matchAll(preprocessedRule, factTypes.Obligation);
+                const LF = SBVRParser.parse(preprocessedRule); // Nutze die richtige Parser-Methode
                 console.log(`Logische Form für Regel: ${preprocessedRule}`);
                 console.log(LF);
             } catch (error) {

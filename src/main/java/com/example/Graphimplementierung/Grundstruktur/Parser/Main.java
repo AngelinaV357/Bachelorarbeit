@@ -41,16 +41,16 @@ public class Main {
             gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
             gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
 
-            // 4. Task Pattern Finder initialisieren (Für alle Tasks)
+//             4. Task Pattern Finder initialisieren (Für alle Tasks)
             TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
             taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
-//            taskPatternFinder.processMessageEdges(graph, sbvrDataBuilder);
+            taskPatternFinder.processMessageEdges(graph, sbvrDataBuilder);
 
 //            // 5. SubProcess Pattern Finder initialisieren
 //            SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();
 //            subProcessPatternFinder.findSubProcessPatterns(graph, sbvrDataBuilder);
 
-            SBVRFileSaver.saveSBVRToFile(sbvrDataBuilder.toString(), "generated_rules.sbvr");
+//            SBVRFileSaver.saveSBVRToFile(sbvrDataBuilder.toString(), "generated_rules.sbvr");
         } catch (Exception e) {
             e.printStackTrace();
         }
