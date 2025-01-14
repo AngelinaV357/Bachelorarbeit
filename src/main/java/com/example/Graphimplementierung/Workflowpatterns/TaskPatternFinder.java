@@ -7,11 +7,24 @@ import java.util.Set;
 
 public class TaskPatternFinder {
 
-    private static Set<Edge> outputEdges = new HashSet<>();
+    private static final Set<Edge> outputEdges = new HashSet<>();
+    private Set<Node> gatewayProcessedNodes;
 
     // Hauptmethode zum Finden aller Task-Typen
     public void findAllTaskPatterns(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+
+        // Fallback-Sicherheitsprüfung
+        if (gatewayProcessedNodes == null) {
+            gatewayProcessedNodes = new HashSet<>();
+        }
+
         for (Node node : graph.getNodes()) {
+            // Prüfe, ob der Knoten bereits in den Gateway-Prozessen verarbeitet wurde
+            if (gatewayProcessedNodes.contains(node)) {
+                System.out.println("Überspringe bereits verarbeiteten Knoten: " + cleanText(node.getName()));
+                continue; // Überspringe diese Knoten
+            }
+
             // StartEventNode erkennen und verarbeiten
             if (node instanceof StartEventNode startEventNode) {
                 String message = "\nStart Event gefunden: " + cleanText(startEventNode.getName());
@@ -20,44 +33,9 @@ public class TaskPatternFinder {
                 processOutgoingEdgesForStartEvent(graph, startEventNode, sbvrDataBuilder);
             }
 
-            if (node instanceof TaskNode) {
-                TaskNode taskNode = (TaskNode) node;
-
-                // UserTask erkennen und verarbeiten
-                if ("UserTask".equals(taskNode.getActivityType())) {
-                    String message = "\nUser Task gefunden: " + cleanText(taskNode.getName());
-                    System.out.println(message);
-                    sbvrDataBuilder.append(message).append("\n");
-                    processOutgoingEdgesForUserTask(graph, taskNode, sbvrDataBuilder);
-                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-                }
-
-                // ServiceTask erkennen und verarbeiten
-                if ("ServiceTask".equals(taskNode.getActivityType())) {
-                    String message = "\nService Task gefunden: " + cleanText(taskNode.getName());
-                    System.out.println(message);
-                    sbvrDataBuilder.append(message).append("\n");
-                    processOutgoingEdgesForServiceTask(graph, taskNode, sbvrDataBuilder);
-                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-                }
-
-                // BusinessRuleTask erkennen und verarbeiten
-                if ("BusinessRuleTask".equals(taskNode.getActivityType())) {
-                    String message = "\nBusiness Rule Task gefunden: " + cleanText(taskNode.getName());
-                    System.out.println(message);
-                    sbvrDataBuilder.append(message).append("\n");
-                    processOutgoingEdgesForBusinessRuleTask(graph, taskNode, sbvrDataBuilder);
-                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-                }
-
-                // Task erkennen und verarbeiten
-                if ("Task".equals(taskNode.getActivityType())) {
-                    String message = "\nTask gefunden: " + cleanText(taskNode.getName());
-                    System.out.println(message);
-                    sbvrDataBuilder.append(message).append("\n");
-                    processOutgoingEdgesForTask(graph, taskNode, sbvrDataBuilder);
-                    processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-                }
+            if (node instanceof TaskNode taskNode) {
+                // Task-Varianten erkennen und verarbeiten
+                processTaskNode(graph, sbvrDataBuilder, taskNode);
             }
 
             // EndEventNode erkennen und verarbeiten
@@ -67,8 +45,43 @@ public class TaskPatternFinder {
                 sbvrDataBuilder.append(message).append("\n");
                 processIncomingEdgesForEndEvent(graph, endEventNode, sbvrDataBuilder);
             }
+            gatewayProcessedNodes.add(node);
         }
     }
+
+    private void processTaskNode(BPMNGraph graph, StringBuilder sbvrDataBuilder, TaskNode taskNode) {
+        switch (taskNode.getActivityType()) {
+            case "UserTask" -> {
+                String message = "\nUser Task gefunden: " + cleanText(taskNode.getName());
+                System.out.println(message);
+                sbvrDataBuilder.append(message).append("\n");
+                processOutgoingEdgesForUserTask(graph, taskNode, sbvrDataBuilder);
+                processIncomingEdges(graph, taskNode, sbvrDataBuilder);
+            }
+            case "ServiceTask" -> {
+                String message = "\nService Task gefunden: " + cleanText(taskNode.getName());
+                System.out.println(message);
+                sbvrDataBuilder.append(message).append("\n");
+                processOutgoingEdgesForServiceTask(graph, taskNode, sbvrDataBuilder);
+                processIncomingEdges(graph, taskNode, sbvrDataBuilder);
+            }
+            case "BusinessRuleTask" -> {
+                String message = "\nBusiness Rule Task gefunden: " + cleanText(taskNode.getName());
+                System.out.println(message);
+                sbvrDataBuilder.append(message).append("\n");
+                processOutgoingEdgesForBusinessRuleTask(graph, taskNode, sbvrDataBuilder);
+                processIncomingEdges(graph, taskNode, sbvrDataBuilder);
+            }
+            case "Task" -> {
+                String message = "\nTask gefunden: " + cleanText(taskNode.getName());
+                System.out.println(message);
+                sbvrDataBuilder.append(message).append("\n");
+                processOutgoingEdgesForTask(graph, taskNode, sbvrDataBuilder);
+                processIncomingEdges(graph, taskNode, sbvrDataBuilder);
+            }
+        }
+    }
+
 
     private void processOutgoingEdgesForTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         for (Edge edge : graph.getEdges()) {
@@ -77,12 +90,12 @@ public class TaskPatternFinder {
                 if (outputEdges.contains(edge)) {
                     // Falls eine Kante als Loop markiert wird (bei spezifischen Bedingungen)
                     if (edge.getCondition() != null && !edge.getCondition().isEmpty() && edge.getCondition().equals("no")) {
-                        System.out.println("Loop entdeckt: " + edge);
+//                        System.out.println("Loop entdeckt: " + edge);
                         // Eine spezielle SBVR-Regel für den Loop ausgeben
                         String loopRule = "It is obligatory that the task " + cleanText(taskNode.getName()) +
                                 " can repeat after encountering the condition '" + cleanText(edge.getCondition()) + "'.\n";
-                        sbvrDataBuilder.append("Loop entdeckt: ").append(edge).append("\n");
-                        sbvrDataBuilder.append(loopRule).append("\n");  // Regel für Loop hinzufügen
+//                        sbvrDataBuilder.append("Loop entdeckt: ").append(edge).append("\n");
+//                        sbvrDataBuilder.append(loopRule).append("\n");  // Regel für Loop hinzufügen
                     }
                     continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
                 }
@@ -98,13 +111,13 @@ public class TaskPatternFinder {
 
                 // Regel erstellen, basierend auf der Bedingung (falls vorhanden)
                 String rule = (condition != null && !condition.isEmpty())
-                        ? "It is obligatory that " + " " + cleanText(targetLane) + " "
+                        ? "It is obligatory that" + " '" + cleanText(targetLane) + "' "
                         + cleanText(targetNode.getName()) +
-                        " after " + cleanText(taskNode.getName()) +
-                        " and if '" + cleanText(condition) + ".\n"
-                        : "It is obligatory that " + " " + cleanText(targetLane) + " "
+                        "after '" + cleanText(taskNode.getName()) +
+                        "' and if '" + cleanText(condition) + ".\n"
+                        : "It is obligatory that " + targetLane + " "
                         + cleanText(targetNode.getName()) +
-                        " after " + " " + cleanText(sourceLane) + " " + cleanText(taskNode.getName()) + " .\n";
+                        " after " + sourceLane + " " + cleanText(taskNode.getName()) + "'.\n";
 
                 System.out.println(rule);
                 sbvrDataBuilder.append(rule).append("\n");
@@ -118,8 +131,8 @@ public class TaskPatternFinder {
             if (edge.getTarget().equals(taskNode)) {
                 // Prüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
                 if (outputEdges.contains(edge)) {
-                    System.out.println("Loop entdeckt: " + edge);
-                    sbvrDataBuilder.append("Loop entdeckt: ").append(edge).append("\n");
+//                    System.out.println("Loop entdeckt: " + edge);
+//                    sbvrDataBuilder.append("Loop entdeckt: ").append(edge).append("\n");
                     continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
                 }
 

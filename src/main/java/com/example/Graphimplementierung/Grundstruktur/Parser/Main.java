@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/May_combine_ingredients.bpmn");
+            File xmlFile = new File("src/main/resources/Employee Onboarding.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -44,11 +44,11 @@ public class Main {
             // 4. Task Pattern Finder initialisieren (Für alle Tasks)
             TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
             taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
-            taskPatternFinder.processMessageEdges(graph, sbvrDataBuilder);
+//            taskPatternFinder.processMessageEdges(graph, sbvrDataBuilder);
 
-            // 5. SubProcess Pattern Finder initialisieren
-            SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();
-            subProcessPatternFinder.findSubProcessPatterns(graph, sbvrDataBuilder);
+//            // 5. SubProcess Pattern Finder initialisieren
+//            SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();
+//            subProcessPatternFinder.findSubProcessPatterns(graph, sbvrDataBuilder);
 
             SBVRFileSaver.saveSBVRToFile(sbvrDataBuilder.toString(), "generated_rules.sbvr");
         } catch (Exception e) {

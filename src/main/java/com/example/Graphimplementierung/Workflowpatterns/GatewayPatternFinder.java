@@ -11,7 +11,8 @@ import java.util.Set;
 public class GatewayPatternFinder {
 
     // Set, um bereits ausgegebene Gateways nachzuverfolgen
-    private Set<String> processedGateways = new HashSet<>();
+    private final Set<String> processedGateways = new HashSet<>();
+    private final Set<Node> gatewayCoveredTasks = new HashSet<>();
 
     public void findExclusiveGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
@@ -40,11 +41,21 @@ public class GatewayPatternFinder {
         System.out.println(message);
         sbvrData.append(message).append("\n");
 
-        // Ausgehende Kanten: Erzeuge Regeln basierend auf ausgehenden Kanten mit Bedingung
+        // Finde alle ausgehenden Kanten und prüfe, ob die Tasks bereits abgedeckt sind
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(gatewayNode)) {
                 String condition = edge.getCondition();
                 Node targetNode = edge.getTarget();
+
+                // Vermeide doppelte Tasks
+                if (targetNode instanceof TaskNode && gatewayCoveredTasks.contains(targetNode)) {
+                    continue; // Task wurde bereits durch das Gateway abgedeckt, überspringe diesen Task
+                }
+
+                // Wenn es sich um einen Task handelt, füge ihn zu den abgedeckten Tasks hinzu
+                if (targetNode instanceof TaskNode) {
+                    gatewayCoveredTasks.add(targetNode);
+                }
 
                 // Finde die Quelle der Kante, um die vorherige Aktivität zu erhalten
                 String sourceActivityName = "";
@@ -63,7 +74,6 @@ public class GatewayPatternFinder {
                             break;
                         }
                     }
-
                 } else {
                     // Regel für den Fall, dass das Gateway einen benutzerdefinierten Namen hat
                     if (condition != null && !condition.isEmpty()) {
@@ -84,6 +94,19 @@ public class GatewayPatternFinder {
             }
         }
     }
+
+    // Methode, um alle Tasks zu speichern, die durch Gateways abgedeckt sind
+    private void extractGatewayTasks(BPMNGraph graph, GatewayNode gatewayNode) {
+        for (Edge edge : graph.getEdges()) {
+            if (edge.getSource().equals(gatewayNode)) {
+                Node targetNode = edge.getTarget();
+                if (targetNode instanceof TaskNode) {
+                    gatewayCoveredTasks.add(targetNode); // Füge den Task hinzu
+                }
+            }
+        }
+    }
+
 
     private void generateExclusiveRule(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         String message = "Zusätzliche SBVR Regel für: " + cleanText(gatewayNode.getName()) + ":";
@@ -171,9 +194,6 @@ public class GatewayPatternFinder {
         }
     }
 
-
-
-
     public void findParallelGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
             if (node instanceof GatewayNode && "Parallel".equals(((GatewayNode) node).getGatewayType())) {
@@ -184,6 +204,9 @@ public class GatewayPatternFinder {
                     System.out.println(message);
                     sbvrData.append(message).append("\n");
 
+                    // Gateway-Tasks extrahieren
+                    extractGatewayTasks(graph, gatewayNode);
+
                     // Generiere die Regeln für paralleles Gateway
                     generateParallelGatewayRules(graph, gatewayNode, sbvrData);
                     processedGateways.add(gatewayNode.getId());
@@ -191,6 +214,7 @@ public class GatewayPatternFinder {
             }
         }
     }
+
 
     private void generateParallelGatewayRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         String message = "SBVR-Regeln für paralleles Gateway " + cleanText(gatewayNode.getName()) + ":";
@@ -265,12 +289,16 @@ public class GatewayPatternFinder {
                     System.out.println(message);
                     sbvrData.append(message).append("\n");
 
+                    // Gateway-Tasks extrahieren
+                    extractGatewayTasks(graph, gatewayNode);
+
                     generateEventBasedGatewayRules(graph, gatewayNode, sbvrData);
                     processedGateways.add(gatewayNode.getId());
                 }
             }
         }
     }
+
 
     private void generateEventBasedGatewayRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         String message = "SBVR-Regeln für Event-Based Gateway " + cleanText(gatewayNode.getName()) + ":";
