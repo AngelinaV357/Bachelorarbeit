@@ -5,6 +5,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 import java.util.Collection;
 
+import static com.example.XMLIteration.Task.Hilfsmethoden.getRoleForNode;
+
 /**
  * Diese Klasse analysiert DataObjects in einem BPMN-Modell und generiert
  * eine textuelle Beschreibung im SBVR-Format basierend auf den gefundenen Verbindungen.
@@ -20,13 +22,15 @@ public class DataObjectAnalysis {
      * @param modelInstance Die BPMN-Modelldatei, die analysiert werden soll.
      * @param sbvrOutput    Der StringBuilder, in den die SBVR-Regeln geschrieben werden.
      */
-    public void analyzeDataObjects(BpmnModelInstance modelInstance, StringBuilder sbvrOutput) {
+    public void analyzeDataObjects(BpmnModelInstance modelInstance, StringBuilder sbvrOutput, Collection<Lane> lanes) {
         // 1. Alle Aktivitäten im Modell finden
         Collection<Activity> activities = modelInstance.getModelElementsByType(Activity.class);
+
 
         // 2. Über alle Aktivitäten iterieren
         for (Activity activity : activities) {
             String activityName = activity.getName();
+            String targetActivityRole = getRoleForNode(activity, lanes);
 
             // ** Verarbeitung von DataInputs **
             // Eingangs-Dateninputs (z. B. explizit als DataInput angegeben)
@@ -38,22 +42,24 @@ public class DataObjectAnalysis {
                 if (sourceElement instanceof DataObjectReference) {
                     DataObjectReference dataObjectRef = (DataObjectReference) sourceElement;
                     String dataObjectName = dataObjectRef.getAttributeValue("name");
-                    sbvrOutput.append("Es ist notwendig, dass die Aktivität '")
+                    sbvrOutput.append("It is obligatory that '")
                             .append(activityName)
-                            .append("' das Datenobjekt '")
+                            .append("' only if '")
                             .append(dataObjectName)
-                            .append("' als Eingabe verwendet.\n");
+                            .append("' is provided to '")
+                            .append(targetActivityRole)
+                            .append("'.\n");
                 }
 
                 // Wenn die Quelle ein DataInput ist
                 if (sourceElement instanceof DataInput) {
                     DataInput dataInput = (DataInput) sourceElement;
                     String dataInputName = dataInput.getAttributeValue("name");
-                    sbvrOutput.append("Es ist notwendig, dass das DataInput '")
+                    sbvrOutput.append("It is obligatory that '")
                             .append(dataInputName)
-                            .append("' der Aktivität '")
+                            .append("' is produced when '")
                             .append(activityName)
-                            .append("' zugeordnet ist.\n");
+                            .append(".\n");
                 }
             }
 
@@ -66,22 +72,24 @@ public class DataObjectAnalysis {
                 if (targetElement instanceof DataObjectReference) {
                     DataObjectReference dataObjectRef = (DataObjectReference) targetElement;
                     String dataObjectName = dataObjectRef.getAttributeValue("name");
-                    sbvrOutput.append("Es ist notwendig, dass die Aktivität '")
+                    sbvrOutput.append("It is obligatory that '")
                             .append(activityName)
-                            .append("' das Datenobjekt '")
+                            .append("' only if '")
                             .append(dataObjectName)
-                            .append("' erzeugt, welches als Ausgabe dient.\n");
+                            .append("' is provided to '")
+                            .append(targetActivityRole)
+                            .append("'.\n");
                 }
 
                 // Wenn das Ziel ein DataInput ist (eher selten, aber möglich)
                 if (targetElement instanceof DataInput) {
                     DataInput dataInput = (DataInput) targetElement;
                     String dataInputName = dataInput.getAttributeValue("name");
-                    sbvrOutput.append("Es ist notwendig, dass das DataInput '")
+                    sbvrOutput.append("It is obligatory that '")
                             .append(dataInputName)
-                            .append("' als Ausgabe von der Aktivität '")
+                            .append("' is produced when '")
                             .append(activityName)
-                            .append("' bereitgestellt wird.\n");
+                            .append("'.\n");
                 }
             }
         }

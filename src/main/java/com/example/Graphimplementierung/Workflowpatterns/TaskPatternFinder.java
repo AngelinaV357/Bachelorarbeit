@@ -88,36 +88,49 @@ public class TaskPatternFinder {
         for (Edge edge : graph.getEdges()) {
             // Prüfen, ob die Kante von der aktuellen Aufgabe (taskNode) ausgeht und keine spezielle Edge ist
             if (edge.getSource().equals(taskNode) && isNormalEdge(edge)) {
-                // Prüfen, ob die Kante eine Gateway-Kante mit einer zyklischen Bedingung ist
+                // Prüfen, ob die Kante bereits besucht wurde
                 if (outputEdges.contains(edge)) {
-                    if (edge.getCondition() != null && !edge.getCondition().isEmpty() && edge.getCondition().equals("no")) {
-                        String loopRule = "It is obligatory that the task " + cleanText(taskNode.getName()) +
-                                " can repeat after encountering the condition '" + cleanText(edge.getCondition()) + "'.\n";
-                    }
                     continue; // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
                 }
 
-                // Kante als besucht markieren
-                outputEdges.add(edge);
-
+                // Regel basierend auf der Bedingung erstellen
                 Node targetNode = edge.getTarget();
                 String condition = edge.getCondition();
                 String sourceLane = edge.getSource().getLane() != null ? edge.getSource().getLane().getName() : "Unknown Lane";
                 String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unknown Lane";
 
-                // Regel basierend auf der Bedingung erstellen
+                // SBVR-Regel basierend auf der Bedingung erstellen
                 String rule = (condition != null && !condition.isEmpty())
                         ? "It is obligatory that \"" + cleanText(targetLane) + "\" \"" + cleanText(targetNode.getName()) +
                         "\" after \"" + cleanText(sourceLane) + "\" \"" + cleanText(taskNode.getName()) +
                         "\" and if \"" + cleanText(condition) + ".\n"
-                        : "It is obligatory that \"" + cleanText(targetLane) + "\" \"" + cleanText(targetNode.getName()) +
-                        "\" after \"" + cleanText(sourceLane) + "\" \"" + cleanText(taskNode.getName()) + "\".\n";
+                        : "It is obligatory that \"" + cleanText(targetLane) + "\" performs \"" + cleanText(targetNode.getName()) +
+                        "\" after \"" + cleanText(sourceLane) + "\" performs \"" + cleanText(taskNode.getName()) + "\".\n";
 
                 System.out.println(rule);
                 sbvrDataBuilder.append(rule).append("\n");
+
+                // Kante als besucht markieren
+                outputEdges.add(edge);
+
+                // Auslagerung der Loop-Bedingung in eine separate Methode
+                handleLoopCondition(taskNode, edge, sbvrDataBuilder);
             }
         }
     }
+
+
+
+    private void handleLoopCondition(TaskNode taskNode, Edge edge, StringBuilder sbvrDataBuilder) {
+        if (edge.getCondition() != null && !edge.getCondition().isEmpty() && edge.getCondition().equals("no")) {
+            String loopRule = "It is obligatory that the task " + cleanText(taskNode.getName()) +
+                    " can repeat after encountering the condition '" + cleanText(edge.getCondition()) + "'.\n";
+            System.out.println(loopRule);
+            sbvrDataBuilder.append(loopRule).append("\n");
+        }
+    }
+
+
 
     private void processIncomingEdges(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         for (Edge edge : graph.getEdges()) {
@@ -137,8 +150,8 @@ public class TaskPatternFinder {
                 String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
                 String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
 
-                String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(taskNode.getName()) +
-                        "\" after \"" + sourceLane + "\" \"" + cleanText(sourceNode.getName()) + "\".\n";
+                String rule = "It is obligatory that \"" + targetLane + "\" performs \"" + cleanText(taskNode.getName()) +
+                        "\" after \"" + sourceLane + "\" performs \"" + cleanText(sourceNode.getName()) + "\".\n";
                 System.out.println(rule);
                 sbvrDataBuilder.append(rule).append("\n");
             }
@@ -153,7 +166,7 @@ public class TaskPatternFinder {
 
     // SBVR-Regeln für ausgehende Kanten von StartEvents
     private void processOutgoingEdgesForStartEvent(BPMNGraph graph, StartEventNode startEventNode, StringBuilder sbvrDataBuilder) {
-        String rule = "It is obligatory that the Process starts with " + cleanText(startEventNode.getName()) + ".\n";
+        String rule = "It is obligatory that the Process starts with \"" + cleanText(startEventNode.getName()) + "\".\n";
         System.out.println(rule);
         sbvrDataBuilder.append(rule).append("\n");
     }

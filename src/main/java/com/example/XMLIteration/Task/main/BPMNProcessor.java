@@ -103,7 +103,7 @@ public class BPMNProcessor { //BPMN Modell verarbeiten
         // Außerhalb der Schleife, da diese nicht direkt an Sequence Flows gebunden sein müssen
         // Zusätzliche Datenanalysen
         DataObjectAnalysis dataObjectAnalysis = new DataObjectAnalysis();
-        dataObjectAnalysis.analyzeDataObjects(modelInstance, sbvrOutput);
+//        dataObjectAnalysis.analyzeDataObjects(modelInstance, sbvrOutput);
 
         TestAnnotationAnalysis analysis = new TestAnnotationAnalysis();
         TestAnnotationAnalysis.analyzeTextAnnotations(modelInstance, sbvrOutput);

@@ -10,9 +10,9 @@ Es ist notwendig, dass die Aktivitäten 'Set up access rights, hardware and soft
 Es ist notwendig, dass 'Procurement' den Subprozess 'Procure work equipment' ausführt, wenn 'Human Resources Department' 'UND-Gateway' aktiv ist und alle eingehenden Pfade abgeschlossen sind.
 
 
-Es ist notwendig, dass das DataInput 'employment contract' der Aktivität 'Add personal data' zugeordnet ist.
-Es ist notwendig, dass die Aktivität 'Select necessary work equipment' das Datenobjekt 'Work equipment' erzeugt, welches als Ausgabe dient.
-Es ist notwendig, dass die Aktivität 'Procure work equipment' das Datenobjekt 'Work equipment' als Eingabe verwendet.
+It is obligatory that 'employment contract' is produced when 'Add personal data.
+It is obligatory that 'Select necessary work equipment' only if 'Work equipment' is provided to lane.
+It is obligatory that 'Procure work equipment' only if 'Work equipment' is provided to lane.
 
 Es ist notwendig, dass die TextAnnotation 'Personnel System' der Aktivität 'Add personal data' zugeordnet ist.
 Es ist notwendig, dass die TextAnnotation 'Personnel System' der Aktivität 'Set up access rights, hardware and software' zugeordnet ist.

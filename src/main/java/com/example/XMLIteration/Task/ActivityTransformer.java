@@ -39,13 +39,13 @@ public class ActivityTransformer implements FlowNodeTransformer {
                     String roleName = getRoleForNode((FlowNode) incomingNode, lanes);
 
                     // Regel für XOR Gateway
-                    sbvrOutput.append("Es ist notwendig, dass '")
+                    sbvrOutput.append("It is obligatory that '")
                             .append(roleName)
-                            .append("' die Aktivität '")
+                            .append("' '")
                             .append(activityName)  // activityName sollte der Name der aktuellen Aktivität sein
-                            .append("' ausführt, wenn das XOR Gateway '")
+                            .append("' if '")
                             .append(gatewayName)
-                            .append("' aktiv ist.\n");
+                            .append("'.\n");
                 } else if (incomingNode instanceof ParallelGateway andGateway) {
                     // AND Gateway-Logik (Parallel-Gateway)
                     String gatewayName = andGateway.getAttributeValue("name");

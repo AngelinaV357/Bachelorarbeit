@@ -1,12 +1,8 @@
 package com.example.Graphimplementierung.Workflowpatterns;
 
-import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.ActivityNode;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Node;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class GatewayPatternFinder {
 
@@ -29,71 +25,96 @@ public class GatewayPatternFinder {
 
                     // Dann die spezifische Regel für das exklusive Gateway
                     generateExclusiveRule(graph, gatewayNode, sbvrData);
+                    generateSBVRRules(graph, gatewayNode, sbvrData);
 
                     processedGateways.add(gatewayNode.getId());
                 }
             }
         }
     }
-//
-//    private void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
-//        String message = "SBVR-Regeln für " + cleanText(gatewayNode.getName()) + ":";
-//        System.out.println(message);
-//        sbvrData.append(message).append("\n");
-//
-//        // Finde alle ausgehenden Kanten und prüfe, ob die Tasks bereits abgedeckt sind
-//        for (Edge edge : graph.getEdges()) {
-//            if (edge.getSource().equals(gatewayNode)) {
-//                String condition = edge.getCondition();
-//                Node targetNode = edge.getTarget();
-//
-//                // Vermeide doppelte Tasks
-//                if (targetNode instanceof TaskNode && gatewayCoveredTasks.contains(targetNode)) {
-//                    continue; // Task wurde bereits durch das Gateway abgedeckt, überspringe diesen Task
-//                }
-//
-//                // Wenn es sich um einen Task handelt, füge ihn zu den abgedeckten Tasks hinzu
-//                if (targetNode instanceof TaskNode) {
-//                    gatewayCoveredTasks.add(targetNode);
-//                }
-//
-//                // Finde die Quelle der Kante, um die vorherige Aktivität zu erhalten
-//                String sourceActivityName = "";
-//                Node sourceNode = edge.getSource();
-//
-//                String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
-//                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
-//
-//                // Wenn das Gateway den Platzhalternamen hat (d.h., es hat keinen benutzerdefinierten Namen)
-//                if ("Exclusive Gateway".equals(cleanText(gatewayNode.getName()))) {
-//                    // Suche die eingehende Kante, um die Quelle der vorherigen Aktivität zu finden
-//                    for (Edge incomingEdge : graph.getEdges()) {
-//                        if (incomingEdge.getTarget().equals(gatewayNode)) {
-//                            sourceNode = incomingEdge.getSource();
-//                            sourceActivityName = cleanText(sourceNode.getName());
-//                            break;
-//                        }
-//                    }
-//                } else {
-//                    // Regel für den Fall, dass das Gateway einen benutzerdefinierten Namen hat
-//                    if (condition != null && !condition.isEmpty()) {
-//                        sourceActivityName = cleanText(sourceNode.getName());
-//                    }
-//                }
-//
-//                // Regel mit Bedingung erstellen
-//                if (condition != null && !condition.isEmpty()) {
-//                    message = "It is obligatory that " + targetLane + " " + cleanText(targetNode.getName()) +
-//                            " after " + sourceLane + " " + cleanText(gatewayNode.getName()) + " and if " + sourceActivityName + " is " + cleanText(condition) + ".\n";
-//                } else {
-//                    message = "It is obligatory that " + targetLane + " " + cleanText(targetNode.getName()) +
-//                            " after " + sourceLane + " " + sourceActivityName + ".\n";
-//                }
-//                System.out.println(message);
-//                sbvrData.append(message).append("\n");
-//            }
-//        }
-//    }
+
+    private void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
+        String message = "SBVR-Regeln für " + cleanText(gatewayNode.getName()) + ":";
+        System.out.println(message);
+        sbvrData.append(message).append("\n");
+
+        // Finde alle ausgehenden Kanten und prüfe, ob die Tasks bereits abgedeckt sind
+        for (Edge edge : graph.getEdges()) {
+            if (edge.getSource().equals(gatewayNode)) {
+                String condition = edge.getCondition();
+                Node targetNode = edge.getTarget();
+
+                // Vermeide doppelte Tasks
+                if (targetNode instanceof TaskNode && gatewayCoveredTasks.contains(targetNode)) {
+                    continue; // Task wurde bereits durch das Gateway abgedeckt, überspringe diesen Task
+                }
+
+                // Wenn es sich um einen Task handelt, füge ihn zu den abgedeckten Tasks hinzu
+                if (targetNode instanceof TaskNode) {
+                    gatewayCoveredTasks.add(targetNode);
+                }
+
+                // Finde die Quelle der Kante, um die vorherige Aktivität zu erhalten
+                String sourceActivityName = "";
+                Node sourceNode = edge.getSource();
+
+                String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
+                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+
+                // Bedingung für das exklusive Gateway
+                if ("Exclusive Gateway".equals(cleanText(gatewayNode.getName()))) {
+                    // Suche die eingehende Kante, um die Quelle der vorherigen Aktivität zu finden
+                    for (Edge incomingEdge : graph.getEdges()) {
+                        if (incomingEdge.getTarget().equals(gatewayNode)) {
+                            sourceNode = incomingEdge.getSource();
+                            sourceActivityName = cleanText(sourceNode.getName());
+                            break;
+                        }
+                    }
+                }
+                // Bedingung für das Event-Based Gateway
+                else if ("EventBased Gateway".equals(cleanText(gatewayNode.getName()))) {
+                    // Suche die eingehende Kante, um die Quelle der vorherigen Aktivität zu finden
+                    for (Edge incomingEdge : graph.getEdges()) {
+                        if (incomingEdge.getTarget().equals(gatewayNode)) {
+                            sourceNode = incomingEdge.getSource();
+                            sourceActivityName = cleanText(sourceNode.getName());
+                            break;
+                        }
+                    }
+                }
+                // Bedingung für das Parallele Gateway
+                else if ("Parallel Gateway".equals(cleanText(gatewayNode.getName()))) {
+                    // Suche die eingehende Kante, um die Quelle der vorherigen Aktivität zu finden
+                    for (Edge incomingEdge : graph.getEdges()) {
+                        if (incomingEdge.getTarget().equals(gatewayNode)) {
+                            sourceNode = incomingEdge.getSource();
+                            sourceActivityName = cleanText(sourceNode.getName());
+                            break;
+                        }
+                    }
+                }
+                else {
+                    // Regel für den Fall, dass das Gateway einen benutzerdefinierten Namen hat
+                    if (condition != null && !condition.isEmpty()) {
+                        sourceActivityName = cleanText(sourceNode.getName());
+                    }
+                }
+
+                // Regel mit Bedingung erstellen
+                if (condition != null && !condition.isEmpty()) {
+                    message = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(targetNode.getName()) +
+                            "\" after \"" + sourceLane + "\" \"" + cleanText(gatewayNode.getName()) + "\" is \"" + cleanText(condition) + "\".\n";
+                } else {
+                    message = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(targetNode.getName()) +
+                            "\" after \"" + sourceLane + "\" \"" + sourceActivityName + "\".\n";
+                }
+                System.out.println(message);
+                sbvrData.append(message).append("\n");
+            }
+        }
+    }
+
 
     // Methode, um alle Tasks zu speichern, die durch Gateways abgedeckt sind
     private void extractGatewayTasks(BPMNGraph graph, GatewayNode gatewayNode, Set<Node> gatewayCoveredTasks) {
@@ -133,33 +154,53 @@ public class GatewayPatternFinder {
             String sourceActivityName = cleanText(gatewayNode.getName());  // Gateway Name als Quelle verwenden
             Node sourceNode = null;
 
-            // Gehe durch alle ausgehenden Kanten
-            for (Edge edge : outgoingEdges) {
-                Node targetNode = edge.getTarget();
-                Node sourceNodeEdge = edge.getSource();
-                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
-                String sourceLane = sourceNodeEdge.getLane() != null ? sourceNodeEdge.getLane().getName() : "Unbekannte Lane";
-
-                // Bedingungen für jede ausgehende Kante
-                if (edge.getCondition() != null && !edge.getCondition().isEmpty()) {
-                    condition = edge.getCondition();
+            // Wenn der Name des Gateways der Platzhaltername ist, finde die Quelle der vorherigen Aktivität
+            if ("Exclusive Gateway".equals(cleanText(gatewayNode.getName()))) {
+                for (Edge incomingEdge : graph.getEdges()) {
+                    if (incomingEdge.getTarget().equals(gatewayNode)) {
+                        sourceNode = incomingEdge.getSource();
+                        sourceActivityName = cleanText(sourceNode.getName());
+                        break;
+                    }
                 }
-
-                // Aktivitäten und Lanes zu den Nachrichten hinzufügen
-                activities.append(cleanText(targetNode.getName())).append(" or ");
-                lanes.append(targetLane).append(" ");
             }
 
-            // Entferne das letzte " or "
-            if (activities.length() > 4) {
-                activities.setLength(activities.length() - 4);
+            // Gehe durch alle ausgehenden Kanten
+            Iterator<Edge> edgeIterator = outgoingEdges.iterator();
+            List<String> activityList = new ArrayList<>();
+            List<String> laneList = new ArrayList<>();
+
+            while (edgeIterator.hasNext()) {
+                Edge edge = edgeIterator.next();
+                Node targetNode = edge.getTarget();
+                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+                String targetNodeName = cleanText(targetNode.getName());
+
+                // Füge Lane und Aktivität zur Liste hinzu
+                activityList.add("\"" + targetNodeName + "\"");
+                laneList.add("\"" + targetLane + "\"");
+
+                // Wenn es nicht das letzte Element ist, fügen wir "or" zwischen den Aktivitäten ein
+                if (edgeIterator.hasNext()) {
+                    activityList.add("or");
+                    laneList.add("or");
+                }
             }
 
             // Regel formulieren
-            message = "It is obligatory that " + lanes + activities +
-                    ", but not both, after " + sourceActivityName + " if " + condition + ".\n";
-            System.out.println(message);
-            sbvrData.append(message).append("\n");
+            StringBuilder finalMessage = new StringBuilder("It is obligatory that ");
+            for (int i = 0; i < activityList.size(); i++) {
+                finalMessage.append(laneList.get(i)).append(" ").append(activityList.get(i));
+                // Vermeide unnötige "or" am Ende der Nachricht
+                if (i < activityList.size() - 1) {
+                    finalMessage.append(" ");
+                }
+            }
+
+            finalMessage.append(", but not both, after \"").append(sourceActivityName).append("\".\n");
+
+            System.out.println(finalMessage.toString());
+            sbvrData.append(finalMessage.toString()).append("\n");
 
         } else if (outgoingEdges.size() == 1) {
             // Gateways, die mehrere Kanten zusammenführen (Merge Gateways)
@@ -189,13 +230,15 @@ public class GatewayPatternFinder {
                 }
 
                 // Regel formulieren
-                message = "It is obligatory that " + incomingLanes + incomingActivities +
-                        " are completed before the execution of " + cleanText(gatewayNode.getName()) + ".\n";
+                message = "It is obligatory that \"" + incomingLanes + "\" \"" + incomingActivities +
+                        "\" are completed before the execution of \"" + cleanText(gatewayNode.getName()) + "\".\n";
                 System.out.println(message);
                 sbvrData.append(message).append("\n");
             }
         }
     }
+
+
 
     public void findParallelGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
@@ -212,6 +255,7 @@ public class GatewayPatternFinder {
 
                     // Generiere die Regeln für paralleles Gateway
                     generateParallelGatewayRules(graph, gatewayNode, sbvrData);
+                    generateSBVRRules(graph, gatewayNode, sbvrData);
 
                     // Gateway als verarbeitet markieren
                     processedGateways.add(gatewayNode.getId());
@@ -327,6 +371,7 @@ public class GatewayPatternFinder {
 
                     // Gateway-Tasks extrahieren
                     extractGatewayTasks(graph, gatewayNode, gatewayCoveredTasks);
+                    generateSBVRRules(graph, gatewayNode, sbvrData);
 
                     generateEventBasedGatewayRules(graph, gatewayNode, sbvrData);
                     processedGateways.add(gatewayNode.getId());

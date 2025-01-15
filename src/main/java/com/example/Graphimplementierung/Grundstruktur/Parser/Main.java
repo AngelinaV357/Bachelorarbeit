@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/Employee Onboarding.bpmn");
+            File xmlFile = new File("src/main/resources/.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -37,16 +37,16 @@ public class Main {
             graph.getEdges().forEach(edge -> System.out.println(cleanText(edge.toString())));
 
             // 3. Gateway Pattern Finder initialisieren
-//            GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
-//            gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
-//            gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
-//            gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
+            GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
+            gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
+            gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
+            gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
 
 //             4. Task Pattern Finder initialisieren (Für alle Tasks)
             TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
             taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
-            DataPatternFinder.generateDataEdgeRules(graph, sbvrDataBuilder);
-            taskPatternFinder.processMessageEdges(graph, sbvrDataBuilder);
+//            DataPatternFinder.generateDataEdgeRules(graph, sbvrDataBuilder);
+//            taskPatternFinder.processMessageEdges(graph, sbvrDataBuilder);
 
 //            // 5. SubProcess Pattern Finder initialisieren
 //            SubProcessPatternFinder subProcessPatternFinder = new SubProcessPatternFinder();
