@@ -167,12 +167,17 @@ public class GatewayPatternFinder {
                 activityList.add("\"" + targetNodeName + "\"");
             }
 
+            // Ausgabe des erkannten Patterns
+            String patternMessage = "Pattern erkannt: Exclusive Choice (XOR-Split)\n";
+            System.out.println(patternMessage);
+            sbvrData.append(patternMessage);
+
             String finalMessage = "It is obligatory that " + String.join(" or ", activityList) + ", but not both, after \"" + sourceActivityName + "\".\n";
             System.out.println(finalMessage);
             sbvrData.append(finalMessage).append("\n");
         }
 
-        // XOR-Merge (Single Merge)
+        // XOR-Merge (Simple Merge)
         if (incomingEdges.size() > 1 && outgoingEdges.size() == 1) {
             List<String> activityList = new ArrayList<>();
             String targetActivityName = cleanText(gatewayNode.getName());
@@ -185,12 +190,18 @@ public class GatewayPatternFinder {
                 activityList.add("\"" + sourceNodeName + "\"");
             }
 
+            // Ausgabe des erkannten Patterns
+            String patternMessage = "Pattern erkannt: Simple Merge (XOR-Merge)\n";
+            System.out.println(patternMessage);
+            sbvrData.append(patternMessage);
+
             String finalMessage = "It is obligatory that exactly one of " + String.join(", ", activityList) + " has occurred before \"" + targetNodeName + "\".\n";
             System.out.println(finalMessage);
             sbvrData.append(finalMessage).append("\n");
         }
 
     }
+
 
     public void findParallelGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
@@ -251,6 +262,11 @@ public class GatewayPatternFinder {
 
             // Falls es mehr als eine ausgehende Kante gibt, parallele Ausführung
             if (outgoingEdges.size() > 1) {
+                // Ausgabe des erkannten Patterns
+                String patternMessage = "Pattern erkannt: Parallel Split\n";
+                System.out.println(patternMessage);
+                sbvrData.append(patternMessage);
+
                 // Finde die Quellaktivität, die das Gateway einleitet
                 for (Edge incomingEdge : graph.getEdges()) {
                     if (incomingEdge.getTarget().equals(gatewayNode)) {
@@ -274,10 +290,15 @@ public class GatewayPatternFinder {
 
                 // Regel formulieren für parallele Ausführung
                 message = "It is obligatory that " + activities +
-                        " are executed simultaneous after " + sourceLane + " " + sourceActivityName + ".";
+                        " are executed simultaneously after " + sourceLane + " " + sourceActivityName + ".";
                 System.out.println(message);
                 sbvrData.append(message).append("\n");
             } else if (incomingEdges.size() > 0) {
+                // Ausgabe des erkannten Patterns
+                String patternMessage = "Pattern erkannt: General And Join\n";
+                System.out.println(patternMessage);
+                sbvrData.append(patternMessage);
+
                 // Merge-Gateway: Regel umkehren
                 StringBuilder mergeActivities = new StringBuilder();
 

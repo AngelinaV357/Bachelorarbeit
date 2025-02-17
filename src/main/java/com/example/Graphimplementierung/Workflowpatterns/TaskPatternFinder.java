@@ -228,10 +228,12 @@ public class TaskPatternFinder {
         sbvrDataBuilder.append(rule).append("\n");
     }
 
-
-
-
-    // SBVR-Regeln für eingehende Kanten von EndEvents
+    /**
+     * Beschreibt das Pattern Excplicit Termination: der gesamte Prozess wird abgebrochen
+     * @param graph
+     * @param endEventNode
+     * @param sbvrDataBuilder
+     */
     private void processIncomingEdgesForEndEvent(BPMNGraph graph, EndEventNode endEventNode, StringBuilder sbvrDataBuilder) {
 
         for (Edge edge : graph.getEdges()) {
@@ -246,6 +248,9 @@ public class TaskPatternFinder {
         }
     }
 
+    /**
+     * Automatic Execution: Automatische Ausführung ohne menschliche Intervention
+     */
     private void processOutgoingEdgesForServiceTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(taskNode)) {
@@ -263,6 +268,9 @@ public class TaskPatternFinder {
         }
     }
 
+    /**
+     * Role-Based Allocation: Eine Aufgabe wird eine Rolle zugewiesen, diese Rolle muss diese Aktivität ausführen
+     */
     private void processOutgoingEdgesForUserTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(taskNode)) {
@@ -282,7 +290,12 @@ public class TaskPatternFinder {
     }
 
 
-    // Methode zur Verarbeitung der ausgehenden Kanten für BusinessRuleTask
+    /**
+     * Beschreibt das Automatic Execution Pattern: dieser prüft automatisch die Anforderung der Aktivität
+     * @param graph
+     * @param taskNode
+     * @param sbvrDataBuilder
+     */
     private void processOutgoingEdgesForBusinessRuleTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(taskNode)) {

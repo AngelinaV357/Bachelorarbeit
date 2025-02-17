@@ -37,14 +37,14 @@ public class Main {
             graph.getEdges().forEach(edge -> System.out.println(cleanText(edge.toString())));
 
             // 3. Gateway Pattern Finder initialisieren
-//            GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
-//            gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
-//            gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
-//            gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
+            GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
+            gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
+            gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
+            gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
 
             // 4. Task Pattern Finder initialisieren (Für alle Tasks)
             TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
-//            taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
+            taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
 //            DataPatternFinder.generateDataEdgeRules(graph, sbvrDataBuilder);
             taskPatternFinder.processMessageEdges(graph, sbvrDataBuilder);
 
