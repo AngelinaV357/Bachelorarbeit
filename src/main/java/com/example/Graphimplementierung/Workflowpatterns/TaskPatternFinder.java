@@ -11,8 +11,8 @@ public class TaskPatternFinder {
     private Set<Node> gatewayProcessedNodes;
 
     // Hauptmethode zum Finden aller Task-Typen
-    public void findAllTaskPatterns(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
 
+    public void findAllTaskPatterns(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         // Fallback-Sicherheitsprüfung
         if (gatewayProcessedNodes == null) {
             gatewayProcessedNodes = new HashSet<>();
@@ -27,10 +27,12 @@ public class TaskPatternFinder {
 
             // StartEventNode erkennen und verarbeiten
             if (node instanceof StartEventNode startEventNode) {
-//                String message = "\nStart Event gefunden: " + cleanText(startEventNode.getName());
-//                System.out.println(message);
-//                sbvrDataBuilder.append(message).append("\n");
                 processOutgoingEdgesForStartEvent(graph, startEventNode, sbvrDataBuilder);
+            }
+
+            if (node instanceof IntermediateNode intermediateNode) {
+                System.out.println("IntermediateNode gefunden: " + cleanText(intermediateNode.getName()));  // Überprüfen, ob der IntermediateNode erkannt wird
+                processIntermediateElements(graph, intermediateNode, sbvrDataBuilder);
             }
 
             if (node instanceof TaskNode taskNode) {
@@ -40,9 +42,6 @@ public class TaskPatternFinder {
 
             // EndEventNode erkennen und verarbeiten
             if (node instanceof EndEventNode endEventNode) {
-//                String message = "\nEnd Event gefunden: " + cleanText(endEventNode.getName());
-//                System.out.println(message);
-//                sbvrDataBuilder.append(message).append("\n");
                 processIncomingEdgesForEndEvent(graph, endEventNode, sbvrDataBuilder);
             }
             gatewayProcessedNodes.add(node);
@@ -132,6 +131,57 @@ public class TaskPatternFinder {
                     " can repeat after encountering the condition '" + cleanText(edge.getCondition()) + "'.\n";
             System.out.println(loopRule);
             sbvrDataBuilder.append(loopRule).append("\n");
+        }
+    }
+
+    /**
+     * Cancel Activity und Interrupting Timer Event Pattern Implementierung
+     * @param graph
+     * @param taskNode
+     * @param sbvrDataBuilder
+     */
+    public void processIntermediateElements(BPMNGraph graph, IntermediateNode taskNode, StringBuilder sbvrDataBuilder) {
+        for (Edge edge : graph.getEdges()) {
+            // Prüfen, ob die Kante ein IntermediateNode als Ziel hat und die Kante keine spezielle Kante ist
+            if (edge.getTarget() instanceof IntermediateNode intermediateNode && edge.getSource().equals(taskNode) && isNormalEdge(edge)) {
+                // Prüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
+                if (outputEdges.contains(edge)) {
+                    continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
+                }
+
+                // Kante als besucht markieren
+                outputEdges.add(edge);
+
+                // Zählen der ausgehenden und eingehenden Kanten des IntermediateNodes
+                long outgoingEdgesCount = graph.getEdges().stream()
+                        .filter(e -> e.getSource().equals(intermediateNode))
+                        .count();
+
+                long incomingEdgesCount = graph.getEdges().stream()
+                        .filter(e -> e.getTarget().equals(intermediateNode))
+                        .count();
+
+                // Debugging-Ausgabe: Zeige die Anzahl der ausgehenden und eingehenden Kanten an
+                System.out.println("Outgoing edges count for " + intermediateNode.getName() + ": " + outgoingEdgesCount);
+                System.out.println("Incoming edges count for " + intermediateNode.getName() + ": " + incomingEdgesCount);
+
+                // Wenn genau eine eingehende und eine ausgehende Kante existieren
+                if (outgoingEdgesCount == 1 && incomingEdgesCount == 1) {
+                    Node sourceNode = edge.getSource();
+                    Node targetNode = edge.getTarget();
+
+                    String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
+                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+
+                    // SBVR-Regel erzeugen
+                    String rule = "It is obligatory that \"" + targetLane + "\" performs \"" + cleanText(intermediateNode.getName()) +
+                            "\" after \"" + sourceLane + "\" performs \"" + cleanText(sourceNode.getName()) + "\", where the event interrupts the activity.\n";
+
+                    // Ausgabe und Anhängen an den StringBuilder
+                    System.out.println(rule);
+                    sbvrDataBuilder.append(rule).append("\n");
+                }
+            }
         }
     }
 
@@ -252,49 +302,98 @@ public class TaskPatternFinder {
         }
     }
 
+    /**
+     * Erkennung folgender Patterns:
+     * Task to Enviroment - Push Orientied: Message Flow vom Task zum Pool
+     * Enviroment to Task - Pull Orientied: Message Flow vom Task zum Pool und zurück vom Pool zum Task
+     * Task to Enviroment - Pull Orientied: Message Flow vom Pool zum Task und zurück vom Task zum Pool
+     * Enviroment to Task - Push Orientied: Message Flow vom Pool zum Task
+     */
     public void processMessageEdges(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+        // Set zum Verfolgen bereits verarbeiteter bidirektionaler Flüsse
+        Set<String> processedEdges = new HashSet<>();
 
         for (Edge edge : graph.getEdges()) {
             String header = "SBVR-Regeln für MessageEdges:";
+
             // Überprüfe, ob die Kante eine MessageEdge ist
             if (edge instanceof MessageEdge) {
                 Node sourceNode = edge.getSource();
                 Node targetNode = edge.getTarget();
 
-                // Prüfe, ob die Quelle ein ParticipantNode ist
-                boolean isSourceParticipant = sourceNode instanceof ParticipantNode;
-
                 // Hole die Lane-Informationen
                 String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
                 String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
 
-                // Generiere die SBVR-Regel für das Senden
-                String sendRule;
-                if (isSourceParticipant) {
-                    sendRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" sends a message to \"" +
-                            cleanText(targetNode.getName()) + "\" .\n";
-                } else {
-                    sendRule = "It is permitted that \"" + sourceLane + "\" \"" + cleanText(sourceNode.getName()) +
-                            "\" sends a message to \"" + cleanText(targetNode.getName()) + "\".\n";
+                // Überprüfe, ob es eine bidirektionale Kante gibt (vom Task zum Pool und zurück)
+                boolean hasReverseEdge = false;
+                for (Edge reverseEdge : graph.getEdges()) {
+                    if (reverseEdge instanceof MessageEdge) {
+                        Node reverseSourceNode = reverseEdge.getSource();
+                        Node reverseTargetNode = reverseEdge.getTarget();
+                        // Stelle sicher, dass der Fluss in der richtigen Reihenfolge ist
+                        if (reverseSourceNode.equals(targetNode) && reverseTargetNode.equals(sourceNode)) {
+                            hasReverseEdge = true;
+                            break;
+                        }
+                    }
                 }
 
-                // Ausgabe und Speichern der Regel für das Senden
-                System.out.println(sendRule);
-                sbvrDataBuilder.append(sendRule).append("\n");
+                // 1. Task to Environment - Push Oriented: Message Flow vom Task zum Pool
+                if (sourceNode instanceof TaskNode && targetNode instanceof ParticipantNode && !hasReverseEdge) {
+                    // Ausgabe für das erkannte Pattern
+                    System.out.println("Pattern erkannt: Task to Environment - Push Oriented (Message Flow vom Task zum Pool)");
 
-                // Generiere die SBVR-Regel für das Empfangen
-                String receiveRule;
-                if (isSourceParticipant) {
-                    receiveRule = "It is permitted that \"" + cleanText(targetNode.getName()) + "\" receives a message from \"" +
-                            cleanText(sourceNode.getName()) + "\".\n";
-                } else {
-                    receiveRule = "It is permitted that \"" + cleanText(targetNode.getName()) +
-                            "\" receives a message from \"" + sourceLane + "\" \"" + cleanText(sourceNode.getName()) + "\".\n";
+                    // Generiere die SBVR-Regel für das Senden (Task sendet Nachricht an Pool)
+                    String sendRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" sends a message to \"" +
+                            cleanText(targetNode.getName()) + "\".\n";
+
+                    // Ausgabe und Speichern der Regel für das Senden
+                    System.out.println(sendRule);
+                    sbvrDataBuilder.append(sendRule).append("\n");
                 }
 
-                // Ausgabe und Speichern der Regel für das Empfangen
-                System.out.println(receiveRule);
-                sbvrDataBuilder.append(receiveRule).append("\n");
+                // 2. Environment to Task - Pull Oriented: Message Flow vom Task zum Pool und zurück vom Pool zum Task
+                if (hasReverseEdge && sourceNode instanceof TaskNode && targetNode instanceof ParticipantNode) {
+                    // Ausgabe für das erkannte Pattern
+                    System.out.println("Pattern erkannt: Environment to Task - Pull Oriented (Message Flow vom Task zum Pool und zurück vom Pool zum Task)");
+
+                    // Generiere die SBVR-Regel für das Senden (Task sendet Nachricht an Pool und empfängt zurück)
+                    String bidirectionalRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" sends and receives messages to and from \"" +
+                            cleanText(targetNode.getName()) + "\".\n";
+
+                    // Ausgabe und Speichern der Regel für den bidirektionalen Flow
+                    System.out.println(bidirectionalRule);
+                    sbvrDataBuilder.append(bidirectionalRule).append("\n");
+                }
+
+                // 3. Task to Environment - Pull Oriented: Message Flow vom Pool zum Task und zurück vom Task zum Pool
+                if (sourceNode instanceof ParticipantNode && targetNode instanceof TaskNode && hasReverseEdge) {
+                    // Ausgabe für das erkannte Pattern
+                    System.out.println("Pattern erkannt: Task to Environment - Pull Oriented (Message Flow vom Pool zum Task und zurück vom Task zum Pool)");
+
+                    // Generiere die SBVR-Regel für das Senden (Pool sendet Nachricht an Task und empfängt zurück)
+                    String bidirectionalRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" sends and receives messages to and from \"" +
+                            cleanText(targetNode.getName()) + "\".\n";
+
+                    // Ausgabe und Speichern der Regel für den bidirektionalen Flow
+                    System.out.println(bidirectionalRule);
+                    sbvrDataBuilder.append(bidirectionalRule).append("\n");
+                }
+
+                // 4. Environment to Task - Push Oriented: Message Flow vom Pool zum Task
+                if (sourceNode instanceof ParticipantNode && targetNode instanceof TaskNode && !hasReverseEdge) {
+                    // Ausgabe für das erkannte Pattern
+                    System.out.println("Pattern erkannt: Environment to Task - Push Oriented (Message Flow vom Pool zum Task)");
+
+                    // Generiere die SBVR-Regel für das Senden (Pool sendet Nachricht an Task)
+                    String sendRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" sends a message to \"" +
+                            cleanText(targetNode.getName()) + "\".\n";
+
+                    // Ausgabe und Speichern der Regel für das Senden
+                    System.out.println(sendRule);
+                    sbvrDataBuilder.append(sendRule).append("\n");
+                }
             }
         }
     }

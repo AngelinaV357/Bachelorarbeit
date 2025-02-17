@@ -42,14 +42,14 @@ public class TaskParser {
                 String name = element.getAttribute("name");
 
                 // Falls kein Name vorhanden ist, setzen wir einen Standardnamen
-                if (name == null || name.isEmpty()) {
+                if (name.isEmpty()) {
                     name = "Intermediate Catch Event";
                 }
 
                 // Bestimme den Event-Typ (Catch oder Throw Event)
                 String eventType = "IntermediateCatchEvent"; // Standardmäßig Catch Event
                 String eventDefinitionRef = element.getAttribute("eventDefinitionRef");
-                if (eventDefinitionRef != null && eventDefinitionRef.contains("Throw")) {
+                if (eventDefinitionRef.contains("Throw")) {
                     eventType = "IntermediateThrowEvent"; // Setze auf Throw Event, wenn "Throw" erkannt wird
                 }
 

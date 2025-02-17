@@ -10,34 +10,23 @@ public class GatewayPatternFinder {
     private final Set<String> processedGateways = new HashSet<>();
     private final Set<Node> gatewayCoveredTasks = new HashSet<>();
 
-
-    /**
-     * Implementierung von Exclusive Choice
-     */
     public void findExclusiveGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
             if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
                 GatewayNode gatewayNode = (GatewayNode) node;
 
                 if (!processedGateways.contains(gatewayNode.getId())) {
-//                    String message = "\nExclusive Gateway gefunden: " + cleanText(gatewayNode.getName());
-//                    System.out.println(message);
-//                    sbvrData.append(message).append("\n");
                     extractGatewayTasks(graph, gatewayNode);
 
-//                    // Zuerst die grundlegenden SBVR-Regeln ausgeben
-//                    generateSBVRRules(graph, gatewayNode, sbvrData);
-
-                    // Dann die spezifische Regel für das exklusive Gateway
-                    generateExclusiveRule(graph, gatewayNode, sbvrData);
-                    generateSBVRRules(graph, gatewayNode, sbvrData);
-                    //generateSBVRRules(graph, gatewayNode, sbvrData);
+                    // Prüfe auf XOR-Split und Single Merge (mehrere ausgehende Kanten)
+                    generateExclusiveChoice(graph, gatewayNode, sbvrData);
 
                     processedGateways.add(gatewayNode.getId());
                 }
             }
         }
     }
+
 
     private void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         String message = "SBVR-Regeln für " + cleanText(gatewayNode.getName()) + ":";
@@ -138,49 +127,69 @@ public class GatewayPatternFinder {
     }
 
 
-
-    private void generateExclusiveRule(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
-        // Finde alle ausgehenden Kanten des exklusiven Gateways
+    /**
+     * Exklusive Choice Pattern: Es wird eine Entscheidung getroffen, welcher von mehreren Pfaden basierend auf einer Bedingung weiterverfolgt wird. Nur ein Pfad wird ausgeführt.
+     * Simple Merge Pattern: die Aktivitäten führen in ein XOR hinein, aber nur einer ist aktiv
+     * @param graph
+     * @param gatewayNode
+     * @param sbvrData
+     */
+    private void generateExclusiveChoice(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         Set<Edge> outgoingEdges = new HashSet<>();
+        Set<Edge> incomingEdges = new HashSet<>();
+
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(gatewayNode)) {
                 outgoingEdges.add(edge);
             }
+            if (edge.getTarget().equals(gatewayNode)) {
+                incomingEdges.add(edge);
+            }
         }
 
-        // Unterscheidung: Gateways mit 2 ausgehenden Kanten
-        if (outgoingEdges.size() == 2) {
-            // Liste der Aktivitäten und Lanes sammeln
+        // 🔹 XOR-Split (Exclusive Choice)
+        if (outgoingEdges.size() > 1) {
             List<String> activityList = new ArrayList<>();
-            List<String> laneList = new ArrayList<>();
             String sourceActivityName = cleanText(gatewayNode.getName());
             Node sourceNode = null;
 
-            // Wenn der Name des Gateways der Platzhaltername ist, finde die Quelle der vorherigen Aktivität
-            if ("Exclusive Gateway".equals(cleanText(gatewayNode.getName()))) {
-                for (Edge incomingEdge : graph.getEdges()) {
-                    if (incomingEdge.getTarget().equals(gatewayNode)) {
-                        sourceNode = incomingEdge.getSource();
-                        sourceActivityName = cleanText(sourceNode.getName());
-                        break;
-                    }
+            if ("Exclusive Gateway".equals(sourceActivityName)) {
+                for (Edge incomingEdge : incomingEdges) {
+                    sourceNode = incomingEdge.getSource();
+                    sourceActivityName = cleanText(sourceNode.getName());
+                    break;
                 }
             }
 
-            // Gehe durch alle ausgehenden Kanten
             for (Edge edge : outgoingEdges) {
                 Node targetNode = edge.getTarget();
-                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unknown Lane";
                 String targetNodeName = cleanText(targetNode.getName());
-
-                activityList.add("\"" + targetLane + "\" \"" + targetNodeName + "\"");
+                activityList.add("\"" + targetNodeName + "\"");
             }
 
-            // Regel formulieren
             String finalMessage = "It is obligatory that " + String.join(" or ", activityList) + ", but not both, after \"" + sourceActivityName + "\".\n";
             System.out.println(finalMessage);
             sbvrData.append(finalMessage).append("\n");
         }
+
+        // XOR-Merge (Single Merge)
+        if (incomingEdges.size() > 1 && outgoingEdges.size() == 1) {
+            List<String> activityList = new ArrayList<>();
+            String targetActivityName = cleanText(gatewayNode.getName());
+            Node targetNode = outgoingEdges.iterator().next().getTarget(); // Es gibt nur einen ausgehenden Pfad
+            String targetNodeName = cleanText(targetNode.getName());
+
+            for (Edge edge : incomingEdges) {
+                Node sourceNode = edge.getSource();
+                String sourceNodeName = cleanText(sourceNode.getName());
+                activityList.add("\"" + sourceNodeName + "\"");
+            }
+
+            String finalMessage = "It is obligatory that exactly one of " + String.join(", ", activityList) + " has occurred before \"" + targetNodeName + "\".\n";
+            System.out.println(finalMessage);
+            sbvrData.append(finalMessage).append("\n");
+        }
+
     }
 
     public void findParallelGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
@@ -206,7 +215,13 @@ public class GatewayPatternFinder {
     }
 
 
-
+    /**
+     * Parallel Split: Eine Aktivität wird in mehrere parallele Pfade aufgeteilt, alle parallelen Aktivitäten werden gleichzeitig ausgeführt
+     * General And Join: Alle eingehenden Pfade werden synchronisiert und müssen abgeschlossen sein, bevor der Pfad fortgesetzt wird
+     * @param graph
+     * @param gatewayNode
+     * @param sbvrData
+     */
     private void generateParallelGatewayRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         String message = "SBVR-Regeln für paralleles Gateway " + cleanText(gatewayNode.getName()) + ":";
         System.out.println(message);
@@ -301,7 +316,7 @@ public class GatewayPatternFinder {
     }
 
     /**
-     * Deferred Choice
+     * Deferred Choice: ermöglicht es eine Entscheidung später im Prozess zu treffen, basierend auf einer Bedingung, die erst später geprüft wird
      */
     public void findEventBasedGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
