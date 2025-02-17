@@ -3,7 +3,7 @@ package com.example.Graphimplementierung.Grundstruktur.Nodes;
 public class Node {
     private final String id;  // final, da ID sich nicht ändern sollte
     private final String type; // Typ der Node (z.B. Task, DataObject)
-    private String name;
+    private final String name;
     private Lane lane;
 
     public Node(String id, String type, String name, Lane lane) {
@@ -30,7 +30,6 @@ public class Node {
         return lane;
     }
 
-    // Setter für Lane (optional)
     public void setLane(Lane lane) {
         this.lane = lane;
     }

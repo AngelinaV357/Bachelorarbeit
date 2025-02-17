@@ -1,10 +1,10 @@
 package com.example.Graphimplementierung.Grundstruktur.Nodes;
 
 public class Edge {
-    private String id;
-    private Node source;
-    private Node target;
-    private String condition;  // Optional, für Bedingungen an den Kanten
+    private final String id;
+    private final Node source;
+    private final Node target;
+    private final String condition;  // Optional, für Bedingungen an den Kanten
 
     public Edge(String id, Node source, Node target, String condition) {
         this.id = id;

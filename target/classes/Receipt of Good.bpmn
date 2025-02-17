@@ -61,12 +61,12 @@
         <ns0:flowNodeRef>sid-BD788E1D-6263-4826-89E7-740E10F636E8</ns0:flowNodeRef>
         <ns0:flowNodeRef>sid-3CD69DC3-FC83-4FD9-ACA2-A8BFA686064C</ns0:flowNodeRef>
         <ns0:flowNodeRef>sid-004F7EB1-F5D8-44B4-BFDB-B745C7F97199</ns0:flowNodeRef>
-        <ns0:flowNodeRef>sid-D093EBC7-6AE6-4AB1-BAD5-1CEE5AE3B22D</ns0:flowNodeRef>
         <ns0:flowNodeRef>sid-78F2E961-6B5E-49D7-9AE3-D76D0C6132B6</ns0:flowNodeRef>
         <ns0:flowNodeRef>sid-19B30181-1EF1-490D-A2BC-E269F6E72A09</ns0:flowNodeRef>
         <ns0:flowNodeRef>sid-93338F33-E9DA-40B2-B42D-19B3567088ED</ns0:flowNodeRef>
         <ns0:flowNodeRef>sid-D046F48D-223E-491B-8DA7-1B0342996DCE</ns0:flowNodeRef>
         <ns0:flowNodeRef>sid-3F4C8464-339E-4516-A096-5A280D70A7C2</ns0:flowNodeRef>
+        <ns0:flowNodeRef>sid-D093EBC7-6AE6-4AB1-BAD5-1CEE5AE3B22D</ns0:flowNodeRef>
       </ns0:lane>
     </ns0:laneSet>
     <ns0:startEvent id="sid-316B8BEE-CB8D-4DCB-A20E-CF743DACF09E" name="Parts&#10; ordered">
@@ -150,18 +150,6 @@
       <ns0:outgoing>sid-906C5996-0F78-4747-8A21-31A83B938C7F</ns0:outgoing>
       <ns0:timerEventDefinition id="sid-f44abeeb-5644-440a-bb59-cbf51b697a58" />
     </ns0:intermediateCatchEvent>
-    <ns0:task id="sid-D093EBC7-6AE6-4AB1-BAD5-1CEE5AE3B22D" name="Raise inquiry with the supplier">
-      <ns0:extensionElements>
-        <ns2:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc" />
-        <ns2:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
-        <ns2:signavioMetaData metaKey="erteiltfreigabe" metaValue="" />
-        <ns2:signavioMetaData metaKey="wirdkonsultiert" metaValue="[]" />
-        <ns2:signavioMetaData metaKey="externaldocuments" metaValue="[]" />
-        <ns2:signavioMetaData metaKey="wirdinformiert" metaValue="[]" />
-      </ns0:extensionElements>
-      <ns0:incoming>sid-906C5996-0F78-4747-8A21-31A83B938C7F</ns0:incoming>
-      <ns0:outgoing>sid-B4BB8B0E-BE58-4864-92AB-7AA1EE9CB37A</ns0:outgoing>
-    </ns0:task>
     <ns0:endEvent id="sid-78F2E961-6B5E-49D7-9AE3-D76D0C6132B6" name="Parts received">
       <ns0:extensionElements>
         <ns2:signavioMetaData metaKey="bgcolor" metaValue="#ffffff" />
@@ -301,6 +289,18 @@
         <ns2:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
       </ns0:extensionElements>
     </ns0:sequenceFlow>
+    <ns0:task id="sid-D093EBC7-6AE6-4AB1-BAD5-1CEE5AE3B22D" name="Raise inquiry with the supplier">
+      <ns0:extensionElements>
+        <ns2:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc" />
+        <ns2:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+        <ns2:signavioMetaData metaKey="erteiltfreigabe" metaValue="" />
+        <ns2:signavioMetaData metaKey="wirdkonsultiert" metaValue="[]" />
+        <ns2:signavioMetaData metaKey="externaldocuments" metaValue="[]" />
+        <ns2:signavioMetaData metaKey="wirdinformiert" metaValue="[]" />
+      </ns0:extensionElements>
+      <ns0:incoming>sid-906C5996-0F78-4747-8A21-31A83B938C7F</ns0:incoming>
+      <ns0:outgoing>sid-B4BB8B0E-BE58-4864-92AB-7AA1EE9CB37A</ns0:outgoing>
+    </ns0:task>
   </ns0:process>
   <ns3:BPMNDiagram id="sid-a8f6d090-d5c9-4504-aeec-3e354b5f585c" name="Receipt of Goods" documentation="This sub-process will take place during the procurement of production parts and was outsourced for reasons of complexity.">
     <ns3:BPMNPlane id="sid-1b31059c-afdd-44a3-a90d-551aa3d57fdf" bpmnElement="sid-7c21c6fd-e76a-45f5-bbbc-62568bb98879">
@@ -359,9 +359,9 @@
         </ns3:BPMNLabel>
       </ns3:BPMNShape>
       <ns3:BPMNShape id="sid-D093EBC7-6AE6-4AB1-BAD5-1CEE5AE3B22D_gui" bpmnElement="sid-D093EBC7-6AE6-4AB1-BAD5-1CEE5AE3B22D">
-        <ns4:Bounds x="562.9684944441724" y="467" width="100" height="80" />
+        <ns4:Bounds x="563" y="467" width="100" height="80" />
         <ns3:BPMNLabel labelStyle="sid-0a2839bc-132c-4f28-b129-ae5a728d10dd">
-          <ns4:Bounds x="567.8399238875318" y="493" width="90.25714111328125" height="24" />
+          <ns4:Bounds x="567.8714294433594" y="493" width="90.25714111328125" height="24" />
         </ns3:BPMNLabel>
       </ns3:BPMNShape>
       <ns3:BPMNShape id="sid-78F2E961-6B5E-49D7-9AE3-D76D0C6132B6_gui" bpmnElement="sid-78F2E961-6B5E-49D7-9AE3-D76D0C6132B6">
@@ -373,7 +373,7 @@
       <ns3:BPMNShape id="sid-19B30181-1EF1-490D-A2BC-E269F6E72A09_gui" bpmnElement="sid-19B30181-1EF1-490D-A2BC-E269F6E72A09" isMarkerVisible="true">
         <ns4:Bounds x="707.9684944441724" y="487" width="40" height="40" />
         <ns3:BPMNLabel labelStyle="sid-6c5030ff-dfb7-41b2-8d1b-48d45cb09fda">
-          <ns4:Bounds x="673.1970711043286" y="454" width="109.5428466796875" height="24" />
+          <ns4:Bounds x="698" y="454" width="60" height="40" />
         </ns3:BPMNLabel>
       </ns3:BPMNShape>
       <ns3:BPMNShape id="sid-93338F33-E9DA-40B2-B42D-19B3567088ED_gui" bpmnElement="sid-93338F33-E9DA-40B2-B42D-19B3567088ED">

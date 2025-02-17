@@ -49,18 +49,4 @@ public class BPMNGraph {
     public Node getNodeById(String nodeid) {
         return nodes.get(nodeid);  // Gibt den Knoten mit der ID zurück, oder null, wenn der Knoten nicht gefunden wurde
     }
-
-    // Knoten nach Lane filtern
-    public List<Node> getNodesByLane(Lane lane) {
-        return nodes.values().stream() // Map.values() liefert Collection<Node>
-                .filter(node -> lane.equals(node.getLane()))
-                .collect(Collectors.toList());
-    }
-
-    // Kanten mit Bedingungen filtern
-    public List<Edge> getEdgesWithConditions() {
-        return edges.stream()
-                .filter(Edge::hasCondition) // Methode hasCondition wird erwartet
-                .collect(Collectors.toList());
-    }
 }

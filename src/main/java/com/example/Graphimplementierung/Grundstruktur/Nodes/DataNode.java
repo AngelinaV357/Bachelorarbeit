@@ -8,10 +8,6 @@ public class DataNode extends Node {
         this.dataType = dataType; // "DataObject" oder "DataInput"
     }
 
-    public String getDataType() {
-        return dataType;
-    }
-
     @Override
     public String toString() {
         // Prüft, ob die Lane vorhanden und nicht "Unknown Lane" ist

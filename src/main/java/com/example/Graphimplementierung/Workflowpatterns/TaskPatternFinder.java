@@ -50,6 +50,11 @@ public class TaskPatternFinder {
     }
 
     private void processTaskNode(BPMNGraph graph, StringBuilder sbvrDataBuilder, TaskNode taskNode) {
+            if (gatewayProcessedNodes.contains(taskNode)) {
+                return;
+            }
+            String message = "Verarbeitete Task Nodes: \n";
+            System.out.print(message);
         switch (taskNode.getActivityType()) {
             case "UserTask" -> {
 //                String message = "\nUser Task gefunden: " + cleanText(taskNode.getName());
@@ -164,8 +169,10 @@ public class TaskPatternFinder {
     }
 
 
-    // SBVR-Regeln für ausgehende Kanten von StartEvents
-    private void processOutgoingEdgesForStartEvent(BPMNGraph graph, StartEventNode startEventNode, StringBuilder sbvrDataBuilder) {
+    private void processOutgoingEdgesForStartEvent(BPMNGraph graph, Node startEventNode, StringBuilder sbvrDataBuilder) {
+        if (!"StartEvent".equals(startEventNode.getType())) {
+            return; // Stelle sicher, dass es wirklich ein StartEvent ist
+        }
         String rule = "It is obligatory that the Process starts with \"" + cleanText(startEventNode.getName()) + "\".\n";
         System.out.println(rule);
         sbvrDataBuilder.append(rule).append("\n");

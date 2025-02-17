@@ -61,7 +61,7 @@ public class TaskParser {
                     if (childNode.getNodeType() == Node.ELEMENT_NODE) {
                         String localName = childNode.getLocalName();
                         if ("timerEventDefinition".equals(localName)) {
-                            eventSubType = "Timer";
+                            eventSubType = "Timer"; // Setze eventSubType auf "Timer", wenn timerEventDefinition gefunden wird
                         } else if ("messageEventDefinition".equals(localName)) {
                             eventSubType = "Message";
                         }
@@ -74,12 +74,10 @@ public class TaskParser {
                 // Erstelle den IntermediateNode und füge ihn dem Graphen hinzu
                 IntermediateNode intermediateNode = new IntermediateNode(id, name, lane, eventType, eventSubType);
                 graph.addNode(intermediateNode);
-
-                // Ausgabe des Intermediate Node
-                System.out.println(intermediateNode);
             }
         }
     }
+
 
 
     static void processStartEndEvents(Document doc, String tagName, String eventType, BPMNGraph graph) {
