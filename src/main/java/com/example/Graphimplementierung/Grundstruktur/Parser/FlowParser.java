@@ -51,13 +51,9 @@ public class FlowParser {
     private static void processAssociations(Document doc, BPMNGraph graph, String tagName) {
         // Holen der Assoziationen für den gegebenen tagName (dataInputAssociation oder dataOutputAssociation)
         NodeList associations = doc.getElementsByTagNameNS("*", tagName);
-        System.out.println("Verarbeite Assoziationen des Typs: " + tagName);
 
         for (int i = 0; i < associations.getLength(); i++) {
             Element element = (Element) associations.item(i);
-
-            // Debugging: Ausgabe der Assoziation
-            System.out.println("Verarbeite Assoziation " + (i + 1) + ": " + element);
 
             // Holen der sourceRef und targetRef aus der Assoziation
             NodeList sourceRefs = element.getElementsByTagName("ns0:sourceRef");

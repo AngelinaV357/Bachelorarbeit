@@ -1,9 +1,6 @@
 package com.example.Graphimplementierung.Workflowpatterns;
 
-import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.DataEdge;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Edge;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.Node;
+import com.example.Graphimplementierung.Grundstruktur.Nodes.*;
 
 import static com.example.Graphimplementierung.Grundstruktur.Parser.Main.cleanText;
 
@@ -20,17 +17,31 @@ public class DataPatternFinder {
                 String sourceName = cleanText(sourceNode.getName());
                 String targetName = cleanText(targetNode.getName());
 
-                String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unknown Lane";
-                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unknown Lane";
+                // Überprüfen, ob der Pfeil auf eine Aktivität zeigt (Incoming)
+                if (targetNode instanceof TaskNode) { // Wenn es sich um eine Aktivität handelt
+                    // Ausgabe für das erkannte "Incoming"-Pattern
+                    System.out.println("Pattern erkannt: Data Transfer by Value - Incoming");
 
-                // Regel formulieren
-                String rule = "It is obligatory that \"" + sourceName +
-                        "\" is associated with \"" + targetName +
-                        "\", and provides the activity with additional information.";
-                System.out.println(rule);
-                sbvrData.append(rule).append("\n");
+                    // Regel formulieren für "Incoming"
+                    String rule = "It is obligatory that \"" + sourceName +
+                            "\" is associated with \"" + targetName +
+                            "\", and provides the activity with additional information.";
+                    System.out.println(rule);
+                    sbvrData.append(rule).append("\n");
+                }
+                // Überprüfen, ob es ein "Outgoing" ist (Daten wird von der Aktivität aus weitergegeben)
+                if (sourceNode instanceof TaskNode) { // Wenn es sich um eine Aktivität handelt
+                    // Ausgabe für das erkannte "Outgoing"-Pattern
+                    System.out.println("Pattern erkannt: Data Transfer by Value - Outgoing");
+
+                    // Regel formulieren für "Outgoing"
+                    String rule = "It is obligatory that \"" + targetName +
+                            "\" is associated with \"" + sourceName +
+                            "\", and sends the activity's output to the next process.";
+                    System.out.println(rule);
+                    sbvrData.append(rule).append("\n");
+                }
             }
         }
     }
-
 }

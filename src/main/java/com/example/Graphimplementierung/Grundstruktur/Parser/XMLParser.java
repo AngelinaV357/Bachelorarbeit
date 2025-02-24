@@ -2,11 +2,12 @@ package com.example.Graphimplementierung.Grundstruktur.Parser;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
 import com.example.Graphimplementierung.Grundstruktur.Nodes.Lane;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.w3c.dom.*;
 
 public class XMLParser {
 
-    public BPMNGraph parseXML(Document doc, BPMNGraph graph) {
+    public BPMNGraph parseXML(Document doc, BPMNGraph graph, BpmnModelInstance modelInstance) {
         try {
             //Verarbeitung der XML-Daten
             TaskParser.processActivityNodes(doc, "ns0:task", "Task", graph);
@@ -23,7 +24,7 @@ public class XMLParser {
             GatewayParser.processGateways(doc, graph);
 
             DataParser.parseData(doc, graph);
-            DataParser.processTextAnnotationsAndAssociations(doc, graph);
+            DataParser.processTextAnnotationsAndAssociations(doc, graph, modelInstance);
 
             FlowParser.processSequenceFlows(doc, graph);
             FlowParser.addEdgesToDataInputAssociation(doc, graph);

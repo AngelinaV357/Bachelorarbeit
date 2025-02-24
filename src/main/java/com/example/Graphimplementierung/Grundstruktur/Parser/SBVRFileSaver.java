@@ -29,7 +29,7 @@ public class SBVRFileSaver {
         StringBuilder sbvrDataBuilder = new StringBuilder();
 
         // SBVR-Daten durch die Verarbeitung von Tasks im Graph generieren
-        taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
+        //taskPatternFinder.findAllTaskPatterns(graph, sbvrDataBuilder);
 
         // Speichern der generierten SBVR-Daten in eine Datei
         String outputFilePath = "generated_rules.sbvr";

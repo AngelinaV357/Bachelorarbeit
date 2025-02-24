@@ -11,14 +11,8 @@
     <sequenceFlow id="Flow_0h4lfzp" sourceRef="Gateway_1dc0h5n" targetRef="Event_1nyl5bj" />
     <task id="Activity_059qj36" name="Test1">
       <incoming>Flow_0odsj8a</incoming>
-      <outgoing>Flow_1a6gb6h</outgoing>
     </task>
     <sequenceFlow id="Flow_0odsj8a" sourceRef="Gateway_1dc0h5n" targetRef="Activity_059qj36" />
-    <intermediateCatchEvent id="Event_1etbi4w" name="Message Boundary">
-      <incoming>Flow_1a6gb6h</incoming>
-      <messageEventDefinition id="MessageEventDefinition_1cdjowr" />
-    </intermediateCatchEvent>
-    <sequenceFlow id="Flow_1a6gb6h" sourceRef="Activity_059qj36" targetRef="Event_1etbi4w" />
   </process>
   <bpmndi:BPMNDiagram id="BpmnDiagram_1">
     <bpmndi:BPMNPlane id="BpmnPlane_1" bpmnElement="Process_1">
@@ -35,12 +29,6 @@
         <omgdc:Bounds x="300" y="180" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1d3u9v0_di" bpmnElement="Event_1etbi4w">
-        <omgdc:Bounds x="512" y="202" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds x="506" y="245" width="48" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0h4lfzp_di" bpmnElement="Flow_0h4lfzp">
         <omgdi:waypoint x="205" y="110" />
         <omgdi:waypoint x="302" y="110" />
@@ -49,10 +37,6 @@
         <omgdi:waypoint x="180" y="135" />
         <omgdi:waypoint x="180" y="220" />
         <omgdi:waypoint x="300" y="220" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1a6gb6h_di" bpmnElement="Flow_1a6gb6h">
-        <omgdi:waypoint x="400" y="220" />
-        <omgdi:waypoint x="512" y="220" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

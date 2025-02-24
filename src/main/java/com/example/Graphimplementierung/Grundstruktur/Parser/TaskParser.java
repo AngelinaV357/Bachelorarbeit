@@ -78,8 +78,6 @@ public class TaskParser {
         }
     }
 
-
-
     static void processStartEndEvents(Document doc, String tagName, String eventType, BPMNGraph graph) {
         NodeList eventNodes = doc.getElementsByTagName(tagName);
         for (int i = 0; i < eventNodes.getLength(); i++) {
@@ -96,12 +94,15 @@ public class TaskParser {
                 // Lane extrahieren und zuweisen
                 Lane lane = extractLane(element, graph);
 
+                // Überprüfen, ob das Endevent ein EscalationEndEvent ist, basierend auf dem Vorhandensein von <escalationEventDefinition>
+                boolean isEscalation = element.getElementsByTagName("escalationEventDefinition").getLength() > 0;
+
                 // EventNode erstellen
                 if (eventType.equals("StartEvent")) {
                     StartEventNode startEventNode = new StartEventNode(id, name, lane);
                     graph.addNode(startEventNode);
                 } else if (eventType.equals("EndEvent")) {
-                    EndEventNode endEventNode = new EndEventNode(id, name, lane);
+                    EndEventNode endEventNode = new EndEventNode(id, name, lane, isEscalation);
                     graph.addNode(endEventNode);
                 }
             }
