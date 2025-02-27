@@ -19,6 +19,7 @@ public class XMLParser {
             TaskParser.processBusinessRuleTasks(doc, graph);
             TaskParser.processIntermediateEvents(doc, graph);
             TaskParser.processParticipants(doc, graph);
+            TaskParser.processBoundaryEventNodes(doc,graph);
             FlowParser.processMessageFlows(doc, graph);
 
             GatewayParser.processGateways(doc, graph);

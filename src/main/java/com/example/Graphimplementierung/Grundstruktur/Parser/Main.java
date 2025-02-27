@@ -19,7 +19,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/May_combine_ingredients.bpmn");
+            File xmlFile = new File("src/main/resources/Procure Parts.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -47,10 +47,6 @@ public class Main {
             System.out.println("\nStarte mit Commencement on Creation Pattern...");
             findCommencementonCreation(graph, sbvrDataBuilder);
 
-            System.out.println("\nStarte mit Sequence-Pattern-Suche...");
-            findSequences(graph, sbvrDataBuilder);
-
-            // Ausgabe strukturieren: Komplexere Patterns zuerst
             System.out.println("Starte mit Gateway-Pattern-Suche...");
             findGateways(graph, sbvrDataBuilder);
 
@@ -60,12 +56,22 @@ public class Main {
             System.out.println("\nStarte mit Task-Pattern-Suche...");
             findTasks(graph, sbvrDataBuilder);
 
+            System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
+            findIntermediateEvents(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
+            findBoundaryEvents(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Sequence Pattern-Suche...");
+            findSequences(graph, sbvrDataBuilder);
+
+
             // Füge hier die Aufrufe für Explicit Termination und Commencement on Creation Pattern hinzu
             System.out.println("\nStarte mit Explicit Termination Pattern...");
             findExplicitTerminationPattern(graph, sbvrDataBuilder);
 
             // 10. Speichern der SBVR-Daten
-            //SBVRFileSaver.saveSBVRToFile(sbvrDataBuilder.toString(), "generated_rules.sbvr");
+            SBVRFileSaver.saveSBVRToFile(sbvrDataBuilder.toString(), "generated_rules.sbvr");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,6 +97,13 @@ public class Main {
         taskPatternFinder.processTaskNode(graph, sbvrDataBuilder);
     }
 
+    // Methode für die Boundary Event Pattern-Suche
+    private static void findBoundaryEvents(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+        TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
+        taskPatternFinder.processBoundaryEvent(graph, sbvrDataBuilder); // Boundary Event Pattern suchen
+    }
+
+
     // Methode für die Sequence Pattern-Suche
     private static void findSequences(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
@@ -107,6 +120,13 @@ public class Main {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
         taskPatternFinder.processOutgoingEdgesForStartEvent(graph, sbvrDataBuilder);
     }
+
+    // Methode für das Finden von Intermediate Event Patterns
+    private static void findIntermediateEvents(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+        TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
+        taskPatternFinder.processIntermediateEvents(graph, sbvrDataBuilder);
+    }
+
 
 
     // Methode zum Entfernen von Zeilenumbrüchen und Tabulatoren

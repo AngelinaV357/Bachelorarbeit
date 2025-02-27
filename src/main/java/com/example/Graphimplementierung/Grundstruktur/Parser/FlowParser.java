@@ -10,9 +10,9 @@ public class FlowParser {
 
     // Methode zur Verarbeitung von normalen Edges ohne Gateways
     public static void processSequenceFlows(Document doc, BPMNGraph graph) {
+        // Über alle SequenceFlow-Elemente iterieren
         NodeList sequenceFlowNodes = doc.getElementsByTagName("ns0:sequenceFlow");
 
-        // Über jedes SequenceFlow iterieren
         for (int i = 0; i < sequenceFlowNodes.getLength(); i++) {
             org.w3c.dom.Node node = sequenceFlowNodes.item(i);
             if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
@@ -27,7 +27,7 @@ public class FlowParser {
                 com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
                 com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
 
-                // Überprüfen, ob die Knoten existieren
+                // Wenn die Knoten nicht existieren, überspringen
                 if (sourceNode == null || targetNode == null) {
                     continue;
                 }
@@ -39,10 +39,68 @@ public class FlowParser {
                 }
             }
         }
+
+        // Über die BoundaryEvents iterieren
+        NodeList boundaryEventNodes = doc.getElementsByTagName("ns0:boundaryEvent");
+
+        for (int i = 0; i < boundaryEventNodes.getLength(); i++) {
+            org.w3c.dom.Node node = boundaryEventNodes.item(i);
+            if (node.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                Element boundaryEventElement = (Element) node;
+
+                String boundaryEventId = boundaryEventElement.getAttribute("id");
+                String boundaryEventName = boundaryEventElement.getAttribute("name")
+                        .replace("&#10;", " ")  // Ersetze HTML-Entity
+                        .replace("\n", " ")      // Ersetze tatsächliche Zeilenumbrüche
+                        .replace("\r", " ")      // Falls Wagenrückläufe ebenfalls vorkommen
+                        .trim();                // Entfernen von führenden/abgeschlossenen Leerzeichen
+
+                String attachedToRef = boundaryEventElement.getAttribute("attachedToRef").trim();
+
+                // Hole den Knoten, an den das Boundary Event angehängt ist
+                com.example.Graphimplementierung.Grundstruktur.Nodes.Node subprocessNode = graph.getNodeById(attachedToRef);
+                if (subprocessNode == null) {
+                    System.out.println("Warnung: Subprozess mit ID " + attachedToRef + " nicht gefunden.");
+                    continue;
+                }
+
+                // Finde die zugehörige SequenceFlow-Verbindung
+                NodeList boundaryEventSequenceFlowNodes = doc.getElementsByTagName("ns0:sequenceFlow");
+                for (int j = 0; j < boundaryEventSequenceFlowNodes.getLength(); j++) {
+                    org.w3c.dom.Node seqNode = boundaryEventSequenceFlowNodes.item(j);
+                    if (seqNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                        Element seqElement = (Element) seqNode;
+
+                        String sequenceFlowId = seqElement.getAttribute("id");
+                        String sourceRef = seqElement.getAttribute("sourceRef").trim();
+                        String targetRef = seqElement.getAttribute("targetRef").trim();
+
+                        // Prüfen, ob die Verbindung vom Boundary Event ausgeht
+                        if (sourceRef.equals(boundaryEventId)) {
+                            // Zielknoten der Verbindung holen
+                            com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
+                            if (targetNode == null) {
+                                System.out.println("Warnung: Zielknoten mit ID " + targetRef + " nicht gefunden.");
+                                continue;
+                            }
+
+                            // Erstelle eine BoundaryEventEdge und füge sie dem Graphen hinzu
+                            BoundaryEventEdge edge = new BoundaryEventEdge(sequenceFlowId, subprocessNode, targetNode, "BoundaryEvent", boundaryEventName);
+                            graph.addEdge(edge);
+
+                            // Debugging-Ausgabe
+                            System.out.println("BoundaryEventEdge{id='" + sequenceFlowId + "', source='" + subprocessNode.getName() +
+                                    "', target='" + targetNode.getName() + "', eventType='BoundaryEvent', condition='" + boundaryEventName + "'}");
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
-    static void addEdgesToDataInputAssociation(Document doc, BPMNGraph graph) {
+
+        static void addEdgesToDataInputAssociation(Document doc, BPMNGraph graph) {
         // Verarbeitung für dataInputAssociation und dataOutputAssociation
         processAssociations(doc, graph, "dataInputAssociation");
         processAssociations(doc, graph, "dataOutputAssociation");

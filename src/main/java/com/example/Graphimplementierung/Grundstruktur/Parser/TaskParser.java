@@ -29,6 +29,8 @@ public class TaskParser {
         }
     }
 
+
+
     static void processIntermediateEvents(Document doc, BPMNGraph graph) {
         // Verarbeite alle Intermediate Catch Events
         NodeList intermediateEventNodes = doc.getElementsByTagName("ns0:intermediateCatchEvent");
@@ -140,6 +142,36 @@ public class TaskParser {
             }
         }
     }
+
+    static void processBoundaryEventNodes(Document doc, BPMNGraph graph) {
+        NodeList boundaryEventNodes = doc.getElementsByTagName("ns0:boundaryEvent");
+        for (int i = 0; i < boundaryEventNodes.getLength(); i++) {
+            Node node = boundaryEventNodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+                String id = element.getAttribute("id");
+
+                // Name des Boundary Event extrahieren
+                String name = element.getAttribute("name");
+
+                // Falls der Name null oder leer ist, überspringe den Knoten
+                if (name == null || name.trim().isEmpty()) {
+                    continue;
+                }
+
+                // Hole die Lane des Boundary Events (falls vorhanden)
+                Lane lane = extractLane(element, graph);  // Deine Logik für Lane extrahieren
+
+                // Extrahiere die Bedingung des Boundary Events
+                String condition = element.getAttribute("condition");  // Bedingung wie "Delivery Problems"
+
+                // BoundaryEventNode erstellen und zum Graphen hinzufügen
+                BoundaryEventNode boundaryEventNode = new BoundaryEventNode(id, name, lane);
+                graph.addNode(boundaryEventNode);  // Füge den BoundaryEventNode zum Graphen hinzu
+            }
+        }
+    }
+
 
     static void processParticipants(Document doc, BPMNGraph graph) {
         // Suche nach den Participant-Knoten im XML-Dokument
