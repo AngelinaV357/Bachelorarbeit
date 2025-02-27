@@ -119,6 +119,46 @@ public class TaskPatternFinder {
         }
     }
 
+    /**
+     * Block Data Pattern: bezieht sich auf das Konzept, bei dem Daten innerhalb eines Subprozesses gesammelt und dann in einem einzigen Block verarbeitet oder gespeichert werden,
+     * bevor sie an den Hauptprozess oder andere Subprozesse weitergegeben werden
+     * @param graph
+     * @param sbvrDataBuilder
+     */
+    public void processSubProcess(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+        if (gatewayProcessedNodes == null) {
+            gatewayProcessedNodes = new HashSet<>();
+        }
+
+        // Durchlaufe alle Knoten im Graphen
+        for (Node node : graph.getNodes()) {
+            // Verarbeite nur Subprozesse
+            if (node instanceof TaskNode taskNode && !gatewayProcessedNodes.contains(taskNode)) {
+
+                // Überprüfen, ob der Knoten vom Typ Subprozess ist
+                if ("SubProcess".equals(taskNode.getActivityType())) {
+                    System.out.println("\nPattern erkannt: Block Data");
+                    String sbvrRule = String.format(
+                            "When the subprocess \"%s\" is executed, the data defined in the properties of the subprocess will be blocked until the subprocess is completed.",
+                            cleanText(taskNode.getName())
+                    );
+                    sbvrDataBuilder.append(sbvrRule).append("\n");
+
+                    // Optional: Ausgabe zur Bestätigung der Regel
+                    System.out.println("SBVR-Regel für Subprozess: " + sbvrRule);
+                }
+
+                // Markiere den TaskNode als verarbeitet
+                gatewayProcessedNodes.add(taskNode);
+
+                // Ausgabe der verarbeiteten Subprozess-TaskNode
+                String message = "Verarbeitete Subprozess Task Node: " + cleanText(taskNode.getName()) + "\n";
+                System.out.print(message);
+            }
+        }
+    }
+
+
 
 
 

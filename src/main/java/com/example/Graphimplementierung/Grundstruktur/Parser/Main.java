@@ -56,14 +56,17 @@ public class Main {
             System.out.println("\nStarte mit Task-Pattern-Suche...");
             findTasks(graph, sbvrDataBuilder);
 
+            System.out.println("\nStarte mit Sequence Pattern-Suche...");
+            findSequences(graph, sbvrDataBuilder);
+
             System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
             findIntermediateEvents(graph, sbvrDataBuilder);
 
+            System.out.println("\nStarte mit Subprozess Pattern-Suche...");
+            findSubProcesses(graph, sbvrDataBuilder);
+
             System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
             findBoundaryEvents(graph, sbvrDataBuilder);
-
-            System.out.println("\nStarte mit Sequence Pattern-Suche...");
-            findSequences(graph, sbvrDataBuilder);
 
 
             // Füge hier die Aufrufe für Explicit Termination und Commencement on Creation Pattern hinzu
@@ -110,6 +113,8 @@ public class Main {
         taskPatternFinder.processSequenceTask(graph, sbvrDataBuilder);
     }
 
+
+
     // Methode für das Finden des Explicit Termination Patterns (EndEvent)
     private static void findExplicitTerminationPattern(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
@@ -125,6 +130,12 @@ public class Main {
     private static void findIntermediateEvents(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
         taskPatternFinder.processIntermediateEvents(graph, sbvrDataBuilder);
+    }
+
+    // Methode für das Finden von Subprozessen (neue Methode für Subprozess Pattern)
+    private static void findSubProcesses(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+        TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
+        taskPatternFinder.processSubProcess(graph, sbvrDataBuilder);
     }
 
 
