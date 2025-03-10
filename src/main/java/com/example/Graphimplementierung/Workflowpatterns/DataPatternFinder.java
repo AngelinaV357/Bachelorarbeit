@@ -6,6 +6,11 @@ import static com.example.Graphimplementierung.Grundstruktur.Parser.Main.cleanTe
 
 public class DataPatternFinder {
 
+    /**
+     * Data Transfer by Value - incoming/Outgoing Pattern
+     * @param graph
+     * @param sbvrData
+     */
     public static void generateDataEdgeRules(BPMNGraph graph, StringBuilder sbvrData) {
         for (Edge edge : graph.getEdges()) {
             // Prüfe, ob die Kante eine DataEdge ist
@@ -23,9 +28,9 @@ public class DataPatternFinder {
                     System.out.println("Pattern erkannt: Data Transfer by Value - Incoming");
 
                     // Regel formulieren für "Incoming"
-                    String rule = "It is obligatory that \"" + sourceName +
-                            "\" is associated with \"" + targetName +
-                            "\", and provides the activity with additional information.";
+                    String rule = "It is obligatory that \"" + targetName +
+                            "\" receives Data  \"" + sourceName +
+                            "\" and uses it to perform its activity. ";
                     System.out.println(rule);
                     sbvrData.append(rule).append("\n");
                 }
@@ -35,9 +40,7 @@ public class DataPatternFinder {
                     System.out.println("Pattern erkannt: Data Transfer by Value - Outgoing");
 
                     // Regel formulieren für "Outgoing"
-                    String rule = "It is obligatory that \"" + targetName +
-                            "\" is associated with \"" + sourceName +
-                            "\", and sends the activity's output to the next process.";
+                    String rule = "It is obligatory that \"" + sourceName + "\" sends its output to \"" + targetName + "\".";
                     System.out.println(rule);
                     sbvrData.append(rule).append("\n");
                 }

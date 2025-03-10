@@ -1,10 +1,8 @@
 package com.example.Graphimplementierung.Grundstruktur.Parser;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.BPMNGraph;
-import com.example.Graphimplementierung.Grundstruktur.Nodes.TaskNode;
 import com.example.Graphimplementierung.Workflowpatterns.DataPatternFinder;
 import com.example.Graphimplementierung.Workflowpatterns.GatewayPatternFinder;
-import com.example.Graphimplementierung.Workflowpatterns.SubProcessPatternFinder;
 import com.example.Graphimplementierung.Workflowpatterns.TaskPatternFinder;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -19,7 +17,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/Procure Parts.bpmn");
+            File xmlFile = new File("src/main/resources/Procurement of Work Equipment.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -56,11 +54,11 @@ public class Main {
             System.out.println("\nStarte mit Task-Pattern-Suche...");
             findTasks(graph, sbvrDataBuilder);
 
-            System.out.println("\nStarte mit Sequence Pattern-Suche...");
-            findSequences(graph, sbvrDataBuilder);
-
             System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
             findIntermediateEvents(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Sequence Pattern-Suche...");
+            findSequences(graph, sbvrDataBuilder);
 
             System.out.println("\nStarte mit Subprozess Pattern-Suche...");
             findSubProcesses(graph, sbvrDataBuilder);

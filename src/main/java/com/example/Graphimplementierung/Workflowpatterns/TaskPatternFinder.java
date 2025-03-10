@@ -139,7 +139,7 @@ public class TaskPatternFinder {
                 if ("SubProcess".equals(taskNode.getActivityType())) {
                     System.out.println("\nPattern erkannt: Block Data");
                     String sbvrRule = String.format(
-                            "When the subprocess \"%s\" is executed, the data defined in the properties of the subprocess will be blocked until the subprocess is completed.",
+                            "It is obligatory, that the data defined in the properties of the subprocess  will be blocked until the subprocess \"%s\" is completed.",
                             cleanText(taskNode.getName())
                     );
                     sbvrDataBuilder.append(sbvrRule).append("\n");
@@ -229,15 +229,15 @@ public class TaskPatternFinder {
         // Durchlaufe alle Knoten im Graphen
         for (Node node : graph.getNodes()) {
             // Überprüfen, ob der Knoten ein IntermediateNode ist und noch nicht verarbeitet wurde
-            if (node instanceof IntermediateNode intermediateNode && !gatewayProcessedNodes.contains(intermediateNode)) {
+            if (node instanceof TaskNode taskNode && !gatewayProcessedNodes.contains(taskNode)) {
                 // Rufe detectIntermediateEvent auf, um Intermediate Events zu erkennen
-                detectIntermediateElements(graph, intermediateNode, sbvrDataBuilder);
+                detectTriggerPatterns(graph, taskNode, sbvrDataBuilder);
 
                 // Markiere den IntermediateNode als verarbeitet
-                gatewayProcessedNodes.add(intermediateNode);
+                gatewayProcessedNodes.add(taskNode);
 
                 // Ausgabe der verarbeiteten IntermediateNode
-                String message = "Verarbeitete Intermediate Event Nodes: " + cleanText(intermediateNode.getName()) + "\n";
+                String message = "Verarbeitete Intermediate Event Nodes: " + cleanText(taskNode.getName()) + "\n";
                 System.out.print(message);
             }
         }
@@ -247,49 +247,75 @@ public class TaskPatternFinder {
 
 
     /**
-     * Event-Based Trigger Pattern: ein Intermediate Event, das verwendet wird, um eine Auswahl basierend auf einem eintreffenden Ereignis zu treffen
+     * Event-Based Trigger Pattern und Persistent Trigger Pattern:
+     * - Event-Based Trigger Pattern, wenn nach einem Event-Based Gateway ein Intermediate Event folgt
+     * - Persistent Trigger Pattern, wenn ein Intermediate Catch Event (Message) eintrifft
      * @param graph
      * @param taskNode
      * @param sbvrDataBuilder
      */
-    public void detectIntermediateElements(BPMNGraph graph, IntermediateNode taskNode, StringBuilder sbvrDataBuilder) {
+    public void detectTriggerPatterns(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        if (gatewayProcessedNodes == null) {
+            gatewayProcessedNodes = new HashSet<>();
+        }
+
+        // Durchlaufe alle Kanten im Graphen
         for (Edge edge : graph.getEdges()) {
-            // Prüfen, ob die Kante ein IntermediateNode als Ziel hat und die Kante keine spezielle Kante ist
-            if (edge.getTarget() instanceof IntermediateNode intermediateNode && edge.getSource().equals(taskNode) && isNormalEdge(edge)) {
-                // Prüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
-                if (outputEdges.contains(edge)) {
-                    continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
+            // Prüfen, ob die Kante den aktuellen TaskNode als Quelle hat
+            if (edge.getSource().equals(taskNode)) {
+                Node targetNode = edge.getTarget();
+
+                // Event-Based Trigger Pattern: Prüfen, ob nach einem Event-Based Gateway ein Intermediate Event kommt
+                if (targetNode instanceof IntermediateNode intermediateNode &&
+                        "IntermediateCatchEvent".equals(intermediateNode.getEventType())) {
+
+                    // Prüfen, ob das Intermediate Event ein Event-Based Gateway aktiviert
+                    if ("EventBased".equals(intermediateNode.getEventSubType())) {
+                        // Überprüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
+                        if (outputEdges.contains(edge)) {
+                            continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
+                        }
+
+                        // Kante als besucht markieren
+                        outputEdges.add(edge);
+
+                        String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
+                        String targetLane = intermediateNode.getLane() != null ? intermediateNode.getLane().getName() : "Unbekannte Lane";
+
+                        System.out.println("\nPattern erkannt: Event-Based Trigger");
+
+                        // SBVR-Regel erzeugen: Event-Based Trigger
+                        String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(intermediateNode.getName()) +
+                                "\" is triggered after \"" + sourceLane + "\" \"" + cleanText(taskNode.getName()) + "\", where the event-based gateway is followed by the event.\n";
+
+                        // Ausgabe und Anhängen an den StringBuilder
+                        System.out.println(rule);
+                        sbvrDataBuilder.append(rule).append("\n");
+                    }
                 }
 
-                // Kante als besucht markieren
-                outputEdges.add(edge);
+                // Persistent Trigger Pattern: Prüfen, ob das Ziel ein Intermediate Catch Event vom Typ Message ist
+                if (targetNode instanceof IntermediateNode intermediateNode &&
+                        "IntermediateCatchEvent".equals(intermediateNode.getEventType()) &&
+                        "Message".equals(intermediateNode.getEventSubType())) {
 
-                // Zählen der ausgehenden und eingehenden Kanten des IntermediateNodes
-                long outgoingEdgesCount = graph.getEdges().stream()
-                        .filter(e -> e.getSource().equals(intermediateNode))
-                        .count();
+                    // Überprüfen, ob der Knoten bereits verarbeitet wurde
+                    if (gatewayProcessedNodes.contains(taskNode)) {
+                        continue; // Weiter mit der nächsten Kante, wenn der Knoten schon verarbeitet wurde
+                    }
 
-                long incomingEdgesCount = graph.getEdges().stream()
-                        .filter(e -> e.getTarget().equals(intermediateNode))
-                        .count();
+                    // Markiere den Knoten als verarbeitet
+                    gatewayProcessedNodes.add(taskNode);
 
-                // Debugging-Ausgabe: Zeige die Anzahl der ausgehenden und eingehenden Kanten an
-                System.out.println("Outgoing edges count for " + intermediateNode.getName() + ": " + outgoingEdgesCount);
-                System.out.println("Incoming edges count for " + intermediateNode.getName() + ": " + incomingEdgesCount);
-
-                // Wenn genau eine eingehende und eine ausgehende Kante existieren
-                if (outgoingEdgesCount == 1 && incomingEdgesCount == 1) {
-                    Node sourceNode = edge.getSource();
-                    Node targetNode = edge.getTarget();
-
+                    // Erstelle die SBVR-Regel für das Persistent Trigger Pattern
                     String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
-                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+                    String targetLane = intermediateNode.getLane() != null ? intermediateNode.getLane().getName() : "Unbekannte Lane";
 
-                    System.out.println("\nPattern erkannt: Event-Based Trigger");
+                    System.out.println("\nPattern erkannt: Persistent Trigger");
 
-                    // SBVR-Regel erzeugen
-                    String rule = "It is obligatory that \"" + targetLane + "\" performs \"" + cleanText(intermediateNode.getName()) +
-                            "\" after \"" + sourceLane + "\" performs \"" + cleanText(sourceNode.getName()) + "\", where the event interrupts the activity.\n";
+                    // SBVR-Regel erzeugen: Das Ereignis wird die Aufgabe „unterbrechen“, bis die Nachricht eintrifft.
+                    String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(intermediateNode.getName()) +
+                            "\" persists until \"" + sourceLane + "\" \"" + cleanText(taskNode.getName()) + "\" receives the message.\n";
 
                     // Ausgabe und Anhängen an den StringBuilder
                     System.out.println(rule);
@@ -298,6 +324,7 @@ public class TaskPatternFinder {
             }
         }
     }
+
 
 
 
@@ -656,8 +683,8 @@ public class TaskPatternFinder {
                     System.out.println("Pattern erkannt: Environment to Task - Pull Oriented (Message Flow vom Task zum Pool und zurück vom Pool zum Task)");
 
                     // Generiere die SBVR-Regel für das Senden (Task sendet Nachricht an Pool und empfängt zurück)
-                    String bidirectionalRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" sends and receives messages to and from \"" +
-                            cleanText(targetNode.getName()) + "\".\n";
+                    String bidirectionalRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" first sends a messages to \"" +
+                            cleanText(targetNode.getName()) + "\" and then receives a message from \"" + cleanText(targetNode.getName()) +"\"\n";
 
                     // Ausgabe und Speichern der Regel für den bidirektionalen Flow
                     System.out.println(bidirectionalRule);
@@ -670,8 +697,8 @@ public class TaskPatternFinder {
                     System.out.println("Pattern erkannt: Task to Environment - Pull Oriented (Message Flow vom Pool zum Task und zurück vom Task zum Pool)");
 
                     // Generiere die SBVR-Regel für das Senden (Pool sendet Nachricht an Task und empfängt zurück)
-                    String bidirectionalRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" sends and receives messages to and from \"" +
-                            cleanText(targetNode.getName()) + "\".\n";
+                    String bidirectionalRule = "It is permitted that \"" + cleanText(sourceNode.getName()) + "\" first receives messages from \"" +
+                            cleanText(targetNode.getName()) + "\" and then sends a message to \"" + cleanText(targetNode.getName()) +"\"\n";
 
                     // Ausgabe und Speichern der Regel für den bidirektionalen Flow
                     System.out.println(bidirectionalRule);
