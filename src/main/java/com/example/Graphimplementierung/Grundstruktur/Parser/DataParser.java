@@ -42,7 +42,6 @@ public class DataParser {
     }
 
 
-
     public static void parseData(Document doc, BPMNGraph graph) {
         // Verarbeitung von DataObjects
         DataParser.processDataNodes(doc, "ns0:dataObject", "DataObject", graph);
@@ -92,7 +91,37 @@ public class DataParser {
             }
         }
 
-        // 3. Verarbeite die Association-Elemente, um Source und Target zu finden
+        // 3. Verarbeite die DataObjectReference-Elemente (Änderungen hier)
+        NodeList dataObjectReferences = doc.getElementsByTagName("ns0:dataObjectReference");
+        for (int i = 0; i < dataObjectReferences.getLength(); i++) {
+            Node node = dataObjectReferences.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+
+                String id = element.getAttribute("id");
+                String dataObjectId = element.getAttribute("dataObjectRef");
+
+                // Finde das eigentliche DataObject im Graph
+                com.example.Graphimplementierung.Grundstruktur.Nodes.Node dataObjectNode = graph.getNodeById(dataObjectId);
+                com.example.Graphimplementierung.Grundstruktur.Nodes.Node dataObjectRefNode = graph.getNodeById(id);
+
+                // Falls die Referenz noch nicht vorhanden ist, füge sie hinzu
+                if (dataObjectRefNode == null && dataObjectNode != null) {
+                    dataObjectRefNode = new DataNode(id, dataObjectNode.getName(), null, "DataObjectReference");
+                    graph.addNode(dataObjectRefNode);
+                }
+
+                // Verknüpfung zwischen DataObject und DataObjectReference, ohne Selbstreferenz
+                if (dataObjectNode != null && dataObjectRefNode != null && !dataObjectNode.getId().equals(dataObjectRefNode.getId())) {
+                    // Verhindere doppelte Kanten
+                    if (!graph.hasEdge("reference_" + id, dataObjectRefNode, dataObjectNode)) {
+                        graph.addEdge(new DataEdge("reference_" + id, dataObjectRefNode, dataObjectNode));
+                    }
+                }
+            }
+        }
+
+        // 4. Verarbeite die Association-Elemente, um Source und Target zu finden
         NodeList associations = doc.getElementsByTagName("ns0:association");
         for (int i = 0; i < associations.getLength(); i++) {
             Node node = associations.item(i);
@@ -107,13 +136,16 @@ public class DataParser {
                 com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceRef);
                 com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetRef);
 
-                if (sourceNode != null && targetNode != null) {
-                    graph.addEdge(new DataEdge(id, sourceNode, targetNode));
+                // Verhindere Selbstreferenzen und doppelte Kanten
+                if (sourceNode != null && targetNode != null && !sourceNode.getId().equals(targetNode.getId())) {
+                    if (!graph.hasEdge(id, sourceNode, targetNode)) {
+                        graph.addEdge(new DataEdge(id, sourceNode, targetNode));
+                    }
                 }
             }
         }
 
-        // 4. Verarbeite DataInputs und DataOutputs aus den Aktivitäten
+        // 5. Verarbeite DataInputs und DataOutputs aus den Aktivitäten
         Collection<Activity> activities = modelInstance.getModelElementsByType(Activity.class);
         for (Activity activity : activities) {
             String activityId = activity.getId();
@@ -123,22 +155,24 @@ public class DataParser {
                 continue; // Falls Aktivität nicht im Graph existiert, überspringen
             }
 
-            // 4.1 Eingehende Datenverbindungen (DataInputAssociations)
+            // 5.1 Eingehende Datenverbindungen (DataInputAssociations)
             for (DataInputAssociation inputAssociation : activity.getDataInputAssociations()) {
                 BaseElement sourceElement = inputAssociation.getSources().iterator().next();
                 com.example.Graphimplementierung.Grundstruktur.Nodes.Node sourceNode = graph.getNodeById(sourceElement.getId());
 
-                if (sourceNode != null) {
+                // Verhindere doppelte Kanten
+                if (sourceNode != null && !graph.hasEdge("input_" + sourceElement.getId(), sourceNode, activityNode)) {
                     graph.addEdge(new DataEdge("input_" + sourceElement.getId(), sourceNode, activityNode));
                 }
             }
 
-            // 4.2 Ausgehende Datenverbindungen (DataOutputAssociations)
+            // 5.2 Ausgehende Datenverbindungen (DataOutputAssociations)
             for (DataOutputAssociation outputAssociation : activity.getDataOutputAssociations()) {
                 BaseElement targetElement = outputAssociation.getTarget();
                 com.example.Graphimplementierung.Grundstruktur.Nodes.Node targetNode = graph.getNodeById(targetElement.getId());
 
-                if (targetNode != null) {
+                // Verhindere doppelte Kanten
+                if (targetNode != null && !graph.hasEdge("output_" + targetElement.getId(), activityNode, targetNode)) {
                     graph.addEdge(new DataEdge("output_" + targetElement.getId(), activityNode, targetNode));
                 }
 
@@ -149,7 +183,7 @@ public class DataParser {
 
                     // Kante für DataObjectReference hinzufügen
                     com.example.Graphimplementierung.Grundstruktur.Nodes.Node dataObjectNode = graph.getNodeById(dataObjectRef.getId());
-                    if (dataObjectNode != null) {
+                    if (dataObjectNode != null && !graph.hasEdge("output_" + dataObjectRef.getId(), activityNode, dataObjectNode)) {
                         graph.addEdge(new DataEdge("output_" + dataObjectRef.getId(), activityNode, dataObjectNode));
                     }
                 }
@@ -160,11 +194,12 @@ public class DataParser {
                     com.example.Graphimplementierung.Grundstruktur.Nodes.Node dataInputNode = graph.getNodeById(dataInput.getId());
 
                     // Kante für DataInput hinzufügen
-                    if (dataInputNode != null) {
+                    if (dataInputNode != null && !graph.hasEdge("output_" + dataInput.getId(), activityNode, dataInputNode)) {
                         graph.addEdge(new DataEdge("output_" + dataInput.getId(), activityNode, dataInputNode));
                     }
                 }
             }
         }
     }
+
 }

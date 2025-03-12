@@ -2,69 +2,15 @@ package com.example.Graphimplementierung.Workflowpatterns;
 
 import com.example.Graphimplementierung.Grundstruktur.Nodes.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class TaskPatternFinder {
 
     private static final Set<Edge> outputEdges = new HashSet<>();
     private Set<Node> gatewayProcessedNodes;
-
-    // Hauptmethode zum Finden aller Task-Typen
-
-//    public void findAllTaskPatterns(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
-//        // Fallback-Sicherheitsprüfung
-//        if (gatewayProcessedNodes == null) {
-//            gatewayProcessedNodes = new HashSet<>();
-//        }
-//
-//        for (Node node : graph.getNodes()) {
-//            // Prüfe, ob der Knoten bereits in den Gateway-Prozessen verarbeitet wurde
-//            if (gatewayProcessedNodes.contains(node)) {
-//                System.out.println("Überspringe bereits verarbeiteten Knoten: " + cleanText(node.getName()));
-//                continue; // Überspringe diese Knoten
-//            }
-//
-//            // StartEventNode erkennen und verarbeiten
-//            if (node instanceof StartEventNode startEventNode) {
-//                processOutgoingEdgesForStartEvent(graph, startEventNode, sbvrDataBuilder);
-//            }
-//
-//            if (node instanceof IntermediateNode intermediateNode) {
-//                System.out.println("IntermediateNode gefunden: " + cleanText(intermediateNode.getName()));  // Überprüfen, ob der IntermediateNode erkannt wird
-//                processIntermediateElements(graph, intermediateNode, sbvrDataBuilder);
-//            }
-
-//            if (node instanceof TaskNode taskNode) {
-//                // Hier entscheidet der activityType des TaskNode, welche Methode ausgeführt wird
-//                switch (taskNode.getActivityType()) {
-//                    case "UserTask" -> {
-//                        processOutgoingEdgesForUserTask(graph, taskNode, sbvrDataBuilder);
-//                        processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-//                    }
-//                    case "ServiceTask" -> {
-//                        processOutgoingEdgesForServiceTask(graph, taskNode, sbvrDataBuilder);
-//                        processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-//                    }
-//                    case "BusinessRuleTask" -> {
-//                        processOutgoingEdgesForBusinessRuleTask(graph, taskNode, sbvrDataBuilder);
-//                        processIncomingEdges(graph, taskNode, sbvrDataBuilder);
-//                    }
-//                    case "Task" -> {
-//                        // Hier wird der spezielle Task (Sequence) Prozess aufgerufen
-//                        processSequenceTask(graph, sbvrDataBuilder, taskNode);
-//                    }
-//                    default -> {
-//                        System.out.println("Unbekannter Task-Typ: " + taskNode.getActivityType());
-//                    }
-//                }
-
-            // EndEventNode erkennen und verarbeiten
-//            if (node instanceof EndEventNode endEventNode) {
-//                processIncomingEdgesForEndEvent(graph, endEventNode, sbvrDataBuilder);
-//            }
-//            gatewayProcessedNodes.add(node);
-//        }
 
     public void processTaskNode(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         if (gatewayProcessedNodes == null) {
@@ -119,6 +65,104 @@ public class TaskPatternFinder {
         }
     }
 
+
+    private void processOutgoingEdgesForTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        for (Edge edge : graph.getEdges()) {
+            // Prüfen, ob die Kante von der aktuellen Aufgabe (taskNode) ausgeht und keine spezielle Edge ist
+            if (edge.getSource().equals(taskNode) && isNormalEdge(edge)) {
+                // Prüfen, ob die Kante bereits besucht wurde
+                if (outputEdges.contains(edge)) {
+                    continue; // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
+                }
+
+                // Zielknoten identifizieren
+                Node targetNode = edge.getTarget();
+
+                // **Hier kommt die Zykluserkennung hinzu**
+                if (gatewayProcessedNodes.contains(targetNode) && targetNode.equals(taskNode)) {
+                    System.out.println("\nPattern erkannt: Structured Loop");
+                    String loopRule = "\nIt is obligatory that \"" + cleanText(taskNode.getLane().getName()) +
+                            "\" performs \"" + cleanText(taskNode.getName()) +
+                            "\" in a structured loop involving \"" + cleanText(targetNode.getName()) + "\".\n";
+                    System.out.println(loopRule);
+                    sbvrDataBuilder.append(loopRule).append("\n");
+
+                    // Kante als besucht markieren
+                    outputEdges.add(edge);
+                    continue; // Zur nächsten Kante springen, ohne doppelte Regeln zu erzeugen
+                }
+
+                // Regel basierend auf der Bedingung erstellen
+                String condition = edge.getCondition();
+                String sourceLane = (taskNode.getLane() != null) ? taskNode.getLane().getName() : null;
+                String targetLane = (targetNode.getLane() != null) ? targetNode.getLane().getName() : null;
+
+                String rule;
+                if (sourceLane == null || targetLane == null) {
+                    rule = (condition != null && !condition.isEmpty())
+                            ? "It is obligatory that \"" + cleanText(targetNode.getName()) +
+                            "\" after \"" + cleanText(taskNode.getName()) +
+                            "\" and if \"" + cleanText(condition) + ".\n"
+                            : "It is obligatory that \"" + cleanText(targetNode.getName()) +
+                            "\" after \"" + cleanText(taskNode.getName()) + "\".\n";
+                } else {
+                    rule = (condition != null && !condition.isEmpty())
+                            ? "It is obligatory that \"" + cleanText(targetLane) + "\" performs \"" + cleanText(targetNode.getName()) +
+                            "\" after \"" + cleanText(sourceLane) + "\" performs \"" + cleanText(taskNode.getName()) +
+                            "\" and if \"" + cleanText(condition) + ".\n"
+                            : "It is obligatory that \"" + cleanText(targetLane) + "\" performs \"" + cleanText(targetNode.getName()) +
+                            "\" after \"" + cleanText(sourceLane) + "\" performs \"" + cleanText(taskNode.getName()) + "\".\n";
+                }
+
+                System.out.println(rule);
+                sbvrDataBuilder.append(rule).append("\n");
+
+                // Kante als besucht markieren
+                outputEdges.add(edge);
+            }
+        }
+    }
+
+    private void processIncomingEdges(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        for (Edge edge : graph.getEdges()) {
+            // Prüfen, ob die Kante zum aktuellen TaskNode führt und keine spezielle Edge ist
+            if (edge.getTarget().equals(taskNode) && isNormalEdge(edge)) {
+                // Prüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
+                if (outputEdges.contains(edge)) {
+                    continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
+                }
+                Node sourceNode = edge.getSource();
+                Node targetNode = edge.getTarget();
+                String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
+                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+
+                // **Zykluserkennung für eingehende Kanten**
+                if (gatewayProcessedNodes.contains(sourceNode) && sourceNode.equals(taskNode)) {
+                    System.out.println("\nPattern erkannt: Structured Loop (Incoming)");
+                    String loopRule = "\nIt is obligatory that \"" + targetLane + "\" performs \"" + cleanText(taskNode.getName()) +
+                            "\" in a structured loop involving \"" + sourceLane + "\" performing \"" + cleanText(sourceNode.getName()) + "\".\n";
+                    System.out.println(loopRule);
+                    sbvrDataBuilder.append(loopRule).append("\n");
+
+                    // Kante als besucht markieren
+                    outputEdges.add(edge);
+                    continue; // Doppelte Regeln vermeiden
+                }
+
+                // Normaler Sequence-Flow
+                System.out.println("\nPattern erkannt: Sequence");
+                String rule = "\nIt is obligatory that \"" + targetLane + "\" performs \"" + cleanText(taskNode.getName()) +
+                        "\" after \"" + sourceLane + "\" performs \"" + cleanText(sourceNode.getName()) + "\".\n";
+                System.out.println(rule);
+                sbvrDataBuilder.append(rule).append("\n");
+
+                // Kante als besucht markieren
+                outputEdges.add(edge);
+            }
+        }
+    }
+
+
     /**
      * Block Data Pattern: bezieht sich auf das Konzept, bei dem Daten innerhalb eines Subprozesses gesammelt und dann in einem einzigen Block verarbeitet oder gespeichert werden,
      * bevor sie an den Hauptprozess oder andere Subprozesse weitergegeben werden
@@ -154,52 +198,6 @@ public class TaskPatternFinder {
                 // Ausgabe der verarbeiteten Subprozess-TaskNode
                 String message = "Verarbeitete Subprozess Task Node: " + cleanText(taskNode.getName()) + "\n";
                 System.out.print(message);
-            }
-        }
-    }
-
-
-
-
-
-    private void processOutgoingEdgesForTask(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
-        for (Edge edge : graph.getEdges()) {
-            // Prüfen, ob die Kante von der aktuellen Aufgabe (taskNode) ausgeht und keine spezielle Edge ist
-            if (edge.getSource().equals(taskNode) && isNormalEdge(edge)) {
-                // Prüfen, ob die Kante bereits besucht wurde
-                if (outputEdges.contains(edge)) {
-                    continue; // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
-                }
-
-                // Regel basierend auf der Bedingung erstellen
-                Node targetNode = edge.getTarget();
-                String condition = edge.getCondition();
-                String sourceLane = (taskNode.getLane() != null) ? taskNode.getLane().getName() : null;
-                String targetLane = (targetNode.getLane() != null) ? targetNode.getLane().getName() : null;
-
-                String rule;
-                if (sourceLane == null || targetLane == null) {
-                    rule = (condition != null && !condition.isEmpty())
-                            ? "It is obligatory that \"" + cleanText(targetNode.getName()) +
-                            "\" after \"" + cleanText(taskNode.getName()) +
-                            "\" and if \"" + cleanText(condition) + ".\n"
-                            : "It is obligatory that \"" + cleanText(targetNode.getName()) +
-                            "\" after \"" + cleanText(taskNode.getName()) + "\".\n";
-                } else {
-                    rule = (condition != null && !condition.isEmpty())
-                            ? "It is obligatory that \"" + cleanText(targetLane) + "\" \"" + cleanText(targetNode.getName()) +
-                            "\" after \"" + cleanText(sourceLane) + "\" \"" + cleanText(taskNode.getName()) +
-                            "\" and if \"" + cleanText(condition) + ".\n"
-                            : "It is obligatory that \"" + cleanText(targetLane) + "\" performs \"" + cleanText(targetNode.getName()) +
-                            "\" after \"" + cleanText(sourceLane) + "\" performs \"" + cleanText(taskNode.getName()) + "\".\n";
-                }
-
-                System.out.println(rule);
-                sbvrDataBuilder.append(rule).append("\n");
-
-                // Kante als besucht markieren
-                outputEdges.add(edge);
-
             }
         }
     }
@@ -249,10 +247,7 @@ public class TaskPatternFinder {
     /**
      * Event-Based Trigger Pattern und Persistent Trigger Pattern:
      * - Event-Based Trigger Pattern, wenn nach einem Event-Based Gateway ein Intermediate Event folgt
-     * - Persistent Trigger Pattern, wenn ein Intermediate Catch Event (Message) eintrifft
-     * @param graph
-     * @param taskNode
-     * @param sbvrDataBuilder
+     * - Persistent Trigger Pattern, wenn ein Intermediate Catch Event mit einem Task verbunden ist
      */
     public void detectTriggerPatterns(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
         if (gatewayProcessedNodes == null) {
@@ -261,77 +256,101 @@ public class TaskPatternFinder {
 
         // Durchlaufe alle Kanten im Graphen
         for (Edge edge : graph.getEdges()) {
-            // Prüfen, ob die Kante den aktuellen TaskNode als Quelle hat
-            if (edge.getSource().equals(taskNode)) {
-                Node targetNode = edge.getTarget();
+            Node sourceNode = edge.getSource();
+            Node targetNode = edge.getTarget();
 
-                // Event-Based Trigger Pattern: Prüfen, ob nach einem Event-Based Gateway ein Intermediate Event kommt
-                if (targetNode instanceof IntermediateNode intermediateNode &&
-                        "IntermediateCatchEvent".equals(intermediateNode.getEventType())) {
+            // 1️⃣ **Event-Based Trigger Pattern:**
+            // - Wenn ein Event-Based Gateway direkt mit einem Intermediate Event verbunden ist.
+            if (sourceNode instanceof GatewayNode gatewayNode && "EventBased".equals(gatewayNode.getGatewayType()) &&
+                    targetNode instanceof IntermediateNode intermediateNode && "IntermediateCatchEvent".equals(intermediateNode.getEventType())) {
 
-                    // Prüfen, ob das Intermediate Event ein Event-Based Gateway aktiviert
-                    if ("EventBased".equals(intermediateNode.getEventSubType())) {
-                        // Überprüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
-                        if (outputEdges.contains(edge)) {
-                            continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
-                        }
-
-                        // Kante als besucht markieren
-                        outputEdges.add(edge);
-
-                        String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
-                        String targetLane = intermediateNode.getLane() != null ? intermediateNode.getLane().getName() : "Unbekannte Lane";
-
-                        System.out.println("\nPattern erkannt: Event-Based Trigger");
-
-                        // SBVR-Regel erzeugen: Event-Based Trigger
-                        String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(intermediateNode.getName()) +
-                                "\" is triggered after \"" + sourceLane + "\" \"" + cleanText(taskNode.getName()) + "\", where the event-based gateway is followed by the event.\n";
-
-                        // Ausgabe und Anhängen an den StringBuilder
-                        System.out.println(rule);
-                        sbvrDataBuilder.append(rule).append("\n");
-                    }
+                // Prüfen, ob diese Verbindung bereits verarbeitet wurde
+                if (outputEdges.contains(edge)) {
+                    continue;  // Vermeidung von Mehrfachverarbeitung
                 }
 
-                // Persistent Trigger Pattern: Prüfen, ob das Ziel ein Intermediate Catch Event vom Typ Message ist
-                if (targetNode instanceof IntermediateNode intermediateNode &&
-                        "IntermediateCatchEvent".equals(intermediateNode.getEventType()) &&
-                        "Message".equals(intermediateNode.getEventSubType())) {
+                // Kante als besucht markieren
+                outputEdges.add(edge);
 
-                    // Überprüfen, ob der Knoten bereits verarbeitet wurde
-                    if (gatewayProcessedNodes.contains(taskNode)) {
-                        continue; // Weiter mit der nächsten Kante, wenn der Knoten schon verarbeitet wurde
-                    }
+                String sourceLane = gatewayNode.getLane() != null ? gatewayNode.getLane().getName() : "Unbekannte Lane";
+                String targetLane = intermediateNode.getLane() != null ? intermediateNode.getLane().getName() : "Unbekannte Lane";
 
-                    // Markiere den Knoten als verarbeitet
-                    gatewayProcessedNodes.add(taskNode);
+                System.out.println("\nPattern erkannt: Event-Based Trigger");
 
-                    // Erstelle die SBVR-Regel für das Persistent Trigger Pattern
-                    String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
-                    String targetLane = intermediateNode.getLane() != null ? intermediateNode.getLane().getName() : "Unbekannte Lane";
+                // SBVR-Regel erzeugen: Event-Based Trigger
+                String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(intermediateNode.getName()) +
+                        "\" is triggered after \"" + sourceLane + "\" \"" + cleanText(gatewayNode.getName()) + "\", where the event-based gateway is followed by the event.\n";
 
-                    System.out.println("\nPattern erkannt: Persistent Trigger");
+                // Ausgabe und Anhängen an den StringBuilder
+                System.out.println(rule);
+                sbvrDataBuilder.append(rule).append("\n");
+            }
 
-                    // SBVR-Regel erzeugen: Das Ereignis wird die Aufgabe „unterbrechen“, bis die Nachricht eintrifft.
-                    String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(intermediateNode.getName()) +
-                            "\" persists until \"" + sourceLane + "\" \"" + cleanText(taskNode.getName()) + "\" receives the message.\n";
+            // 2️⃣ **Persistent Trigger Pattern bleibt unverändert:**
+            // - Ein Task mit einem Intermediate Catch Event.
+            if (sourceNode instanceof TaskNode task && targetNode instanceof IntermediateNode intermediate &&
+                    "IntermediateCatchEvent".equals(intermediate.getEventType())) {
 
-                    // Ausgabe und Anhängen an den StringBuilder
-                    System.out.println(rule);
-                    sbvrDataBuilder.append(rule).append("\n");
+                if (gatewayProcessedNodes.contains(task)) {
+                    continue;
                 }
+
+                gatewayProcessedNodes.add(task);
+
+                String sourceLane = task.getLane() != null ? task.getLane().getName() : "Unbekannte Lane";
+                String targetLane = intermediate.getLane() != null ? intermediate.getLane().getName() : "Unbekannte Lane";
+
+                System.out.println("\nPattern erkannt: Persistent Trigger");
+
+                // SBVR-Regel für Persistent Trigger
+                String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(intermediate.getName()) +
+                        "\" persists until \"" + sourceLane + "\" \"" + cleanText(task.getName()) + "\" is completed.\n";
+
+                System.out.println(rule);
+                sbvrDataBuilder.append(rule).append("\n");
             }
         }
     }
 
 
 
+    public void processChainedExecution(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+        if (gatewayProcessedNodes == null) {
+            gatewayProcessedNodes = new HashSet<>();
+        }
 
-    private void processIncomingEdges(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        // Durchlaufe alle Knoten im Graphen
+        for (Node node : graph.getNodes()) {
+            // Nur TaskNodes verarbeiten, die keine spezifischen Task-Typen sind (für Chained Execution)
+            if (node instanceof TaskNode taskNode && !gatewayProcessedNodes.contains(taskNode) && "Task".equals(taskNode.getActivityType())) {
+                // Rufe die Methode für Chained Execution auf
+                determineChainedExecution(graph, taskNode, sbvrDataBuilder);
+
+                // Markiere den TaskNode als verarbeitet
+                gatewayProcessedNodes.add(taskNode);
+
+                // Ausgabe der verarbeiteten Chained Execution TaskNode
+                String message = "Verarbeitete Chained Execution Task Nodes: " + cleanText(taskNode.getName()) + "\n";
+                System.out.print(message);
+            }
+        }
+    }
+
+    private void determineChainedExecution(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
+        // Variablen zur Verfolgung der Kette und der Lane
+        String currentLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
+        boolean isChainedExecution = true;
+        TaskNode previousTaskNode = taskNode;
+        List<TaskNode> chainedTasks = new ArrayList<>();
+        chainedTasks.add(taskNode); // Füge die erste TaskNode der Kette hinzu
+
+        // Iteriere über alle Kanten im Graphen und prüfe auf eine Chained Execution
         for (Edge edge : graph.getEdges()) {
-            // Prüfen, ob die Kante zum aktuellen TaskNode führt und keine spezielle Edge ist
-            if (edge.getTarget().equals(taskNode) && isNormalEdge(edge)) {
+            // Prüfen, ob die Kante eine normale Edge ist und das Ziel die aktuelle TaskNode ist
+            if (edge.getSource().equals(previousTaskNode) && isNormalEdge(edge)) {
+                Node sourceNode = edge.getSource();
+                Node targetNode = edge.getTarget();
+
                 // Prüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
                 if (outputEdges.contains(edge)) {
                     continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
@@ -340,91 +359,51 @@ public class TaskPatternFinder {
                 // Kante als besucht markieren
                 outputEdges.add(edge);
 
-                Node sourceNode = edge.getSource();
-                Node targetNode = edge.getTarget();
+                // Prüfen, ob das Ziel-Node ein TaskNode ist (damit wir es casten können)
+                if (targetNode instanceof TaskNode) {
+                    TaskNode targetTaskNode = (TaskNode) targetNode;  // Nur casten, wenn es ein TaskNode ist
+                    // Prüfen, ob die Tasks in der gleichen Lane sind
+                    String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
+                    String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
 
-                String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
-                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+                    // Wenn die Tasks nicht in der gleichen Lane sind, breche das Chained Execution-Muster ab
+                    if (!sourceLane.equals(targetLane)) {
+                        isChainedExecution = false;
+                        break;
+                    }
 
-                // Ausgabe für das erkannte Pattern
-                System.out.println("\nPattern erkannt: Sequence");
+                    // Füge das aktuelle TaskNode zur Kette hinzu
+                    chainedTasks.add(targetTaskNode);
 
-                String rule = "\nIt is obligatory that \"" + targetLane + "\" performs \"" + cleanText(taskNode.getName()) +
-                        "\" after \"" + sourceLane + "\" performs \"" + cleanText(sourceNode.getName()) + "\".\n";
-                System.out.println(rule);
-                sbvrDataBuilder.append(rule).append("\n");
+                    // Setze das aktuelle Node als vorherige Node für die nächste Iteration
+                    previousTaskNode = targetTaskNode;
+                } else {
+                    // Wenn das Ziel kein TaskNode ist, dann abbrechen, weil nur TaskNode verarbeitet werden sollen
+                    break;
+                }
             }
         }
-    }
 
-//    public void processChainedExecution(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
-//        if (gatewayProcessedNodes == null) {
-//            gatewayProcessedNodes = new HashSet<>();
-//        }
-//
-//        // Durchlaufe alle Knoten im Graphen
-//        for (Node node : graph.getNodes()) {
-//            // Nur TaskNodes verarbeiten, die keine spezifischen Task-Typen sind (für Chained Execution)
-//            if (node instanceof TaskNode taskNode && !gatewayProcessedNodes.contains(taskNode) && "Task".equals(taskNode.getActivityType())) {
-//                // Rufe die Methode für Chained Execution auf
-//                processChainedExecution(graph, taskNode, sbvrDataBuilder);
-//
-//                // Markiere den TaskNode als verarbeitet
-//                gatewayProcessedNodes.add(taskNode);
-//
-//                // Ausgabe der verarbeiteten Chained Execution TaskNode
-//                String message = "Verarbeitete Chained Execution Task Nodes: " + cleanText(taskNode.getName()) + "\n";
-//                System.out.print(message);
-//            }
-//        }
-//    }
-//
-//
-//    private void processChainedExecution(BPMNGraph graph, TaskNode taskNode, StringBuilder sbvrDataBuilder) {
-//        // Variablen zur Verfolgung der Kette und der Lane
-//        String currentLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
-//        boolean isChainedExecution = true;
-//        TaskNode previousTaskNode = taskNode;
-//
-//        // Iteriere über alle Kanten im Graphen
-//        for (Edge edge : graph.getEdges()) {
-//            // Prüfen, ob die Kante eine normale Edge ist und das Ziel die aktuelle TaskNode ist
-//            if (edge.getSource().equals(previousTaskNode) && isNormalEdge(edge)) {
-//                Node sourceNode = edge.getSource();
-//                Node targetNode = edge.getTarget();
-//
-//                // Prüfen, ob die Kante bereits besucht wurde (für Loop-Erkennung)
-//                if (outputEdges.contains(edge)) {
-//                    continue;  // Weiter mit der nächsten Kante, ohne sie erneut zu verarbeiten
-//                }
-//
-//                // Kante als besucht markieren
-//                outputEdges.add(edge);
-//
-//                // Prüfen, ob die Tasks in der gleichen Lane sind
-//                String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
-//                String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
-//
-//                // Wenn die Tasks nicht in der gleichen Lane sind, breche das Chained Execution-Muster ab
-//                if (!sourceLane.equals(targetLane)) {
-//                    isChainedExecution = false;
-//                    break;
-//                }
-//
-//                // Wenn das Chained Execution-Muster gültig ist, gib die Regel aus
-//                String rule = "\nIt is obligatory that \"" + targetLane + "\" performs \"" + cleanText(targetNode.getName()) +
-//                        "\" after \"" + sourceLane + "\" performs \"" + cleanText(sourceNode.getName()) + "\".\n";
-//
-//                // Ausgabe des Musters und Anhängen der Regel an den StringBuilder
-//                System.out.println("\nPattern erkannt: Chained Execution");
-//                System.out.println(rule);
-//                sbvrDataBuilder.append(rule).append("\n");
-//
-//                // Setze das aktuelle Node als vorherige Node für die nächste Iteration
-//                previousTaskNode = (TaskNode) targetNode;
-//            }
-//        }
-//    }
+        // Überprüfe, ob mindestens 3 Tasks in der gleichen Lane hintereinander sind
+        if (chainedTasks.size() >= 3) {
+            StringBuilder rule = new StringBuilder("\nIt is obligatory that the following tasks are performed in sequence in the same lane:\n");
+            for (int i = 0; i < chainedTasks.size() - 1; i++) {
+                TaskNode source = chainedTasks.get(i);
+                TaskNode target = chainedTasks.get(i + 1);
+
+                rule.append("After \"")
+                        .append(cleanText(source.getName()))
+                        .append("\" performs, \"")
+                        .append(cleanText(target.getName()))
+                        .append("\" performs.\n");
+            }
+
+            // Ausgabe des Musters und Anhängen der Regel an den StringBuilder
+            System.out.println("\nPattern erkannt: Chained Execution");
+            System.out.println(rule);
+            sbvrDataBuilder.append(rule).append("\n");
+        }
+    }
 
 
     // Überprüft, ob die Kante eine normale Edge ist (keine DataEdge, MessageEdge oder GatewayEdge)

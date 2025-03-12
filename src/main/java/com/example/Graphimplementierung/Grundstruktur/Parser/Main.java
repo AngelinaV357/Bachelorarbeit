@@ -57,15 +57,17 @@ public class Main {
             System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
             findIntermediateEvents(graph, sbvrDataBuilder);
 
+            System.out.println("\nStarte mit Chained Execution Pattern...");
+            findChainedExecution(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
+            findBoundaryEvents(graph, sbvrDataBuilder);
+
             System.out.println("\nStarte mit Sequence Pattern-Suche...");
             findSequences(graph, sbvrDataBuilder);
 
             System.out.println("\nStarte mit Subprozess Pattern-Suche...");
             findSubProcesses(graph, sbvrDataBuilder);
-
-            System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
-            findBoundaryEvents(graph, sbvrDataBuilder);
-
 
             // Füge hier die Aufrufe für Explicit Termination und Commencement on Creation Pattern hinzu
             System.out.println("\nStarte mit Explicit Termination Pattern...");
@@ -104,14 +106,11 @@ public class Main {
         taskPatternFinder.processBoundaryEvent(graph, sbvrDataBuilder); // Boundary Event Pattern suchen
     }
 
-
     // Methode für die Sequence Pattern-Suche
     private static void findSequences(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
         taskPatternFinder.processSequenceTask(graph, sbvrDataBuilder);
     }
-
-
 
     // Methode für das Finden des Explicit Termination Patterns (EndEvent)
     private static void findExplicitTerminationPattern(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
@@ -130,13 +129,16 @@ public class Main {
         taskPatternFinder.processIntermediateEvents(graph, sbvrDataBuilder);
     }
 
+    private static void findChainedExecution(BPMNGraph graph, StringBuilder sbvrDataBuilder){
+        TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
+        taskPatternFinder.processChainedExecution(graph, sbvrDataBuilder);
+    }
+
     // Methode für das Finden von Subprozessen (neue Methode für Subprozess Pattern)
     private static void findSubProcesses(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
         taskPatternFinder.processSubProcess(graph, sbvrDataBuilder);
     }
-
-
 
     // Methode zum Entfernen von Zeilenumbrüchen und Tabulatoren
     public static String cleanText(String text) {
