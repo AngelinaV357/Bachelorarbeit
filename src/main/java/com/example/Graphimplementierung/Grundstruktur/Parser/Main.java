@@ -46,6 +46,8 @@ public class Main {
             System.out.println("\nStarte mit Commencement on Creation Pattern...");
             findCommencementonCreation(graph, sbvrDataBuilder);
 
+
+
             // Anstatt `findGateways()` und `findDataBasedRouting()` einzeln aufzurufen:
             System.out.println("Starte mit Pattern-Erkennung...");
             GatewayPatternFinder.detectPatterns(graph, sbvrDataBuilder);
@@ -57,30 +59,30 @@ public class Main {
 //            System.out.print("\nStarte mit Data Based Routing Pattern...");
 //            findDataBasedRouting(graph, sbvrDataBuilder);
 
-//            System.out.println("\nStarte mit Data-Pattern-Suche...");
-//            findDataPatterns(graph, sbvrDataBuilder);
-//
-//            System.out.println("\nStarte mit Task-Pattern-Suche...");
-//            findTasks(graph, sbvrDataBuilder);
-//
-//            System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
-//            findIntermediateEvents(graph, sbvrDataBuilder);
+            System.out.println("\nStarte mit Data-Pattern-Suche...");
+            findDataPatterns(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Task-Pattern-Suche...");
+            findTasks(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
+            findIntermediateEvents(graph, sbvrDataBuilder);
 //
 //            System.out.println("\nStarte mit Chained Execution Pattern...");
 //            findChainedExecution(graph, sbvrDataBuilder);
-//
-//            System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
-//            findBoundaryEvents(graph, sbvrDataBuilder);
-//
-//            System.out.println("\nStarte mit Sequence Pattern-Suche...");
-//            findSequences(graph, sbvrDataBuilder);
-//
-//            System.out.println("\nStarte mit Subprozess Pattern-Suche...");
-//            findSubProcesses(graph, sbvrDataBuilder);
-//
-//            // Füge hier die Aufrufe für Explicit Termination und Commencement on Creation Pattern hinzu
-//            System.out.println("\nStarte mit Explicit Termination Pattern...");
-//            findExplicitTerminationPattern(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
+            findBoundaryEvents(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Sequence Pattern-Suche...");
+            findSequences(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Subprozess Pattern-Suche...");
+            findSubProcesses(graph, sbvrDataBuilder);
+
+            // Füge hier die Aufrufe für Explicit Termination und Commencement on Creation Pattern hinzu
+            System.out.println("\nStarte mit Explicit Termination Pattern...");
+            findExplicitTerminationPattern(graph, sbvrDataBuilder);
 
             // 10. Speichern der SBVR-Daten
             SBVRFileSaver.saveSBVRToFile(sbvrDataBuilder.toString(), "generated_rules.sbvr");
@@ -139,10 +141,10 @@ public class Main {
         taskPatternFinder.processIntermediateEvents(graph, sbvrDataBuilder);
     }
 
-    private static void findChainedExecution(BPMNGraph graph, StringBuilder sbvrDataBuilder){
-        TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
-        taskPatternFinder.processChainedExecution(graph, sbvrDataBuilder);
-    }
+//    private static void findChainedExecution(BPMNGraph graph, StringBuilder sbvrDataBuilder){
+//        TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
+//        taskPatternFinder.processChainedExecution(graph, sbvrDataBuilder);
+//    }
 
     // Methode für das Finden von Subprozessen (neue Methode für Subprozess Pattern)
     private static void findSubProcesses(BPMNGraph graph, StringBuilder sbvrDataBuilder) {

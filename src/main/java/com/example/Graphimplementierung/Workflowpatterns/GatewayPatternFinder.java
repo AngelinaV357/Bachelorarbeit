@@ -14,8 +14,8 @@ public class GatewayPatternFinder {
 
     public static void detectPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         System.out.println("Starte mit Gateway-Pattern-Suche...");
-//        findDataBasedRouting(graph, sbvrData);
-        findExclusiveGatewayPatterns(graph, sbvrData);
+        findDataBasedRouting(graph, sbvrData);
+//        findExclusiveGatewayPatterns(graph, sbvrData);
 
         if (patternExecuted) {
             System.out.println("Ein Pattern wurde erkannt. Data Based Routing wird nicht ausgeführt.");
@@ -23,8 +23,8 @@ public class GatewayPatternFinder {
         }
 
         System.out.println("Starte mit Data Based Routing Pattern...");
-        findDataBasedRouting(graph, sbvrData);
-//        findExclusiveGatewayPatterns(graph, sbvrData);
+//        findDataBasedRouting(graph, sbvrData);
+        findExclusiveGatewayPatterns(graph, sbvrData);
     }
 
 
