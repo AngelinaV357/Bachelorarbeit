@@ -7,32 +7,100 @@ import java.util.*;
 public class GatewayPatternFinder {
 
     // Set, um bereits ausgegebene Gateways nachzuverfolgen
-    private final Set<String> processedGateways = new HashSet<>();
-    private final Set<Node> gatewayCoveredTasks = new HashSet<>();
+    private static final Set<String> processedGateways = new HashSet<>();
+    private static final Set<Node> gatewayCoveredTasks = new HashSet<>();
 
-    public void findExclusiveGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
+    private static boolean patternExecuted = false;  // Flag, um zu verfolgen, ob bereits ein Pattern ausgeführt wurde
+
+    public static void detectPatterns(BPMNGraph graph, StringBuilder sbvrData) {
+        System.out.println("Starte mit Gateway-Pattern-Suche...");
+//        findDataBasedRouting(graph, sbvrData);
+        findExclusiveGatewayPatterns(graph, sbvrData);
+
+        if (patternExecuted) {
+            System.out.println("Ein Pattern wurde erkannt. Data Based Routing wird nicht ausgeführt.");
+            return;
+        }
+
+        System.out.println("Starte mit Data Based Routing Pattern...");
+        findDataBasedRouting(graph, sbvrData);
+//        findExclusiveGatewayPatterns(graph, sbvrData);
+    }
+
+
+    public static void findExclusiveGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
+        if (patternExecuted) return;
+
         for (Node node : graph.getNodes()) {
             if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
                 GatewayNode gatewayNode = (GatewayNode) node;
 
                 if (!processedGateways.contains(gatewayNode.getId())) {
-                    // Generiere die SBVR-Regel für das Gateway
+                    processedGateways.add(gatewayNode.getId());
+
+                    patternExecuted = true;  //
                     generateExclusiveChoice(graph, gatewayNode, sbvrData);
-                    generateSBVRRules(graph, gatewayNode, sbvrData);
 
-                    // Extrahiere die abgedeckten Tasks nach der Regelgenerierung
                     extractGatewayTasks(graph, gatewayNode);
-
-                    // Gib die abgedeckten Tasks nach der Ausgabe der SBVR-Regel aus
                     for (Node task : gatewayCoveredTasks) {
                         System.out.println("Gateway deckt Task ab: " + cleanText(task.getName()));
                     }
 
-                    processedGateways.add(gatewayNode.getId());
+                    return;
                 }
             }
         }
     }
+
+
+    public static void findExclusiveMergePatterns(BPMNGraph graph, StringBuilder sbvrData) {
+        for (Node node : graph.getNodes()) {
+            if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
+                GatewayNode gatewayNode = (GatewayNode) node;
+
+                if (!processedGateways.contains(gatewayNode.getId())) {
+                    processedGateways.add(gatewayNode.getId());
+
+                    // XOR-Merge (Simple Merge) immer ausführen
+                    generateXORMerge(graph, gatewayNode, sbvrData);
+
+                    extractGatewayTasks(graph, gatewayNode);
+                    for (Node task : gatewayCoveredTasks) {
+                        System.out.println("Gateway deckt Task ab: " + cleanText(task.getName()));
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    public static void findDataBasedRouting(BPMNGraph graph, StringBuilder sbvrData) {
+        if (patternExecuted) return;  // Falls bereits ein Pattern ausgeführt wurde, abbrechen
+
+        for (Node node : graph.getNodes()) {
+            if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
+                GatewayNode gatewayNode = (GatewayNode) node;
+
+                if (!processedGateways.contains(gatewayNode.getId())) {
+                    processedGateways.add(gatewayNode.getId());
+
+                    patternExecuted = true;  // Setze das Flag direkt hier, um das andere Pattern zu blockieren
+                    generateSBVRRules(graph, gatewayNode, sbvrData);
+
+                    extractGatewayTasks(graph, gatewayNode);
+
+                    for (Node task : gatewayCoveredTasks) {
+                        System.out.println("Gateway deckt Task ab: " + cleanText(task.getName()));
+                    }
+
+                    return; // Beende die Methode sofort, um zu verhindern, dass ein anderes Pattern ausgeführt wird
+                }
+            }
+        }
+    }
+
+
 
     /**
      * Data Based Routing Pattern: Es beschreibt die konkrete Regel einer Entscheidung mit Bedingungen
@@ -40,7 +108,7 @@ public class GatewayPatternFinder {
      * @param gatewayNode
      * @param sbvrData
      */
-    private void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
+    private static void generateSBVRRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
 
         boolean hasCondition = false;
 
@@ -112,7 +180,7 @@ public class GatewayPatternFinder {
 
 
     // Methode, um alle Tasks zu speichern, die durch Gateways abgedeckt sind
-    private void extractGatewayTasks(BPMNGraph graph, GatewayNode gatewayNode) {
+    private static void extractGatewayTasks(BPMNGraph graph, GatewayNode gatewayNode) {
         // Extrahiere Tasks, die durch das Gateway abgedeckt werden, und markiere sie als bearbeitet
         for (Edge edge : graph.getEdges()) {
             if (edge.getSource().equals(gatewayNode)) {
@@ -126,14 +194,7 @@ public class GatewayPatternFinder {
     }
 
 
-    /**
-     * Exklusive Choice Pattern: Es wird eine Entscheidung getroffen, welcher von mehreren Pfaden basierend auf einer Bedingung weiterverfolgt wird. Nur ein Pfad wird ausgeführt.
-     * Simple Merge Pattern: die Aktivitäten führen in ein XOR hinein, aber nur einer ist aktiv
-     * @param graph
-     * @param gatewayNode
-     * @param sbvrData
-     */
-    private void generateExclusiveChoice(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
+    private static void generateExclusiveChoice(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         Set<Edge> outgoingEdges = new HashSet<>();
         Set<Edge> incomingEdges = new HashSet<>();
 
@@ -146,7 +207,7 @@ public class GatewayPatternFinder {
             }
         }
 
-        // 🔹 XOR-Split (Exclusive Choice)
+        // XOR-Split (Exclusive Choice)
         if (outgoingEdges.size() > 1) {
             List<String> activityList = new ArrayList<>();
             String sourceActivityName = cleanText(gatewayNode.getName());
@@ -175,6 +236,26 @@ public class GatewayPatternFinder {
             System.out.println(finalMessage);
             sbvrData.append(finalMessage).append("\n");
         }
+    }
+
+    /**
+     * XOR-Merge (Simple Merge) erkennen und ausgeben.
+     * @param graph
+     * @param gatewayNode
+     * @param sbvrData
+     */
+    private static void generateXORMerge(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
+        Set<Edge> outgoingEdges = new HashSet<>();
+        Set<Edge> incomingEdges = new HashSet<>();
+
+        for (Edge edge : graph.getEdges()) {
+            if (edge.getSource().equals(gatewayNode)) {
+                outgoingEdges.add(edge);
+            }
+            if (edge.getTarget().equals(gatewayNode)) {
+                incomingEdges.add(edge);
+            }
+        }
 
         // XOR-Merge (Simple Merge)
         if (incomingEdges.size() > 1 && outgoingEdges.size() == 1) {
@@ -198,8 +279,9 @@ public class GatewayPatternFinder {
             System.out.println(finalMessage);
             sbvrData.append(finalMessage).append("\n");
         }
-
     }
+
+
 
 
     public void findParallelGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
@@ -417,7 +499,7 @@ public class GatewayPatternFinder {
 
 
     // Bereinigt den Text von unerwünschten Umbrüchen und Leerzeichen
-    private String cleanText(String text) {
+    private static String cleanText(String text) {
         if (text != null) {
             return text.replaceAll("[\\r\\n\\t]", " ").trim();
         }

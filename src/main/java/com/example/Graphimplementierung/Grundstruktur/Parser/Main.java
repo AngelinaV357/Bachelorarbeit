@@ -6,6 +6,7 @@ import com.example.Graphimplementierung.Workflowpatterns.GatewayPatternFinder;
 import com.example.Graphimplementierung.Workflowpatterns.TaskPatternFinder;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/Procurement of Work Equipment.bpmn");
+            File xmlFile = new File("src/main/resources/May_combine_ingredients.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -45,33 +46,41 @@ public class Main {
             System.out.println("\nStarte mit Commencement on Creation Pattern...");
             findCommencementonCreation(graph, sbvrDataBuilder);
 
-            System.out.println("Starte mit Gateway-Pattern-Suche...");
-            findGateways(graph, sbvrDataBuilder);
+            // Anstatt `findGateways()` und `findDataBasedRouting()` einzeln aufzurufen:
+            System.out.println("Starte mit Pattern-Erkennung...");
+            GatewayPatternFinder.detectPatterns(graph, sbvrDataBuilder);
+            GatewayPatternFinder.findExclusiveMergePatterns(graph, sbvrDataBuilder);
+//
+//            System.out.println("Starte mit Gateway-Pattern-Suche...");
+//            findGateways(graph, sbvrDataBuilder);
+//
+//            System.out.print("\nStarte mit Data Based Routing Pattern...");
+//            findDataBasedRouting(graph, sbvrDataBuilder);
 
-            System.out.println("\nStarte mit Data-Pattern-Suche...");
-            findDataPatterns(graph, sbvrDataBuilder);
-
-            System.out.println("\nStarte mit Task-Pattern-Suche...");
-            findTasks(graph, sbvrDataBuilder);
-
-            System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
-            findIntermediateEvents(graph, sbvrDataBuilder);
-
-            System.out.println("\nStarte mit Chained Execution Pattern...");
-            findChainedExecution(graph, sbvrDataBuilder);
-
-            System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
-            findBoundaryEvents(graph, sbvrDataBuilder);
-
-            System.out.println("\nStarte mit Sequence Pattern-Suche...");
-            findSequences(graph, sbvrDataBuilder);
-
-            System.out.println("\nStarte mit Subprozess Pattern-Suche...");
-            findSubProcesses(graph, sbvrDataBuilder);
-
-            // Füge hier die Aufrufe für Explicit Termination und Commencement on Creation Pattern hinzu
-            System.out.println("\nStarte mit Explicit Termination Pattern...");
-            findExplicitTerminationPattern(graph, sbvrDataBuilder);
+//            System.out.println("\nStarte mit Data-Pattern-Suche...");
+//            findDataPatterns(graph, sbvrDataBuilder);
+//
+//            System.out.println("\nStarte mit Task-Pattern-Suche...");
+//            findTasks(graph, sbvrDataBuilder);
+//
+//            System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
+//            findIntermediateEvents(graph, sbvrDataBuilder);
+//
+//            System.out.println("\nStarte mit Chained Execution Pattern...");
+//            findChainedExecution(graph, sbvrDataBuilder);
+//
+//            System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
+//            findBoundaryEvents(graph, sbvrDataBuilder);
+//
+//            System.out.println("\nStarte mit Sequence Pattern-Suche...");
+//            findSequences(graph, sbvrDataBuilder);
+//
+//            System.out.println("\nStarte mit Subprozess Pattern-Suche...");
+//            findSubProcesses(graph, sbvrDataBuilder);
+//
+//            // Füge hier die Aufrufe für Explicit Termination und Commencement on Creation Pattern hinzu
+//            System.out.println("\nStarte mit Explicit Termination Pattern...");
+//            findExplicitTerminationPattern(graph, sbvrDataBuilder);
 
             // 10. Speichern der SBVR-Daten
             SBVRFileSaver.saveSBVRToFile(sbvrDataBuilder.toString(), "generated_rules.sbvr");
@@ -86,6 +95,7 @@ public class Main {
         GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
         gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
         gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
+        gatewayPatternFinder.findExclusiveMergePatterns(graph, sbvrDataBuilder);
         gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
     }
 
@@ -138,6 +148,11 @@ public class Main {
     private static void findSubProcesses(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
         taskPatternFinder.processSubProcess(graph, sbvrDataBuilder);
+    }
+
+    private static void findDataBasedRouting(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+        GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
+        gatewayPatternFinder.findDataBasedRouting(graph, sbvrDataBuilder);
     }
 
     // Methode zum Entfernen von Zeilenumbrüchen und Tabulatoren
