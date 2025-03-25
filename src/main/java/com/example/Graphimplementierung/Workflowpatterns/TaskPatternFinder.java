@@ -723,6 +723,8 @@ public class TaskPatternFinder {
     }
 
 
+
+
     // Methode zum Entfernen von Zeilenumbrüchen, Tabulatoren und überflüssigen Leerzeichen
     private static String cleanText(String text) {
         if (text != null) {

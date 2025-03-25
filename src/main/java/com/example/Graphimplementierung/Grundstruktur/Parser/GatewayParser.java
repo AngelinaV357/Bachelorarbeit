@@ -26,6 +26,8 @@ public class GatewayParser {
                     gatewayType = "Exclusive";
                 } else if (tagName.equals("ns0:parallelGateway")) {
                     gatewayType = "Parallel";
+                } else if (tagName.equals("ns0:inclusiveGateway")) {
+                    gatewayType = "Inclusive";
                 } else if (tagName.equals("ns0:eventBasedGateway")) {
                     gatewayType = "EventBased";
                 }

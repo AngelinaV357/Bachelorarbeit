@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/May_combine_ingredients.bpmn");
+            File xmlFile = new File("src/main/resources/Car Wash Process LOOP.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -49,13 +49,13 @@ public class Main {
 
 
             // Anstatt `findGateways()` und `findDataBasedRouting()` einzeln aufzurufen:
-            System.out.println("Starte mit Pattern-Erkennung...");
-            GatewayPatternFinder.detectPatterns(graph, sbvrDataBuilder);
-            GatewayPatternFinder.findExclusiveMergePatterns(graph, sbvrDataBuilder);
+//            System.out.println("Starte mit Pattern-Erkennung...");
+//            GatewayPatternFinder.detectPatterns(graph, sbvrDataBuilder);
+//            GatewayPatternFinder.findExclusiveMergePatterns(graph, sbvrDataBuilder);
 //
-//            System.out.println("Starte mit Gateway-Pattern-Suche...");
-//            findGateways(graph, sbvrDataBuilder);
-//
+            System.out.println("Starte mit Gateway-Pattern-Suche...");
+            findGateways(graph, sbvrDataBuilder);
+
 //            System.out.print("\nStarte mit Data Based Routing Pattern...");
 //            findDataBasedRouting(graph, sbvrDataBuilder);
 
@@ -97,7 +97,7 @@ public class Main {
         GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
         gatewayPatternFinder.findParallelGatewayPatterns(graph, sbvrDataBuilder);
         gatewayPatternFinder.findExclusiveGatewayPatterns(graph, sbvrDataBuilder);
-        gatewayPatternFinder.findExclusiveMergePatterns(graph, sbvrDataBuilder);
+//        gatewayPatternFinder.findExclusiveMergePatterns(graph, sbvrDataBuilder);
         gatewayPatternFinder.findEventBasedGatewayPatterns(graph, sbvrDataBuilder);
     }
 
@@ -152,10 +152,10 @@ public class Main {
         taskPatternFinder.processSubProcess(graph, sbvrDataBuilder);
     }
 
-    private static void findDataBasedRouting(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
-        GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
-        gatewayPatternFinder.findDataBasedRouting(graph, sbvrDataBuilder);
-    }
+//    private static void findDataBasedRouting(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+//        GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
+//        gatewayPatternFinder.findDataBasedRouting(graph, sbvrDataBuilder);
+//    }
 
     // Methode zum Entfernen von Zeilenumbrüchen und Tabulatoren
     public static String cleanText(String text) {

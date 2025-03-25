@@ -10,96 +10,36 @@ public class GatewayPatternFinder {
     private static final Set<String> processedGateways = new HashSet<>();
     private static final Set<Node> gatewayCoveredTasks = new HashSet<>();
 
-    private static boolean patternExecuted = false;  // Flag, um zu verfolgen, ob bereits ein Pattern ausgeführt wurde
-
-    public static void detectPatterns(BPMNGraph graph, StringBuilder sbvrData) {
-        System.out.println("Starte mit Gateway-Pattern-Suche...");
-        findDataBasedRouting(graph, sbvrData);
-//        findExclusiveGatewayPatterns(graph, sbvrData);
-
-        if (patternExecuted) {
-            System.out.println("Ein Pattern wurde erkannt. Data Based Routing wird nicht ausgeführt.");
-            return;
-        }
-
-        System.out.println("Starte mit Data Based Routing Pattern...");
-//        findDataBasedRouting(graph, sbvrData);
-        findExclusiveGatewayPatterns(graph, sbvrData);
-    }
-
-
-    public static void findExclusiveGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
-        if (patternExecuted) return;
-
+    /**
+     * Hier entweder generateSBVRRules oder generateExklusiveChoice auskommentieren, je nach dem ob man zuerst Databased Pattern oder Exklusive Choice ausgeben möchte
+     * Merge Pattern wird immer ausgegeben
+     * @param graph
+     * @param sbvrData
+     */
+    public void findExclusiveGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
         for (Node node : graph.getNodes()) {
             if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
                 GatewayNode gatewayNode = (GatewayNode) node;
 
                 if (!processedGateways.contains(gatewayNode.getId())) {
-                    processedGateways.add(gatewayNode.getId());
+                    // Generiere die SBVR-Regel für das Gateway
+                    generateExclusiveChoiceSplit(graph, gatewayNode, sbvrData);
+                    //generateSBVRRules(graph, gatewayNode, sbvrData);
+                    generateExclusiveChoiceMerge(graph, gatewayNode, sbvrData);
 
-                    patternExecuted = true;  //
-                    generateExclusiveChoice(graph, gatewayNode, sbvrData);
-
+                    // Extrahiere die abgedeckten Tasks nach der Regelgenerierung
                     extractGatewayTasks(graph, gatewayNode);
+
+                    // Gib die abgedeckten Tasks nach der Ausgabe der SBVR-Regel aus
                     for (Node task : gatewayCoveredTasks) {
                         System.out.println("Gateway deckt Task ab: " + cleanText(task.getName()));
                     }
 
-                    return;
-                }
-            }
-        }
-    }
-
-
-    public static void findExclusiveMergePatterns(BPMNGraph graph, StringBuilder sbvrData) {
-        for (Node node : graph.getNodes()) {
-            if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
-                GatewayNode gatewayNode = (GatewayNode) node;
-
-                if (!processedGateways.contains(gatewayNode.getId())) {
                     processedGateways.add(gatewayNode.getId());
-
-                    // XOR-Merge (Simple Merge) immer ausführen
-                    generateXORMerge(graph, gatewayNode, sbvrData);
-
-                    extractGatewayTasks(graph, gatewayNode);
-                    for (Node task : gatewayCoveredTasks) {
-                        System.out.println("Gateway deckt Task ab: " + cleanText(task.getName()));
-                    }
                 }
             }
         }
     }
-
-
-
-    public static void findDataBasedRouting(BPMNGraph graph, StringBuilder sbvrData) {
-        if (patternExecuted) return;  // Falls bereits ein Pattern ausgeführt wurde, abbrechen
-
-        for (Node node : graph.getNodes()) {
-            if (node instanceof GatewayNode && "Exclusive".equals(((GatewayNode) node).getGatewayType())) {
-                GatewayNode gatewayNode = (GatewayNode) node;
-
-                if (!processedGateways.contains(gatewayNode.getId())) {
-                    processedGateways.add(gatewayNode.getId());
-
-                    patternExecuted = true;  // Setze das Flag direkt hier, um das andere Pattern zu blockieren
-                    generateSBVRRules(graph, gatewayNode, sbvrData);
-
-                    extractGatewayTasks(graph, gatewayNode);
-
-                    for (Node task : gatewayCoveredTasks) {
-                        System.out.println("Gateway deckt Task ab: " + cleanText(task.getName()));
-                    }
-
-                    return; // Beende die Methode sofort, um zu verhindern, dass ein anderes Pattern ausgeführt wird
-                }
-            }
-        }
-    }
-
 
 
     /**
@@ -194,7 +134,13 @@ public class GatewayPatternFinder {
     }
 
 
-    private static void generateExclusiveChoice(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
+    /**
+     * Exklusive Choice Pattern (XOR-Split): Eine Entscheidung wird getroffen, welcher von mehreren Pfaden basierend auf einer Bedingung weiterverfolgt wird.
+     * @param graph
+     * @param gatewayNode
+     * @param sbvrData
+     */
+    private void generateExclusiveChoiceSplit(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         Set<Edge> outgoingEdges = new HashSet<>();
         Set<Edge> incomingEdges = new HashSet<>();
 
@@ -239,12 +185,12 @@ public class GatewayPatternFinder {
     }
 
     /**
-     * XOR-Merge (Simple Merge) erkennen und ausgeben.
+     * Simple Merge Pattern (XOR-Merge): Die Aktivitäten führen in ein XOR-Gateway hinein, aber nur eine ist aktiv.
      * @param graph
      * @param gatewayNode
      * @param sbvrData
      */
-    private static void generateXORMerge(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
+    private void generateExclusiveChoiceMerge(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
         Set<Edge> outgoingEdges = new HashSet<>();
         Set<Edge> incomingEdges = new HashSet<>();
 
@@ -280,8 +226,6 @@ public class GatewayPatternFinder {
             sbvrData.append(finalMessage).append("\n");
         }
     }
-
-
 
 
     public void findParallelGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
@@ -411,6 +355,111 @@ public class GatewayPatternFinder {
             sbvrData.append(message).append("\n");
         }
     }
+
+    public void findInclusiveGatewayPatterns(BPMNGraph graph, StringBuilder sbvrData) {
+        for (Node node : graph.getNodes()) {
+            if (node instanceof GatewayNode && "Inclusive".equals(((GatewayNode) node).getGatewayType())) {
+                GatewayNode gatewayNode = (GatewayNode) node;
+
+                if (!processedGateways.contains(gatewayNode.getId())) {
+                    generateInclusiveGatewayRules(graph, gatewayNode, sbvrData);
+                    processedGateways.add(gatewayNode.getId());
+                }
+            }
+        }
+    }
+
+    /**
+     * Multi Choice Split: OR Merge
+     * Strucutured Synchronizing Merge: OR Join
+     * @param graph
+     * @param gatewayNode
+     * @param sbvrData
+     */
+    private void generateInclusiveGatewayRules(BPMNGraph graph, GatewayNode gatewayNode, StringBuilder sbvrData) {
+        Set<Edge> outgoingEdges = new HashSet<>();
+        for (Edge edge : graph.getEdges()) {
+            if (edge.getSource().equals(gatewayNode)) {
+                outgoingEdges.add(edge);
+            }
+        }
+
+        Set<Edge> incomingEdges = new HashSet<>();
+        for (Edge edge : graph.getEdges()) {
+            if (edge.getTarget().equals(gatewayNode)) {
+                incomingEdges.add(edge);
+            }
+        }
+
+        if (!outgoingEdges.isEmpty()) {
+            StringBuilder activities = new StringBuilder();
+            String sourceActivityName = "";
+            String sourceLane = "Unbekannte Lane";
+
+            if (outgoingEdges.size() > 1) {
+                String patternMessage = "\nPattern erkannt: Multi Choice";
+                System.out.println(patternMessage);
+                sbvrData.append(patternMessage);
+
+                for (Edge incomingEdge : graph.getEdges()) {
+                    if (incomingEdge.getTarget().equals(gatewayNode)) {
+                        Node sourceNode = incomingEdge.getSource();
+                        sourceActivityName = cleanText(sourceNode.getName());
+                        sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
+                        break;
+                    }
+                }
+
+                for (Edge edge : outgoingEdges) {
+                    Node targetNode = edge.getTarget();
+                    activities.append(cleanText(targetNode.getName())).append(" or ");
+                }
+
+                if (activities.length() > 4) {
+                    activities.setLength(activities.length() - 4);
+                }
+
+                String message = "It is obligatory that " + activities +
+                        " are executed after " + sourceLane + " " + sourceActivityName + "depending on the conditions.";
+                System.out.println(message);
+                sbvrData.append(message).append("\n");
+            } else if (incomingEdges.size() > 0) {
+                String patternMessage = "\nPattern erkannt: Structured Synchronizing Merge";
+                System.out.println(patternMessage);
+                sbvrData.append(patternMessage);
+
+                StringBuilder mergeActivities = new StringBuilder();
+
+                for (Edge incomingEdge : incomingEdges) {
+                    Node sourceNode = incomingEdge.getSource();
+                    mergeActivities.append(cleanText(sourceNode.getName())).append(" or ");
+                }
+
+                if (mergeActivities.length() > 4) {
+                    mergeActivities.setLength(mergeActivities.length() - 4);
+                }
+
+                String targetActivityName = "";
+                String targetLane = "Unbekannte Lane";
+                for (Edge outgoingEdge : outgoingEdges) {
+                    Node targetNode = outgoingEdge.getTarget();
+                    targetActivityName = cleanText(targetNode.getName());
+                    targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
+                    break;
+                }
+
+                String message = "It is obligatory that " + mergeActivities +
+                        " merge into " + targetLane + " " + targetActivityName + " after all active paths have been completed.";
+                System.out.println(message);
+                sbvrData.append(message).append("\n");
+            }
+        } else {
+            String message = "No outgoing edges found for inclusive gateway " + cleanText(gatewayNode.getName()) + ".";
+            System.out.println(message);
+            sbvrData.append(message).append("\n");
+        }
+    }
+
 
     /**
      * Deferred Choice: ermöglicht es eine Entscheidung später im Prozess zu treffen, basierend auf einer Bedingung, die erst später geprüft wird
