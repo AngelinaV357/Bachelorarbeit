@@ -32,7 +32,7 @@ public class GatewayPatternFinder {
 
                     // Gib die abgedeckten Tasks nach der Ausgabe der SBVR-Regel aus
                     for (Node task : gatewayCoveredTasks) {
-                        System.out.println("Gateway deckt Task ab: " + cleanText(task.getName()));
+                        //.out.println("Gateway deckt Task ab: " + cleanText(task.getName()));
                     }
 
                     processedGateways.add(gatewayNode.getId());
@@ -96,9 +96,9 @@ public class GatewayPatternFinder {
                 if (condition != null && !condition.isEmpty()) {
                     // Bedingung existiert, daher Ausgabe erzeugen
                     if (!hasCondition) {
-                        String message = "SBVR-Regeln für " + cleanText(gatewayNode.getName()) + ":";
-                        System.out.println(message);
-                        sbvrData.append(message).append("\n");
+                        //String message = "SBVR-Regeln für " + cleanText(gatewayNode.getName()) + ":";
+                        //System.out.println(message);
+                        //sbvrData.append(message).append("\n");
                         hasCondition = true; // Markieren, dass eine Bedingung gefunden wurde
                     }
 
@@ -107,8 +107,8 @@ public class GatewayPatternFinder {
                     sbvrData.append(patternMessage).append("\n");
 
                     // Regel mit Bedingung erstellen
-                    String message = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(targetNode.getName()) +
-                            "\" after \"" + sourceLane + "\" \"" + cleanText(gatewayNode.getName()) + "\" is \"" + cleanText(condition) + "\".\n";
+                    String message = "It is obligatory that \"" + targetLane + "\" performs \"" + cleanText(targetNode.getName()) +
+                            "\" after \"" + sourceLane + "\" performs \"" + cleanText(gatewayNode.getName()) + "\" and if \"" + cleanText(condition) + "\".\n";
                     System.out.println(message);
                     sbvrData.append(message).append("\n");
                 }
@@ -186,6 +186,7 @@ public class GatewayPatternFinder {
 
     /**
      * Simple Merge Pattern (XOR-Merge): Die Aktivitäten führen in ein XOR-Gateway hinein, aber nur eine ist aktiv.
+     * Multi Merge
      * @param graph
      * @param gatewayNode
      * @param sbvrData

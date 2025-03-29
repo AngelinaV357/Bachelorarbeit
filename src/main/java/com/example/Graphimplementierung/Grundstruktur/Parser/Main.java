@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // 1. XML-Dokument parsen
-            File xmlFile = new File("src/main/resources/Car Wash Process LOOP.bpmn");
+            File xmlFile = new File("src/main/resources/Conference room.bpmn");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
@@ -43,21 +43,12 @@ public class Main {
             System.out.println("\nAlle Kanten im Graph:");
             graph.getEdges().forEach(edge -> System.out.println(cleanText(edge.toString())));
 
+
             System.out.println("\nStarte mit Commencement on Creation Pattern...");
             findCommencementonCreation(graph, sbvrDataBuilder);
 
-
-
-            // Anstatt `findGateways()` und `findDataBasedRouting()` einzeln aufzurufen:
-//            System.out.println("Starte mit Pattern-Erkennung...");
-//            GatewayPatternFinder.detectPatterns(graph, sbvrDataBuilder);
-//            GatewayPatternFinder.findExclusiveMergePatterns(graph, sbvrDataBuilder);
-//
             System.out.println("Starte mit Gateway-Pattern-Suche...");
             findGateways(graph, sbvrDataBuilder);
-
-//            System.out.print("\nStarte mit Data Based Routing Pattern...");
-//            findDataBasedRouting(graph, sbvrDataBuilder);
 
             System.out.println("\nStarte mit Data-Pattern-Suche...");
             findDataPatterns(graph, sbvrDataBuilder);
@@ -65,20 +56,20 @@ public class Main {
             System.out.println("\nStarte mit Task-Pattern-Suche...");
             findTasks(graph, sbvrDataBuilder);
 
+            System.out.println("\nStarte mit Message Pattern-Suche...");
+            findMessageEvent(graph, sbvrDataBuilder);
+
             System.out.println("\nStarte mit Intermediate Event Pattern-Suche...");
             findIntermediateEvents(graph, sbvrDataBuilder);
-//
-//            System.out.println("\nStarte mit Chained Execution Pattern...");
-//            findChainedExecution(graph, sbvrDataBuilder);
 
             System.out.println("\nStarte mit Boundary Event Pattern-Suche...");
             findBoundaryEvents(graph, sbvrDataBuilder);
 
-            System.out.println("\nStarte mit Sequence Pattern-Suche...");
-            findSequences(graph, sbvrDataBuilder);
-
             System.out.println("\nStarte mit Subprozess Pattern-Suche...");
             findSubProcesses(graph, sbvrDataBuilder);
+
+            System.out.println("\nStarte mit Sequence Pattern-Suche...");
+            findSequences(graph, sbvrDataBuilder);
 
             // Füge hier die Aufrufe für Explicit Termination und Commencement on Creation Pattern hinzu
             System.out.println("\nStarte mit Explicit Termination Pattern...");
@@ -118,6 +109,11 @@ public class Main {
         taskPatternFinder.processBoundaryEvent(graph, sbvrDataBuilder); // Boundary Event Pattern suchen
     }
 
+    private static void findMessageEvent(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
+            TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
+            taskPatternFinder.processMessageEdges(graph, sbvrDataBuilder);
+    }
+
     // Methode für die Sequence Pattern-Suche
     private static void findSequences(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
@@ -141,21 +137,12 @@ public class Main {
         taskPatternFinder.processIntermediateEvents(graph, sbvrDataBuilder);
     }
 
-//    private static void findChainedExecution(BPMNGraph graph, StringBuilder sbvrDataBuilder){
-//        TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
-//        taskPatternFinder.processChainedExecution(graph, sbvrDataBuilder);
-//    }
 
     // Methode für das Finden von Subprozessen (neue Methode für Subprozess Pattern)
     private static void findSubProcesses(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
         TaskPatternFinder taskPatternFinder = new TaskPatternFinder();
         taskPatternFinder.processSubProcess(graph, sbvrDataBuilder);
     }
-
-//    private static void findDataBasedRouting(BPMNGraph graph, StringBuilder sbvrDataBuilder) {
-//        GatewayPatternFinder gatewayPatternFinder = new GatewayPatternFinder();
-//        gatewayPatternFinder.findDataBasedRouting(graph, sbvrDataBuilder);
-//    }
 
     // Methode zum Entfernen von Zeilenumbrüchen und Tabulatoren
     public static String cleanText(String text) {
