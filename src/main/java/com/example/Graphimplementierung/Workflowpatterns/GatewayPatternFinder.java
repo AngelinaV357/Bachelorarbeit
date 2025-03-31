@@ -178,7 +178,7 @@ public class GatewayPatternFinder {
             System.out.println(patternMessage);
             sbvrData.append(patternMessage);
 
-            String finalMessage = "It is obligatory that " + String.join(" or ", activityList) + ", but not both, after \"" + sourceActivityName + "\".";
+            String finalMessage = "It is obligatory that " + String.join(" and ", activityList) + ", but not both, after \"" + sourceActivityName + "\".";
             System.out.println(finalMessage);
             sbvrData.append(finalMessage).append("\n");
         }

@@ -133,8 +133,8 @@ public class TaskPatternFinder {
                 String sourceLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
                 String targetLane = targetNode.getLane() != null ? targetNode.getLane().getName() : "Unbekannte Lane";
 
-                String rule = "It is obligatory that \"" +  targetLane +  " " + cleanText(targetNode.getName()) +
-                        "\" after \"" + sourceLane + " " + cleanText(taskNode.getName()) + "\".\n";
+                String rule = "It is obligatory that \"" +  targetLane +  "\" performs \"" + cleanText(targetNode.getName()) +
+                        "\" after \"" + sourceLane + "\" performs \"" + cleanText(taskNode.getName()) + "\".\n";
                 System.out.println(rule);
                 sbvrDataBuilder.append(rule).append("\n");
 
@@ -155,8 +155,8 @@ public class TaskPatternFinder {
                 String sourceLane = sourceNode.getLane() != null ? sourceNode.getLane().getName() : "Unbekannte Lane";
                 String targetLane = taskNode.getLane() != null ? taskNode.getLane().getName() : "Unbekannte Lane";
 
-                String rule = "It is obligatory that \""  + sourceLane + " " + cleanText(sourceNode.getName()) +
-                        "\" after \"" +  targetLane + " " + cleanText(taskNode.getName()) + ".\n";
+                String rule = "It is obligatory that \""  + targetLane + "\" performs \"" + cleanText(taskNode.getName())+
+                        "\" after \"" +  sourceLane + "\" performs \"" +  cleanText(sourceNode.getName())  + ".\n";
                 System.out.println(rule);
                 sbvrDataBuilder.append(rule).append("\n");
 
@@ -242,7 +242,7 @@ public class TaskPatternFinder {
                 if ("SubProcess".equals(taskNode.getActivityType())) {
                     System.out.println("\nPattern erkannt: Block Data");
                     String sbvrRule = String.format(
-                            "It is obligatory, that the data defined in the properties of the subprocess  will be blocked until the subprocess \"%s\" is completed.",
+                            "It is obligatory, that the data defined in the properties of the subprocess  is blocked until \"%s\".",
                             cleanText(taskNode.getName())
                     );
                     sbvrDataBuilder.append(sbvrRule).append("\n");
@@ -326,8 +326,8 @@ public class TaskPatternFinder {
                         System.out.println("\nPattern erkannt: Event-Based Trigger");
 
                         // SBVR-Regel erzeugen: Event-Based Trigger
-                        String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(intermediateNode.getName()) +
-                                "\" is triggered after \"" + sourceLane + "\" \"" + cleanText(taskNode.getName()) + "\", where the event-based gateway is followed by the event.\n";
+                        String rule = "It is obligatory that \"" + targetLane + "\" performs \"" + cleanText(intermediateNode.getName()) +
+                                "\" is triggered after \"" + sourceLane + "\" performs \"" + cleanText(taskNode.getName()) + "\", where the event-based gateway is followed by the event.\n";
 
                         // Ausgabe und Anhängen an den StringBuilder
                         System.out.println(rule);
@@ -356,7 +356,7 @@ public class TaskPatternFinder {
 
                     // SBVR-Regel erzeugen: Das Ereignis wird die Aufgabe „unterbrechen“, bis die Nachricht eintrifft.
                     String rule = "It is obligatory that \"" + targetLane + "\" \"" + cleanText(intermediateNode.getName()) +
-                            "\" persists until \"" + sourceLane + "\" \"" + cleanText(taskNode.getName()) + "\" receives the message.\n";
+                            "\" persists until \"" + sourceLane + "\" \"" + cleanText(taskNode.getName()) + ".\n";
 
                     // Ausgabe und Anhängen an den StringBuilder
                     System.out.println(rule);
